@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>微雲小棧</title>
+    <link rel="stylesheet" type="text/css" href="/static/layui/css/layui.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/main.css">
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <!--加載meta IE兼容文件-->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div class="header">
+    <div class="menu-btn">
+        <div class="menu"></div>
+    </div>
+    <h1 class="logo">
+        <a href="index">
+            <span>MYBLOG</span>
+            <img src="/static/images/logo.png">
+        </a>
+    </h1>
+    <div class="nav">
+        <a href="/index" class="active">Home</a>
+        <a href="/about">About</a>
+    </div>
+    <ul class="layui-nav header-down-nav">
+        <li class="layui-nav-item"><a href="/index" class="active">Home</a></li>
+        <li class="layui-nav-item"><a href="/about">About</a></li>
+    </ul>
+</div>
+
+<div class="banner">
+    <div class="cont w1000">
+        <div class="title">
+            <h4>生活，要有一個小目標<br/></h4>
+        </div>
+    </div>
+</div>
+<div class="content">
+    <div class="cont w1000">
+        <a id="turnToContent" href="#content"></a>
+        <div class="title">
+            <input type="hidden" id="sub-menu-count"/>
+            <span class="layui-breadcrumb" lay-separator="|" id="sub-menu"></span>
+        </div>
+        <div class="list-item" id="list-item"></div>
+        <div id="paging" style="text-align: center;"></div>
+    </div>
+</div>
+
+<div class="footer-wrap">
+    <div class="footer w1000">
+        <div class="qrcode">
+            <img src="/static/images/qrcode.png">
+        </div>
+        <div class="practice-mode">
+            <div class="text">
+                <h4 class="title">我的聯繫方式</h4>
+                <p>郵箱<span class="email">microyum@outlook.com</span></p>
+                <p>Copyright © 2019 SyaKa All rights reserved</p>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="/static/layui/layui.js"></script>
+<script type="text/javascript" src="/static/layui/lay/modules/laypage.js"></script>
+<script type="text/javascript" src="/static/js/jquery.min.js"></script>
+<script type="text/javascript">
+    var article = 5, firstLoad = true;
+
+    function initLayPage(conf) {
+        if (!conf) {
+            conf = {pageNo: 1, pageSize: 5, article: article};
+        }
+
+        $.post("/list/active/blog", conf, function (result) {
+            layui.config({
+                base: '/static/js/util/'
+            }).use(['laypage', 'layer', 'menu'], function () {
+                let page = layui.laypage, menu = layui.menu;
+                page.render({
+                    elem: 'paging',
+                    count: result.data.total,
+                    curr: conf.pageNo,
+                    limit: conf.pageSize,
+                    first: "首頁",
+                    last: "尾頁",
+                    layout: ['prev', 'page', 'next', 'skip'],
+                    jump: function (obj, first) {
+                        if (!firstLoad) {
+                            $('html, body').animate({
+                                scrollTop: $("#turnToContent").offset().top
+                            }, 500);
+                        } else {
+                            firstLoad = false;
+                        }
+
+                        if (!first) {
+                            initLayPage({pageNo: obj.curr, pageSize: obj.limit, article: article});
+                        }
+                    }
+                });
+
+                page.render();
+
+                menu.init();
+            });
+
+            let listItem = "";
+            for (let i = 0; i < result.data.list.length; i++) {
+                listItem += result.data.list[i];
+            }
+            $("#list-item").html(listItem);
+        });
+    }
+
+    function filterType(articleId) {
+        let count = $("#sub-menu-count").val();
+        for (var i = 0; i <= count; i++) {
+            $("#filter_" + i).removeClass("active")
+            if (articleId == i) {
+                $("#filter_" + i).addClass("active");
+            }
+        }
+
+        article = articleId;
+
+        initLayPage({pageNo: 1, pageSize: 5, article: articleId});
+
+    }
+
+    $.ajax({
+        type: "POST",
+        url: "/list/article/type",
+        dataType: "json",
+        success: function (result) {
+            var template = '<a href="javascript:; " {0} id="filter_{1}" onclick="filterType({1})">{2}</a>';
+            var menu = "";
+            for (var i in result.data) {
+                if (menu == "") {
+                    menu = template.replace(new RegExp("\\{0\\}", "g"), 'class="active"');
+                    menu = menu.replace(new RegExp("\\{1\\}", "g"), result.data[i].id);
+                    menu = menu.replace(new RegExp("\\{2\\}", "g"), result.data[i].name);
+                } else {
+                    menu = menu + template.replace(new RegExp("\\{0\\}", "g"), '');
+                    menu = menu.replace(new RegExp("\\{1\\}", "g"), result.data[i].id);
+                    menu = menu.replace(new RegExp("\\{2\\}", "g"), result.data[i].name);
+                }
+
+                $("#sub-menu-count").val(i);
+            }
+            $("#sub-menu").html(menu);
+
+            initLayPage();
+        }
+    });
+</script>
+</body>
+</html>

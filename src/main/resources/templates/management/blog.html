@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>微云小栈</title>
+    <link type="text/css" href="/static/kindeditor/themes/default/default.css" rel="stylesheet"/>
+    <link type="text/css" href="/static/kindeditor/plugins/code/prettify.css" rel="stylesheet"/>
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+</head>
+
+<div class="layui-body" id="LAY_app_body">
+    <div class="layadmin-tabsbody-item layui-show">
+        <div class="layui-fluid" style="margin: 15px;">
+            <table>
+                <tr>
+                    <td>Title:</td>
+                    <td><input type="text" id="title" width="20"/></td>
+                </tr>
+                <tr>
+                    <td>Summary:</td>
+                    <td><textarea id="summary" cols="100" rows="5"></textarea></td>
+                </tr>
+                <tr>
+                    <td>Topic Picture:</td>
+                    <td><input type="file" id="topicImg" onchange="uploadTopicImg()"></td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <textarea name="editor" cols="50" rows="8" style="width:700px;height:200px;visibility:hidden;"></textarea></td>
+                </tr>
+                <tr>
+                    <td>Blog Type:</td>
+                    <td>
+                        <select id="articleId">
+                            <option value="0">随笔</option>
+                            <option value="1">编程</option>
+                            <option value="2">理财</option>
+                            <option value="3">优选</option>
+                            <option value="4">日语</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <button id="submit">提交内容</button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <input type="hidden" value="" id="topicImgPath">
+    </div>
+</div>
+
+<script src="/static/kindeditor/kindeditor-all.js"></script>
+<script src="/static/kindeditor/lang/zh-CN.js"></script>
+<script src="/static/kindeditor/plugins/code/prettify.js"></script>
+<script src="/static/js/jquery.min.js"></script>
+
+<script>
+    var editor;
+    KindEditor.ready(function (K) {
+        editor = K.create('textarea[name="editor"]', {
+            cssPath: '/static/kindeditor/plugins/code/prettify.css',
+            uploadJson: '/upload/blog/picture',
+            filePostName: 'imgFile',
+            allowFileManager: true,
+            afterCreate: function () {
+                var self = this;
+                K.ctrl(document, 13, function () {
+                    self.sync();
+                    document.forms['example'].submit();
+                });
+                K.ctrl(self.edit.doc, 13, function () {
+                    self.sync();
+                    document.forms['example'].submit();
+                });
+            },
+            afterBlur: function () {
+                this.sync();
+            }
+        });
+        prettyPrint();
+    });
+
+    $("#submit").click(function () {
+
+        let summary = $.trim($("#summary").val());
+        if (summary.length == 0) {
+            summary = editor.text().replace(/[\r\n]/g, "");
+            if (summary.length > 120) {
+                summary = summary.substr(0, 120) + "...";
+            }
+        }
+
+        let param = {
+            title: $.trim($("#title").val()),
+            summary: summary,
+            content: editor.html(),
+            topicImg: $("#topicImgPath").val(),
+            status: 1,
+            articleId: $("#articleId").val()
+        };
+
+        $.ajax({
+            type: "POST",
+            url: "/save/blog",
+            data: param,
+            dataType: "json",
+            success: function (data) {
+
+                alert(data.code);
+
+                console.log(data);
+            }
+        });
+    });
+
+    function uploadTopicImg() {
+        var fd = new FormData();
+        fd.append("imgFile", document.getElementById("topicImg").files[0]);
+        $.ajax({
+            url: "/upload/blog/picture",
+            type: "post",
+            data: fd,
+            processData: false,
+            contentType: false,
+            success: function (res) {
+                console.log(res.url);
+                $("#topicImgPath").val(res.url);
+            },
+            dataType: "json"
+        })
+    }
+</script>
+
+</html>

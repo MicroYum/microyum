@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>微云小栈 - 管理登录</title>
+    <link rel="stylesheet" type="text/css" href="/static/layui/css/layui.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/main.css">
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+</head>
+<body style="position: absolute;width: 90%; height: 90%; background: url('/static/images/signin-background.png')repeat 50% fixed; background-size: 100% 100%;">
+
+<div style="position: absolute; top: 20%; left: 40%">
+    <table>
+        <tr>
+            <td colspan="2"><input type="text" id="userName" style="width:250px; height: 20px" placeholder="User Name"/></td>
+        </tr>
+        <tr><td>&nbsp;</td></tr>
+        <tr>
+            <td colspan="2"><input type="password" id="password" style="width:250px; height: 20px" placeholder="Password"/></td>
+        </tr>
+        <tr><td>&nbsp;</td></tr>
+        <tr>
+            <td><input type="text" id="captcha" style="width:250px; height: 20px" placeholder="Captcha"/></td>
+            <td><img alt="验证码" id="captchaImg" src="/user/captcha"></td>
+        </tr>
+    </table>
+    <br/>
+    <button id="userLogin" onclick="userLogin()"> Submit </button>
+</div>
+<div id="errorMessage"></div>
+
+<script type="text/javascript" src="/static/js/util/md5.min.js"></script>
+<script type="text/javascript" src="/static/layui/layui.js"></script>
+<script type="text/javascript" src="/static/layui/lay/modules/laypage.js"></script>
+<script src="/static/js/jquery.min.js"></script>
+<script type="text/javascript">
+
+    function userLogin() {
+
+        let param = {
+            userName: $.trim($("#userName").val()),
+            password: md5($.trim($("#password").val())),
+            captcha: $.trim($("#captcha").val()),
+            time: new Date().getTime()
+        };
+
+        $.ajax({
+            type: "POST",
+            url: "/user/login",
+            data: param,
+            dataType: "json",
+            success: function (result) {
+                if (result.code == 200) {
+                    window.location.href = result.data;
+                } else {
+                    $("errorMessage").val(result.data);
+                }
+            }
+        })
+    }
+
+</script>
+
+</body>
+</html>
