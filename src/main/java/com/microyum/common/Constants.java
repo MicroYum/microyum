@@ -3,7 +3,7 @@ package com.microyum.common;
 public class Constants {
 
     public static final String COMMON_MD5 = "MD5";
-    public static final String COMMON_MD5_SLAT = "abcd.1234";
+    public static final String COMMON_MD5_SLAT = "";
     public static final String COMMON_DEFAULT_ENCODE = "UTF-8";
 
     public static final String ALBUM_FILE_ACTUAL_PICTURE_DIR = "/data/album/";
