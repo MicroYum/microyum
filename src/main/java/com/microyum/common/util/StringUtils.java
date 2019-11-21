@@ -15,11 +15,11 @@ public class StringUtils {
         return str.trim();
     }
 
-    private static String md5Encrypt(String str, boolean slat) {
+    private static String md5Encrypt(String str, String salt) {
         String result = "";
         try {
-            if (slat) {
-                str = str + Constants.COMMON_MD5_SLAT;
+            if (salt == null) {
+                str = str + salt;
             }
 
             MessageDigest m = MessageDigest.getInstance(Constants.COMMON_MD5);
@@ -37,18 +37,19 @@ public class StringUtils {
         return result;
     }
 
-    public static String md5EncryptSlat(String str) {
+    public static String md5EncryptSlat(String str, String salt) {
 
-        return StringUtils.md5Encrypt(str, true);
+        return StringUtils.md5Encrypt(str, salt);
     }
 
     public static String md5Encrypt(String str) {
 
-        return StringUtils.md5Encrypt(str, false);
+        return StringUtils.md5Encrypt(str, null);
     }
 
     public static void main(String[] args) {
-        System.out.println(StringUtils.md5EncryptSlat("password"));
-        System.out.println(StringUtils.md5EncryptSlat(StringUtils.md5Encrypt("abcd.1234")));
+
+        System.out.println(StringUtils.md5Encrypt("password"));
+        System.out.println(StringUtils.md5EncryptSlat(StringUtils.md5Encrypt("abcd.1234"), "abcd.1234"));
     }
 }

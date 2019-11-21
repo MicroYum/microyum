@@ -32,4 +32,7 @@ public class MyUser extends BaseModel {
 
     @Column(nullable = false, columnDefinition = "bit(1) DEFAULT false")
     private Boolean locked;
+
+    @Column(nullable = false, length = 80)
+    private String salt;
 }

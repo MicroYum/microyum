@@ -14,6 +14,7 @@ import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -25,7 +26,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean checkUserLogin(String userName, String password) {
 
-        MyUser myUser = myUserDao.findByNameAndPassword(userName, StringUtils.md5EncryptSlat(password));
+        MyUser myUser = myUserDao.findByName(userName);
+
+        myUser = myUserDao.findByNameAndPassword(userName, StringUtils.md5EncryptSlat(password, myUser.getSalt()));
         if (myUser != null) {
             return true;
         }
@@ -55,9 +58,12 @@ public class UserServiceImpl implements UserService {
                 return new BaseResponseDTO(HttpStatus.DATA_SHOULD_NOT_EXIST, "user name not unique.");
             }
 
+            String salt = UUID.randomUUID().toString();
+
             MyUser entity = new MyUser();
             BeanUtils.copyProperties(dto, entity);
-            entity.setPassword(StringUtils.md5EncryptSlat(dto.getPassword()));
+            entity.setPassword(StringUtils.md5EncryptSlat(dto.getPassword(), salt));
+            entity.setSalt(salt);
             myUserDao.save(entity);
         } catch (Exception e) {
 
