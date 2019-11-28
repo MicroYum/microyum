@@ -1,6 +1,7 @@
 package com.microyum.controller;
 
 import com.microyum.common.http.BaseResponseDTO;
+import com.microyum.dto.CalculateStockTransactionCostDTO;
 import com.microyum.service.StockService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,6 +39,12 @@ public class StockController {
     public BaseResponseDTO referStockTradeDayDetail(String stockCode) {
 
         return stockService.referStockTradeDayDetail(stockCode);
+    }
+
+    @RequestMapping(value = "/stock/transaction/cost")
+    public BaseResponseDTO calculateStockTransactionCost(CalculateStockTransactionCostDTO dto) {
+
+        return stockService.calculateStockTransactionCost(dto);
     }
 
 
