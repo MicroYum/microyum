@@ -280,7 +280,7 @@
 
     let stockList = [];
 
-    $.post("/stock/list", {pageNo: 1, pageSize: 10}, function (result) {
+    $.post("/public/stock/list", {pageNo: 1, pageSize: 10}, function (result) {
         console.log(result);
         for (let index in result.data) {
             stockList.push({'area': result.data[index].area, 'code': result.data[index].stockCode});

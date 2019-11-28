@@ -46,7 +46,7 @@ public class PageController {
         return new ModelAndView("album");
     }
 
-    @RequestMapping(value = "/album/{id}/detail")
+    @RequestMapping(value = "/public/album/{id}/detail")
     public ModelAndView albumDetailPage(@PathVariable("id") Long id) {
         ModelAndView mv = new ModelAndView("album_detail");
         return mv;
@@ -90,7 +90,7 @@ public class PageController {
         return new ModelAndView("management/login");
     }
 
-    @RequestMapping(value = "/blog/{id}/detail")
+    @RequestMapping(value = "/public/blog/{id}/detail")
     public ModelAndView blogDetailPage(@PathVariable("id") Long id, HttpServletRequest request) {
 
         ModelAndView mv = new ModelAndView("blog_detail");

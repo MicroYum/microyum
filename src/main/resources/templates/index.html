@@ -79,7 +79,7 @@
             conf = {pageNo: 1, pageSize: 5, article: article};
         }
 
-        $.post("/list/active/blog", conf, function (result) {
+        $.post("/public/list/active/blog", conf, function (result) {
             layui.config({
                 base: '/static/js/util/'
             }).use(['laypage', 'layer', 'menu'], function () {
@@ -137,7 +137,7 @@
 
     $.ajax({
         type: "POST",
-        url: "/list/article/type",
+        url: "/public/list/article/type",
         dataType: "json",
         success: function (result) {
             var template = '<a href="javascript:; " {0} id="filter_{1}" onclick="filterType({1})">{2}</a>';

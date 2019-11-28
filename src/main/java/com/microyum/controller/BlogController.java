@@ -23,17 +23,7 @@ public class BlogController {
     @Autowired
     private FileService fileService;
 
-    @RequestMapping(value = "/list/active/blog", produces = "application/json")
-    public BaseResponseDTO listActiveBlog(int pageNo, int pageSize, int article) {
-        return blogService.listActiveBlog(pageNo, pageSize, article);
-    }
-
-    @RequestMapping(value = "/list/article/type", produces = "application/json")
-    public BaseResponseDTO listArticleType() {
-        return blogService.findAllArticleType();
-    }
-
-    @RequestMapping(value = "/list/all/blog", produces = "application/json")
+    @RequestMapping(value = "/public/list/all/blog", produces = "application/json")
     public BaseResponseDTO listAllBlog(HttpServletRequest request) {
 
         int pageNo = Integer.parseInt(request.getParameter("page"));
@@ -42,6 +32,18 @@ public class BlogController {
         String title = request.getParameter("selectTitle");
         return blogService.listAllBlog(pageNo, pageSize, article, title);
     }
+
+
+    @RequestMapping(value = "/public/list/active/blog", produces = "application/json")
+    public BaseResponseDTO listActiveBlog(int pageNo, int pageSize, int article) {
+        return blogService.listActiveBlog(pageNo, pageSize, article);
+    }
+
+    @RequestMapping(value = "/public/list/article/type", produces = "application/json")
+    public BaseResponseDTO listArticleType() {
+        return blogService.findAllArticleType();
+    }
+
 
     @RequestMapping(value = "/search/blog/{id}", produces = "application/json")
     public BaseResponseDTO searchBlog(@PathVariable("id") Long id, HttpServletRequest request) {

@@ -13,7 +13,7 @@ public class Constants {
     public static final Byte BLOG_STATUS_ACTIVE = 1;
     public static final Byte BLOG_STATUS_TOP = 1;
     public static final Byte BLOG_STATUS_TEMPORARY = 3;
-    public static final String BLOG_LIST_SUMMARY = "<div class=\"item\"><div class=\"layui-fluid\"><div class=\"layui-row\"><div class=\"layui-col-xs12 layui-col-sm4 layui-col-md5\"><div class=\"img\"><img src=\"{#topicImg#}\" style=\"width:300;height:250px;margin-top:20px;\"></div></div><div class=\"layui-col-xs12 layui-col-sm8 layui-col-md7\"><div class=\"item-cont\"><h3>{#title#}{#newButton#}</h3><p>{#summary#}</p><p>{#createTime#}</p><a href=\"/blog/{#blodId#}/detail\" class=\"go-icon\"></a></div></div></div></div></div>";
+    public static final String BLOG_LIST_SUMMARY = "<div class=\"item\"><div class=\"layui-fluid\"><div class=\"layui-row\"><div class=\"layui-col-xs12 layui-col-sm4 layui-col-md5\"><div class=\"img\"><img src=\"{#topicImg#}\" style=\"width:300;height:250px;margin-top:20px;\"></div></div><div class=\"layui-col-xs12 layui-col-sm8 layui-col-md7\"><div class=\"item-cont\"><h3>{#title#}{#newButton#}</h3><p>{#summary#}</p><p>{#createTime#}</p><a href=\"/public/blog/{#blodId#}/detail\" class=\"go-icon\"></a></div></div></div></div></div>";
     public static final String BLOG_NO_PICTURE = "/static/images/no_pic.jpg";
     public static final String BLOG_NEW_BUTTON = "<button class=\"layui-btn layui-btn-danger new-icon\">new</button>";
     public static final String BLOG_FILE_ACTUAL_PICTURE_DIR = "/data/image/";
