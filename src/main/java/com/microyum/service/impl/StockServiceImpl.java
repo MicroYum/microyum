@@ -44,9 +44,7 @@ public class StockServiceImpl implements StockService {
     @Override
     public BaseResponseDTO referStockTradeDayDetail(String stockCode) {
 
-        StockLatestDataDTO latestDataDTO = stockDao.referLatestStockData(stockCode);
-
-        return new BaseResponseDTO(HttpStatus.OK, latestDataDTO);
+        return new BaseResponseDTO(HttpStatus.OK, stockDao.referLatestStockData(stockCode));
     }
 
     @Override
