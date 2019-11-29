@@ -107,7 +107,7 @@ public class MyStockDao {
             stockData.setClose(rs.getBigDecimal("close"));
             stockData.setHigh(rs.getBigDecimal("high"));
             stockData.setLow(rs.getBigDecimal("low"));
-            stockData.setChg(String.format("%s[%s%]", rs.getBigDecimal("chg"), rs.getBigDecimal("percent")));
+            stockData.setChg(String.format("%s[%s%%]", rs.getBigDecimal("chg"), rs.getBigDecimal("percent")));
             stockData.setTradeCount(rs.getBigDecimal("trade_count"));
             stockData.setTradeAmount(rs.getBigDecimal("trade_amount"));
             stockData.setTradeDate(rs.getDate("trade_date"));
