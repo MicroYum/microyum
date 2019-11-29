@@ -296,7 +296,7 @@
 
         for (let i = 0; i < stockList.length; i++) {
 
-            $.post("/stock/data/latest", {stockCode: stockList[i].code}, function (result) {
+            $.post("/public/stock/data/latest", {stockCode: stockList[i].code}, function (result) {
                 console.log(result);
             });
 
