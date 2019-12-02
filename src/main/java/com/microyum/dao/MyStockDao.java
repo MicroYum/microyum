@@ -11,6 +11,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -90,6 +91,31 @@ public class MyStockDao {
             stockBase.setArea(rs.getString("area"));
             return stockBase;
         });
+    }
+
+    // 获取已列入观察的股票清单
+    public List<MyStockBase> getObservedListNotIndex() {
+
+        String sql = "select * from `my_stock_base` where `observe` = true and `listing_date` is not null";
+
+        return jdbcTemplate.query(sql, new Object[]{}, (rs, rowNum) -> {
+            MyStockBase stockBase = new MyStockBase();
+            stockBase.setStockCode(rs.getString("stock_code"));
+            stockBase.setArea(rs.getString("area"));
+            return stockBase;
+        });
+    }
+
+    public BigDecimal getHighestStock(String stockCode) {
+        String sql = "select max(t.hfq_close) from `my_stock_data` t where t.symbol = ?";
+
+        return jdbcTemplate.queryForObject(sql, new Object[]{stockCode}, BigDecimal.class);
+    }
+
+    public BigDecimal getLowestStock(String stockCode) {
+        String sql = "select min(t.hfq_close) from `my_stock_data` t where t.symbol = ?";
+
+        return jdbcTemplate.queryForObject(sql, new Object[]{stockCode}, BigDecimal.class);
     }
 
     public StockLatestDataDTO referLatestStockData(String stockCode) {
