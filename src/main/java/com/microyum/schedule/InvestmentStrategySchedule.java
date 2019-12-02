@@ -11,6 +11,17 @@ import org.springframework.stereotype.Component;
 public class InvestmentStrategySchedule {
 
     // 进入买卖区间
+    public void valueInterval() {
+
+        // 获取所有数据的最高点记录
+
+        // 获取所有数据的最低点记录
+
+        // 将数据分为三档：低档20%， 中档60%，高档20%
+
+        // 进入低档和高档区间后，发邮件提升
+    }
+
 
     // 可转债定时任务
     public void convertibleBond() {
