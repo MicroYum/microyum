@@ -21,6 +21,8 @@ public class StockLatestDataDTO {
     private BigDecimal open;
     // 收盘价
     private BigDecimal close;
+    // 后复权收盘价
+    private BigDecimal hfqClose;
     // 最高价
     private  BigDecimal high;
     // 最低价
