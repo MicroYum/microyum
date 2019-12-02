@@ -92,11 +92,6 @@ public class MyStockDao {
         });
     }
 
-    /**
-     * 获取最新的股票数据
-     * @param stockCode
-     * @return
-     */
     public StockLatestDataDTO referLatestStockData(String stockCode) {
 
         String sql = "select b.stock_code, b.stock_name, d.`open`, d.`close`, d.high, d.low, d.percent, d.chg, " +
@@ -112,7 +107,7 @@ public class MyStockDao {
             stockData.setClose(rs.getBigDecimal("close"));
             stockData.setHigh(rs.getBigDecimal("high"));
             stockData.setLow(rs.getBigDecimal("low"));
-            stockData.setChg(String.format("%s[%s%%]", rs.getBigDecimal("chg"), rs.getBigDecimal("percent")));
+            stockData.setChg(String.format("%s[%s%]", rs.getBigDecimal("chg"), rs.getBigDecimal("percent")));
             stockData.setTradeCount(rs.getBigDecimal("trade_count"));
             stockData.setTradeAmount(rs.getBigDecimal("trade_amount"));
             stockData.setTradeDate(rs.getDate("trade_date"));
