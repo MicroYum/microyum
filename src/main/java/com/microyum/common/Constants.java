@@ -3,7 +3,6 @@ package com.microyum.common;
 public class Constants {
 
     public static final String COMMON_MD5 = "MD5";
-    public static final String COMMON_MD5_SLAT = "";
     public static final String COMMON_DEFAULT_ENCODE = "UTF-8";
 
     public static final String ALBUM_FILE_ACTUAL_PICTURE_DIR = "/data/album/";
@@ -20,4 +19,10 @@ public class Constants {
     public static final String BLOG_FILE_VIRTUAL_PICTURE_DIR = "/blog/image/";
 
     public static final String STOCK_SINA_URL = "http://hq.sinajs.cn/list=";
+
+    public static final String MAIL_TEMPLATE_STOCK_BUY = "";
+    public static final String MAIL_TEMPLATE_STOCK_BUY_OBSERVE = "";
+    public static final String MAIL_TEMPLATE_STOCK_SELL = "";
+    public static final String MAIL_TEMPLATE_STOCK_SELL_OBSERVE = "";
+    public static final String MAIL_ADMIN_ADDR = "microyum@163.com";
 }

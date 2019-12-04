@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public class MyStockDao {
@@ -37,6 +38,35 @@ public class MyStockDao {
         }
 
         return namedParameterJdbcTemplate.queryForObject(builder.toString(), parameters, Long.class);
+    }
+
+    public Integer countStockDataByCode(String stockCode, Map<String, BigDecimal> map) {
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        StringBuilder builder = new StringBuilder();
+        builder.append("select count(1) count  from `my_stock_data` where `symbol` = :stockCode ");
+        parameters.addValue("stockCode", stockCode);
+
+        if (map != null) {
+
+            if (map.containsKey("lowPrice")) {
+                builder.append(" and `hfq_close` < :price ");
+                parameters.addValue("price", map.get("lowPrice"));
+            }
+            if (map.containsKey("lowVolume")) {
+                builder.append(" and `trade_count` < :volume ");
+                parameters.addValue("volume", map.get("lowVolume"));
+            }
+            if (map.containsKey("highPrice")) {
+                builder.append(" and `hfq_close` > :price ");
+                parameters.addValue("price", map.get("lowPrice"));
+            }
+            if (map.containsKey("highVolume")) {
+                builder.append(" and `trade_count` > :volume ");
+                parameters.addValue("volume", map.get("highVolume"));
+            }
+        }
+
+        return namedParameterJdbcTemplate.queryForObject(builder.toString(), parameters, Integer.class);
     }
 
     public List<MyStockBase> referStockList(int pageNo, int pageSize, String stock) {
@@ -101,6 +131,7 @@ public class MyStockDao {
         return jdbcTemplate.query(sql, new Object[]{}, (rs, rowNum) -> {
             MyStockBase stockBase = new MyStockBase();
             stockBase.setStockCode(rs.getString("stock_code"));
+            stockBase.setStockName(rs.getString("stock_name"));
             stockBase.setArea(rs.getString("area"));
             return stockBase;
         });
@@ -121,7 +152,7 @@ public class MyStockDao {
     public StockLatestDataDTO referLatestStockData(String stockCode) {
 
         String sql = "select b.stock_code, b.stock_name, d.`open`, d.`close`, d.high, d.low, d.percent, d.chg, " +
-                " d.trade_amount, d.trade_count, d.trade_date from my_stock_data d, my_stock_base b where " +
+                " d.trade_amount, d.trade_count, d.trade_date, d.hfq_close from my_stock_data d, my_stock_base b where " +
                 " d.trade_date = (SELECT max(t.trade_date) from my_stock_data t where t.symbol = ?) and " +
                 " d.symbol = ? and d.symbol = b.stock_code";
 
@@ -133,10 +164,11 @@ public class MyStockDao {
             stockData.setClose(rs.getBigDecimal("close"));
             stockData.setHigh(rs.getBigDecimal("high"));
             stockData.setLow(rs.getBigDecimal("low"));
-            stockData.setChg(String.format("%s[%s%]", rs.getBigDecimal("chg"), rs.getBigDecimal("percent")));
+            stockData.setChg(String.format("%s[%s%%]", rs.getBigDecimal("chg"), rs.getBigDecimal("percent")));
             stockData.setTradeCount(rs.getBigDecimal("trade_count"));
             stockData.setTradeAmount(rs.getBigDecimal("trade_amount"));
             stockData.setTradeDate(rs.getDate("trade_date"));
+            stockData.setHfqClose(rs.getBigDecimal("hfq_close"));
 
             return stockData;
         });
