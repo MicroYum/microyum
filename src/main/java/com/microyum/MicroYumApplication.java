@@ -9,7 +9,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EntityScan(basePackages = {"com.microyum.model"})
 @EnableJpaRepositories(basePackages = {"com.microyum.dao"})
 @SpringBootApplication
-// @EnableScheduling
+@EnableScheduling
 public class MicroYumApplication {
 
     public static void main(String[] args) {
