@@ -9,6 +9,7 @@ import com.microyum.common.util.DateUtils;
 import com.microyum.dao.MyArticleTypeDao;
 import com.microyum.dao.MyBlogDao;
 import com.microyum.dao.MyBlogLogDao;
+import com.microyum.dto.BlogDetailPaging;
 import com.microyum.dto.BlogListDTO;
 import com.microyum.dto.BlogRequestDTO;
 import com.microyum.model.MyArticleType;
@@ -113,6 +114,20 @@ public class BlogServiceImpl implements BlogService {
         myBlogLogDao.save(blogLog);
 
         return blog;
+    }
+
+    @Override
+    public BaseResponseDTO findBlogDetailPaging(Long id, BlogDetailPaging blogDetailPaging, String ip, String contextPath) {
+
+        MyBlog blog;
+        MyArticleType articleType = myArticleTypeDao.findByName(blogDetailPaging.getArticle());
+        if (StringUtils.equals(blogDetailPaging.getKbn(), "pre")) {
+            blog = myBlogDao.findPostBlogDetail(id, articleType.getId());
+        } else {
+            blog = myBlogDao.findPreBlogDetail(id, articleType.getId());
+        }
+
+        return new BaseResponseDTO(HttpStatus.OK, blog);
     }
 
     @Override

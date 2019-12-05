@@ -15,6 +15,7 @@
     <![endif]-->
 </head>
 <body>
+<a id="turnToContent"></a>
 <div class="header">
     <div class="menu-btn">
         <div class="menu"></div>
@@ -42,15 +43,15 @@
                 <div class="review-version">
                     <div class="form-box">
                         <div class="article-cont">
-                            <input type="hidden" id="article-id" th:value="${blogId}" />
+                            <input type="hidden" id="blog-id" th:value="${blogId}" />
                             <div class="title">
-                                <h3 id="article-title" th:text="${title}"></h3>
-                                <p class="cont-info"><span id="article-time" class="data" th:text="${createTime}"></span>
+                                <h3 id="blog-title" th:text="${title}"></h3>
+                                <p class="cont-info"><span id="blog-time" class="data" th:text="${createTime}"></span>
                                     <span class="types" id="article-type" th:text="${blogType}"></span>
                                 </p>
                             </div>
                             <br/>
-                            <div id="article-content" th:utext="${content}"></div>
+                            <div id="blog-content" th:utext="${content}"></div>
                             <div class="btn-box">
                                 <button class="layui-btn layui-btn-primary" id="pre-blog">上一篇</button>
                                 <button class="layui-btn layui-btn-primary" id="post-blog">下一篇</button>
@@ -80,30 +81,33 @@
 <script src="/static/js/jquery.min.js"></script>
 <script type="text/javascript">
     $("#pre-blog").on("click", function () {
-        let blogId = $.trim($("#article-id").val());
-        let blogType = $.trim($("#article-type").val());
+        let blogId = $.trim($("#blog-id").val());
+        let blogType = $.trim($("#article-type").text());
         referBlog(blogId, blogType, "pre");
     });
 
     $("#post-blog").on("click", function () {
-        let blogId = $.trim($("#article-id").val());
-        let blogType = $.trim($("#article-type").val());
+        let blogId = $.trim($("#blog-id").val());
+        let blogType = $.trim($("#article-type").text());
         referBlog(blogId, blogType, "post");
     });
     
     function referBlog(blogId, blogType, kbn) {
-        let param = {type: blogType, kbn: kbn};
+        let param = {article: blogType, kbn: kbn};
         $.ajax({
             type: "POST",
-            url: "/search/blog/" + blogId,
+            url: "/public/blog/paging/" + blogId,
             data: param,
             success: function (result) {
                 console.log(result);
-                $("#article-id").val(result.data.article-id);
-                $("#article-title").val(result.data.article-title);
-                $("#article-time").val(result.data.article-time);
-                $("#article-type").val(result.data.article-type);
-                $("#article-content").val(result.data.article-content);
+                $("#blog-id").val(result.data.id);
+                $("#blog-title").text(result.data.title);
+                $("#blog-time").text(result.data.createTime);
+                $("#blog-content").html(result.data.content);
+
+                $('html, body').animate({
+                    scrollTop: $("#turnToContent").offset().top
+                }, 800);
             },
             dataType: "json"
         });

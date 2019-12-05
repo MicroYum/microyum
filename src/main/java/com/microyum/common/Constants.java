@@ -17,6 +17,8 @@ public class Constants {
     public static final String BLOG_NEW_BUTTON = "<button class=\"layui-btn layui-btn-danger new-icon\">new</button>";
     public static final String BLOG_FILE_ACTUAL_PICTURE_DIR = "/data/image/";
     public static final String BLOG_FILE_VIRTUAL_PICTURE_DIR = "/blog/image/";
+    public static final String BLOG_DETAIL_KBN_PRE = "pre";
+    public static final String BLOG_DETAIL_KBN_POST = "post";
 
     public static final String STOCK_SINA_URL = "http://hq.sinajs.cn/list=";
 

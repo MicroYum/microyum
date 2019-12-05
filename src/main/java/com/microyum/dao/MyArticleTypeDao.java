@@ -11,4 +11,6 @@ public interface MyArticleTypeDao extends JpaRepository<MyArticleType, Long> {
     @Query(value = "select * from `my_article_type` order by `order` asc", nativeQuery = true)
     List<MyArticleType> findAllArticleType();
 
+    MyArticleType findByName(String name);
+
 }

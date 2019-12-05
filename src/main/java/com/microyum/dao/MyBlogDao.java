@@ -51,7 +51,7 @@ public class MyBlogDao {
             parameters.addValue("title", title);
         }
 
-        return  namedParameterJdbcTemplate.queryForObject(builder.toString(), parameters, Long.class);
+        return namedParameterJdbcTemplate.queryForObject(builder.toString(), parameters, Long.class);
     }
 
     public List<BlogListDTO> findAllBlog(int pageNo, int pageSize, int article, String title) {
@@ -155,6 +155,30 @@ public class MyBlogDao {
 
         List<MyBlog> listBlog = jdbcTemplate.query("select * from my_blog where id = ?", new Object[]{id}, (rs, rowNum) -> getMyBlog(rs));
         return listBlog == null ? null : listBlog.get(0);
+    }
+
+    public MyBlog findPreBlogDetail(Long id, Long article) {
+        List<MyBlog> blogs = jdbcTemplate.query("select * from my_blog where id < ? and article_id = ? and status = 1 order by id desc", new Object[]{id, article}, (rs, rowNum) -> getMyBlog(rs));
+
+        if (blogs.size() > 0) {
+            return blogs.get(0);
+        }
+
+        blogs = jdbcTemplate.query("select * from my_blog where article_id = ? and status = 1 order by id desc", new Object[]{article}, (rs, rowNum) -> getMyBlog(rs));
+
+        return blogs.get(0);
+    }
+
+    public MyBlog findPostBlogDetail(Long id, Long article) {
+        List<MyBlog> blogs = jdbcTemplate.query("select * from my_blog where id > ? and article_id = ? and status = 1 order by id asc", new Object[]{id, article}, (rs, rowNum) -> getMyBlog(rs));
+
+        if (blogs.size() > 0) {
+            return blogs.get(0);
+        }
+
+        blogs = jdbcTemplate.query("select * from my_blog where article_id = ? and status = 1 order by id asc", new Object[]{article}, (rs, rowNum) -> getMyBlog(rs));
+
+        return blogs.get(0);
     }
 
     public int save(MyBlog blog) {

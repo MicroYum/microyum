@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import com.microyum.common.http.BaseResponseDTO;
 import com.microyum.common.http.HttpStatus;
 import com.microyum.common.util.UserUtils;
+import com.microyum.dto.BlogDetailPaging;
 import com.microyum.dto.BlogRequestDTO;
 import com.microyum.model.MyBlog;
 import com.microyum.service.BlogService;
@@ -45,12 +46,12 @@ public class BlogController {
     }
 
 
-    @RequestMapping(value = "/search/blog/{id}", produces = "application/json")
-    public BaseResponseDTO searchBlog(@PathVariable("id") Long id, HttpServletRequest request) {
+    @RequestMapping(value = "/public/blog/paging/{id}", produces = "application/json")
+    public BaseResponseDTO searchBlog(@PathVariable("id") Long id, BlogDetailPaging paging, HttpServletRequest request) {
 
-        MyBlog myBlog = blogService.findBlogDetailById(id, UserUtils.getIpAddress(request), request.getRequestURI());
+        BaseResponseDTO responseDTO = blogService.findBlogDetailPaging(id, paging, UserUtils.getIpAddress(request), request.getRequestURI());
 
-        return new BaseResponseDTO(HttpStatus.OK, myBlog);
+        return responseDTO;
     }
 
     @RequestMapping(value = "/save/blog", produces = "application/json")
