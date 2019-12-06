@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * 投资策略定时任务
@@ -31,6 +32,7 @@ public class InvestmentStrategySchedule {
     @Scheduled(cron = "0 0 9 * * ? ")
     public void valueInterval() {
 
+        log.info("买卖区判断定时任务开始...");
         List<StockStrategyBO> strategyBOList = Lists.newArrayList();
 
         // 获取所有股票的列表
@@ -157,6 +159,8 @@ public class InvestmentStrategySchedule {
                 e.printStackTrace();
             }
         }
+
+        log.info("买卖区判断定时任务结束.");
     }
 
     // 可转债定时任务
