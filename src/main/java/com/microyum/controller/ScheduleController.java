@@ -13,6 +13,7 @@ public class ScheduleController {
     @Autowired
     private ReferStockDataSchedule referStockDataSchedule;
 
+    @Autowired
     private StockService stockService;
 
     @Autowired
