@@ -28,5 +28,6 @@ public class ScheduleController {
         investmentStrategySchedule.valueInterval();
     }
 
+    @RequestMapping(value = "/public/repair/stock/data")
     public void repairStockData() {stockService.repairStockData();}
 }
