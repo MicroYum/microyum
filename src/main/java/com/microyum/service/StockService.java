@@ -12,4 +12,6 @@ public interface StockService {
     BaseResponseDTO referStockTradeDayDetail(String stockCode);
 
     BaseResponseDTO calculateStockTransactionCost(CalculateStockTransactionCostDTO dto);
+
+    void repairStockData();
 }

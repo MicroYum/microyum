@@ -15,6 +15,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -35,14 +36,20 @@ public class ReferStockDataSchedule {
     @Autowired
     private MyStockDao stockDao;
 
+    @Value("${python.script.repair.latest.hfqdata}")
+    private String repairLatestScript;
+
     @Scheduled(cron = "0 0/1 * * * ? ")
     public synchronized void getRealtimeStockBySina() {
+
+        log.info("获取股票数据定时任务开始...");
 
         // 定时任务运行时间每周一到周五，9:30 ~ 11:30, 13:00 ~ 15:00
         Calendar calendar = Calendar.getInstance();
         int dayWeek = calendar.get(Calendar.DAY_OF_WEEK);
 
         if (dayWeek == 1 || dayWeek == 7) {
+            log.info("周六、周日不获取数据.");
             return;
         }
 
@@ -110,6 +117,8 @@ public class ReferStockDataSchedule {
                 log.error("释放新浪股票接口连接错误", e);
             }
         }
+
+        log.info("获取股票数据定时任务结束.");
     }
 
     private MyStockData tidyStockData(Map<String, String> mapStack) {
@@ -139,5 +148,23 @@ public class ReferStockDataSchedule {
         stockDataDetail.setTradeAmount(new BigDecimal(mapStack.get("tradeAmount")));
 
         return stockDataDetail;
+    }
+
+    /**
+     * 补齐后复权数据
+     */
+    @Scheduled(cron = "0 15 15 * * ? ")
+    public void repairHfqData() {
+
+        log.info("开始补齐当天的后复权数据...");
+
+        try {
+            Runtime.getRuntime().exec(repairLatestScript);
+        } catch (Exception e) {
+            log.error("补齐后复权数据失败, ", e);
+            return;
+        }
+
+        log.info("补齐当天的后复权数据结束.");
     }
 }

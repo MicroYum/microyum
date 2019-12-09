@@ -29,7 +29,7 @@ public class InvestmentStrategySchedule {
     private MyStockDao stockDao;
 
     // 进入买卖区间，每天9:00执行
-    @Scheduled(cron = "0 0 9 * * ? ")
+    @Scheduled(cron = "0 0/1 * * * ? ")
     public void valueInterval() {
 
         log.info("买卖区判断定时任务开始...");
@@ -72,7 +72,7 @@ public class InvestmentStrategySchedule {
                     lowVolume.put("lowVolume", latestStock.getTradeCount());
                     strategyBO.setLowVolumeDate(stockDao.countStockDataByCode(stockBase.getStockCode(), lowVolume));
 
-                    // 判断成交量，如果成交量小于5%，或者大于50%的时间，重点标注
+                    // 判断成交量，如果成交量小于5%，或者大于40%的时间，重点标注
                     if (strategyBO.getDate() * 0.05 > strategyBO.getLowVolumeDate() || strategyBO.getDate() * 0.4 < strategyBO.getLowVolumeDate()) {
                         strategyBO.setBuy(true);
                     } else {

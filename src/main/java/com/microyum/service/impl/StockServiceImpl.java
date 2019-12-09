@@ -8,8 +8,10 @@ import com.microyum.dto.StockLatestDataDTO;
 import com.microyum.model.MyStockBase;
 import com.microyum.model.MyStockData;
 import com.microyum.service.StockService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -18,10 +20,14 @@ import java.text.DecimalFormat;
 import java.util.List;
 
 @Service
+@Slf4j
 public class StockServiceImpl implements StockService {
 
     @Autowired
     private MyStockDao stockDao;
+
+    @Value("${python.script.repair.stock.hfqdata}")
+    private String repairStockScript;
 
     @Override
     public BaseResponseDTO referStockList(int pageNo, int pageSize, String stock) {
@@ -111,6 +117,20 @@ public class StockServiceImpl implements StockService {
         dto.setProfit(format.format(sellTotal.subtract(buyTotal).subtract(totalTax)));
 
         return new BaseResponseDTO(HttpStatus.OK, dto);
+    }
+
+    public void repairStockData() {
+
+        log.info("开始补齐股票数据...");
+
+        try {
+            Runtime.getRuntime().exec(repairStockScript);
+        } catch (Exception e) {
+            log.error("补齐股票数据失败, ", e);
+            return;
+        }
+
+        log.info("补齐股票数据结束.");
     }
 
     public static void main(String[] args) {
