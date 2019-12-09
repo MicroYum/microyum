@@ -1,5 +1,7 @@
 package com.microyum.controller;
 
+import com.microyum.common.http.BaseResponseDTO;
+import com.microyum.common.http.HttpStatus;
 import com.microyum.schedule.InvestmentStrategySchedule;
 import com.microyum.schedule.ReferStockDataSchedule;
 import com.microyum.service.StockService;
@@ -20,15 +22,20 @@ public class ScheduleController {
     private InvestmentStrategySchedule investmentStrategySchedule;
 
     @RequestMapping(value = "/public/schedule/refer/stock")
-    public void referStockData() {
+    public BaseResponseDTO referStockData() {
         referStockDataSchedule.getRealtimeStockBySina();
+        return new BaseResponseDTO(HttpStatus.OK);
     }
 
     @RequestMapping(value = "/public/schedule/stock/value")
-    public void stockValueInterval() {
+    public BaseResponseDTO stockValueInterval() {
         investmentStrategySchedule.valueInterval();
+        return new BaseResponseDTO(HttpStatus.OK);
     }
 
     @RequestMapping(value = "/public/repair/stock/data")
-    public void repairStockData() {stockService.repairStockData();}
+    public BaseResponseDTO repairStockData() {
+        stockService.repairStockData();
+        return new BaseResponseDTO(HttpStatus.OK);
+    }
 }
