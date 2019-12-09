@@ -28,8 +28,8 @@ public class InvestmentStrategySchedule {
     @Autowired
     private MyStockDao stockDao;
 
-    // 进入买卖区间，每天9:00执行
-    @Scheduled(cron = "0 0/1 * * * ? ")
+    // 进入买卖区间，每天16:30执行
+    @Scheduled(cron = "0 30 16 * * ? ")
     public void valueInterval() {
 
         log.info("买卖区判断定时任务开始...");
