@@ -30,9 +30,9 @@ public class StockController {
     }
 
     @RequestMapping(value = "/public/stock/list", produces = "application/json")
-    public BaseResponseDTO referStockList(int pageNo, int pageSize, String stock) {
+    public BaseResponseDTO referStockList(int page, int limit, String stock) {
 
-        return stockService.referStockList(pageNo, pageSize, stock);
+        return stockService.referStockList(page, limit, stock);
     }
 
     @RequestMapping(value = "/public/stock/data/latest", produces = "application/json")

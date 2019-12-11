@@ -1,5 +1,6 @@
 package com.microyum.filter;
 
+import com.microyum.model.MyUser;
 import com.microyum.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -37,7 +38,9 @@ public class JSONLoginFilter extends AbstractAuthenticationProcessingFilter {
         validateUsernameAndPassword(request);
         List<SimpleGrantedAuthority> simpleGrantedAuthorities = new ArrayList<>();
         simpleGrantedAuthorities.add(new SimpleGrantedAuthority("USER"));
-        return new UsernamePasswordAuthenticationToken(request.getParameter("userName"), request.getParameter("password"), simpleGrantedAuthorities);
+
+        MyUser myUser = userService.getUserByName(request.getParameter("userName"));
+        return new UsernamePasswordAuthenticationToken(myUser, request.getParameter("password"), simpleGrantedAuthorities);
     }
 
     private void validateUsernameAndPassword(HttpServletRequest request) throws AuthenticationException {

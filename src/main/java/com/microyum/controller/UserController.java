@@ -1,9 +1,11 @@
 package com.microyum.controller;
 
 import com.microyum.common.http.BaseResponseDTO;
+import com.microyum.common.http.HttpStatus;
 import com.microyum.common.util.CaptchaUtils;
 import com.microyum.common.util.DateUtils;
 import com.microyum.dto.UserDTO;
+import com.microyum.model.MyUser;
 import com.microyum.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -53,12 +55,53 @@ public class UserController {
     @GetMapping(value = "/user/info", produces = "application/json")
     public BaseResponseDTO getUserInfo(String name) {
 
-        return userService.getUserByName(name);
+        MyUser myUser = userService.getUserByName(name);
+        if (myUser == null) {
+            return new BaseResponseDTO(HttpStatus.DATA_NOT_FOUND);
+        }
+
+        return new BaseResponseDTO(HttpStatus.OK, myUser);
     }
 
     @PostMapping(value = "/user/create")
     public BaseResponseDTO createUser(UserDTO userDTO) {
 
         return userService.createUser(userDTO);
+    }
+
+    @PostMapping(value = "/user/update")
+    public BaseResponseDTO updateUser(UserDTO userDTO) {
+
+        boolean result = userService.updateUser(userDTO);
+
+        if (result) {
+            return new BaseResponseDTO(HttpStatus.OK);
+        }
+
+        return new BaseResponseDTO(HttpStatus.ERROR_IN_DATABASE);
+    }
+
+    @GetMapping(value = "/user/{id}/delete")
+    public BaseResponseDTO deleteUser(@PathVariable("id") Long id) {
+
+        boolean result = userService.deleteUser(id);
+
+        if (result) {
+            return new BaseResponseDTO(HttpStatus.OK);
+        }
+
+        return new BaseResponseDTO(HttpStatus.ERROR_IN_DATABASE);
+    }
+
+    @GetMapping(value = "/refer/user/info", produces = "application/json")
+    public BaseResponseDTO referUserInfo(int page, int limit, String name) {
+
+        return new BaseResponseDTO(HttpStatus.OK_LAYUI, userService.referUserInfo(page, limit, name));
+    }
+
+    @GetMapping(value = "/refer/role/list", produces = "application/json")
+    public BaseResponseDTO referRoleList() {
+
+        return new BaseResponseDTO(HttpStatus.OK, userService.referRoleList());
     }
 }

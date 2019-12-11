@@ -58,7 +58,7 @@ public class ReferStockDataSchedule {
         }
 
         int minute = calendar.get(Calendar.MINUTE);
-        if ((hour == 9 && minute < 30) || (hour == 11 && minute > 30) || (hour == 15 && minute > 1)) {
+        if ((hour == 9 && minute < 30) || (hour == 11 && minute > 30) || (hour == 13 && minute < 1) || (hour == 15 && minute > 1)) {
             log.info("现在是：" + hour + "点" + minute + "分，股市还未开盘");
             return;
         }

@@ -21,6 +21,4 @@ public class MyUserRole extends BaseModel {
     @Column(nullable = false)
     private Long roleId;
 
-    @Column(nullable = false, columnDefinition = "BIGINT(20) DEFAULT 1")
-    private Long status;
 }

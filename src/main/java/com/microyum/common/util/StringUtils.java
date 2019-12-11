@@ -18,7 +18,7 @@ public class StringUtils {
     private static String md5Encrypt(String str, String salt) {
         String result = "";
         try {
-            if (salt == null) {
+            if (salt != null) {
                 str = str + salt;
             }
 

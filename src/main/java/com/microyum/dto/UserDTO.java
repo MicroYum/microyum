@@ -4,18 +4,26 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.security.PrivateKey;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserDTO {
 
+    private Long id;
     private String email;
-    private Byte locked;
+    private String locked;
     private String name;
+    private String nickName;
     private String openId;
-    private Long parentId;
+    private String parentId;
     private String password;
     private String telephone;
     private String unionId;
+    private String createDate;
+    private String lastUpdateDate;
+    private Long roleId;
+    private String roleName;
 
 }

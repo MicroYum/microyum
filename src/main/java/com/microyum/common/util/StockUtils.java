@@ -1,6 +1,7 @@
 package com.microyum.common.util;
 
 import com.google.common.collect.Maps;
+import com.microyum.bo.StockStrategyBO;
 import com.microyum.model.MyStockData;
 
 import java.math.BigDecimal;
@@ -10,6 +11,13 @@ import java.util.regex.Pattern;
 
 public class StockUtils {
 
+    /**
+     * 解析新浪股票数据
+     *
+     * @param stockId
+     * @param strStock
+     * @return
+     */
     public static Map<String, String> parseSinaStock(String stockId, String strStock) {
 
         Map<String, String> result = Maps.newHashMap();
@@ -42,5 +50,46 @@ public class StockUtils {
         result.put("tradeAmount", stock[9]);
 
         return result;
+    }
+
+    /**
+     * 高估买入
+     *
+     * @param strategyBO
+     * @return 邮件消息
+     */
+    public static String overrateBuy(StockStrategyBO strategyBO) {
+
+        return null;
+    }
+
+    /**
+     * 高估观察
+     *
+     * @param strategyBO
+     * @return 邮件消息
+     */
+    public static String overrateObserve(StockStrategyBO strategyBO) {
+        return null;
+    }
+
+    /**
+     * 低估买入
+     *
+     * @param strategyBO
+     * @return 邮件消息
+     */
+    public static String underrateBuy(StockStrategyBO strategyBO) {
+        return null;
+    }
+
+    /**
+     * 低估观察
+     *
+     * @param strategyBO
+     * @return 邮件消息
+     */
+    public static String underrateObserve(StockStrategyBO strategyBO) {
+        return null;
     }
 }

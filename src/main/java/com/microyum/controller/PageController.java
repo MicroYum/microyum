@@ -3,6 +3,7 @@ package com.microyum.controller;
 import com.microyum.common.util.DateUtils;
 import com.microyum.common.util.UserUtils;
 import com.microyum.model.MyBlog;
+import com.microyum.model.MyUser;
 import com.microyum.service.BlogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContext;
@@ -59,11 +60,21 @@ public class PageController {
 
     @RequestMapping(value = "/management/main")
     public ModelAndView managePage() {
-        return new ModelAndView("management/main");
+
+        ModelAndView mv = new ModelAndView("management/main");
+
+        MyUser myUser = (MyUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        mv.addObject("nickName", myUser.getNickName());
+
+        return mv;
     }
 
     @RequestMapping(value = "/management/login")
     public ModelAndView loginPage() {
+
+        SecurityContext context = SecurityContextHolder.getContext();
+        context.setAuthentication(null);
+        SecurityContextHolder.clearContext();
         return new ModelAndView("management/login");
     }
 
@@ -80,6 +91,11 @@ public class PageController {
     @RequestMapping(value = "/management/stock/base")
     public ModelAndView stockBase() {
         return new ModelAndView("management/stock_base");
+    }
+
+    @RequestMapping(value = "/management/system/user")
+    public ModelAndView systemUser() {
+        return new ModelAndView("management/users");
     }
 
     @RequestMapping(value = "/management/exit")

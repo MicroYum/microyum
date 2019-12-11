@@ -59,12 +59,13 @@
         var tableObj = table.render({
             elem: '#stockBaseTable' //指定原始表格元素选择器（推荐id选择器）
             , cellMinWidth: 30
-            , height: 'full-200'
+            , height: 'full-150'
             , loading: true
             , cols: [tblCols]
             , sort: true
             , page: true
             , url: '/public/stock/list'
+            , limit: 15
             , where: {
                 selectStock: $.trim($("#select-stock").val())
             }

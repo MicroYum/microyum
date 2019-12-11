@@ -12,6 +12,9 @@ public class MyUser extends BaseModel {
     @Column(nullable = false, length = 20)
     private String name;
 
+    @Column(nullable = false, length = 20)
+    private String nickName;
+
     @Column(nullable = false, length = 80)
     private String password;
 
