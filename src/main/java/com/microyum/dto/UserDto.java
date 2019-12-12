@@ -9,7 +9,7 @@ import java.security.PrivateKey;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDTO {
+public class UserDto {
 
     private Long id;
     private String email;

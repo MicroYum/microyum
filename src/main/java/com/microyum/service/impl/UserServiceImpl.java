@@ -1,15 +1,13 @@
 package com.microyum.service.impl;
 
-import com.google.common.collect.Lists;
 import com.microyum.common.http.BaseResponseDTO;
 import com.microyum.common.http.HttpStatus;
-import com.microyum.common.util.DateUtils;
 import com.microyum.common.util.StringUtils;
 import com.microyum.dao.MyRoleDao;
 import com.microyum.dao.MyUserDao;
 import com.microyum.dao.MyUserJdbcDao;
 import com.microyum.dao.MyUserRoleDao;
-import com.microyum.dto.UserDTO;
+import com.microyum.dto.UserDto;
 import com.microyum.model.MyRole;
 import com.microyum.model.MyUser;
 import com.microyum.model.MyUserRole;
@@ -20,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.Id;
 import java.util.List;
 import java.util.UUID;
 
@@ -64,7 +61,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public BaseResponseDTO createUser(UserDTO dto) {
+    public BaseResponseDTO createUser(UserDto dto) {
 
         try {
 
@@ -99,10 +96,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDTO> referUserInfo(int page, int limit, String name) {
+    public List<UserDto> userListOverview(int page, int limit, String name) {
 
         int start = (page - 1) * limit;
-        List<UserDTO> userList;
+        List<UserDto> userList;
         if (org.apache.commons.lang3.StringUtils.isNotBlank(name)) {
             userList = myUserJdbcDao.findByNameOrNickName(start, limit, name);
         } else {
@@ -118,7 +115,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public boolean updateUser(UserDTO dto) {
+    public boolean updateUser(UserDto dto) {
 
         try {
             MyUser myUser = myUserDao.findByUId(dto.getId());
@@ -152,5 +149,10 @@ public class UserServiceImpl implements UserService {
         }
 
         return true;
+    }
+
+    @Override
+    public List<MyUser> userList() {
+        return myUserDao.findAll();
     }
 }

@@ -47,6 +47,14 @@ public class StringUtils {
         return StringUtils.md5Encrypt(str, null);
     }
 
+    public static boolean isBlank(String str) {
+        return org.apache.commons.lang3.StringUtils.isBlank(str);
+    }
+
+    public static boolean isNotBlank(String str) {
+        return org.apache.commons.lang3.StringUtils.isNotBlank(str);
+    }
+
     public static void main(String[] args) {
 
         System.out.println(StringUtils.md5Encrypt("password"));

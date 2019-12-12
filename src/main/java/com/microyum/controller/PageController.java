@@ -98,6 +98,11 @@ public class PageController {
         return new ModelAndView("management/users");
     }
 
+    @RequestMapping(value = "/management/trader/account")
+    public ModelAndView traderAccount() {
+        return new ModelAndView("management/trader_account");
+    }
+
     @RequestMapping(value = "/management/exit")
     public ModelAndView managementExit() {
         SecurityContext context = SecurityContextHolder.getContext();

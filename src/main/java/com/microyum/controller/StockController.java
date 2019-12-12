@@ -1,7 +1,7 @@
 package com.microyum.controller;
 
 import com.microyum.common.http.BaseResponseDTO;
-import com.microyum.dto.CalculateStockTransactionCostDTO;
+import com.microyum.dto.CalculateStockTransactionCostDto;
 import com.microyum.service.StockService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -42,7 +42,7 @@ public class StockController {
     }
 
     @RequestMapping(value = "/public/stock/transaction/cost", produces = "application/json")
-    public BaseResponseDTO calculateStockTransactionCost(CalculateStockTransactionCostDTO dto) {
+    public BaseResponseDTO calculateStockTransactionCost(CalculateStockTransactionCostDto dto) {
 
         return stockService.calculateStockTransactionCost(dto);
     }

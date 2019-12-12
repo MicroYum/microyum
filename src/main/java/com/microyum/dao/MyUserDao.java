@@ -1,11 +1,8 @@
 package com.microyum.dao;
 
-import com.microyum.dto.UserDTO;
 import com.microyum.model.MyUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-
-import java.util.List;
 
 public interface MyUserDao extends JpaRepository<MyUser, Long> {
 

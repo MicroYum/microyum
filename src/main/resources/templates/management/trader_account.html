@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>用户列表</title>
+    <title>渠道账户配置</title>
     <link rel="stylesheet" href="/static/layui/css/layui.css">
 </head>
 <body>
@@ -10,23 +10,23 @@
     <div class="layadmin-tabsbody-item layui-show">
         <div class="layui-fluid" style="margin: 15px;">
             <div class="layui-form-item">
-                <label class="layui-form-label" style="width: 80px;">Name: </label>
+                <label class="layui-form-label" style="width: 80px;">Trader Name: </label>
                 <div class="layui-input-inline" style="width: 300px;">
-                    <input type="text" id="select-user" lay-verify="required" placeholder="Please input name"
+                    <input type="text" id="select-trader" lay-verify="required" placeholder="Please input trader name"
                            autocomplete="off" class="layui-input">
                 </div>
                 <a href="javascript:;" class="layui-btn layui-btn-small" id="btn-select"><i
                         class="layui-icon layui-icon-refresh"></i> Select</a>
                 <a href="javascript:;" class="layui-btn layui-btn-small" id="btn-add"><i
-                        class="layui-icon layui-icon-add-circle"></i> Add User</a>
+                        class="layui-icon layui-icon-add-circle"></i> Add Account</a>
             </div>
         </div>
 
         <div style="padding: 15px; overflow:auto;">
-            <table class="layui-table" id="userTable" lay-filter="userTable" width="auto"
+            <table class="layui-table" id="account-table" lay-filter="account-table" width="auto"
                    style="white-space:nowrap"></table>
             <script type="text/html" id="toolbar">
-                <a class="layui-btn layui-btn-xs" lay-event="edit" id="editForm">
+                <a class="layui-btn layui-btn-xs" lay-event="edit">
                     <i class="layui-icon">&#xe642;</i>Edit
                 </a>
                 <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete">
@@ -39,40 +39,22 @@
 
 <div style="margin: 15px; display: none" id="pop-div">
     <form class="layui-form">
-        <div class="layui-form-item" id="pop-name">
-            <label class="layui-form-label">Name:</label>
-            <div class="layui-input-block" style="margin-left: 200px;">
-                <input type="text" name="name" id="name" class="layui-input">
-            </div>
-        </div>
-        <div class="layui-form-item" id="pop-nick-name">
-            <label class="layui-form-label">Nick Name:</label>
-            <div class="layui-input-block" style="margin-left: 200px;">
-                <input type="text" name="nick-name" id="nick-name" class="layui-input">
-            </div>
-        </div>
-        <div class="layui-form-item" id="pop-email">
-            <label class="layui-form-label">E-Mail:</label>
-            <div class="layui-input-block" style="margin-left: 200px;">
-                <input type="text" name="email" id="email" class="layui-input">
-            </div>
-        </div>
-        <div class="layui-form-item" id="pop-telephone">
-            <label class="layui-form-label">Telephone:</label>
-            <div class="layui-input-block" style="margin-left: 200px;">
-                <input type="text" name="telephone" id="telephone" class="layui-input">
-            </div>
-        </div>
-        <div class="layui-form-item" id="pop-password">
-            <label class="layui-form-label">Password:</label>
-            <div class="layui-input-block" style="margin-left: 200px;">
-                <input type="text" name="password" id="password" class="layui-input">
-            </div>
-        </div>
         <div class="layui-form-item">
             <label class="layui-form-label">Role:</label>
             <div class="layui-input-block" style="margin-left: 200px;">
-                <select class="layui-select" name="select-role" id="select-role"></select>
+                <select class="layui-select" name="select-user" id="select-user" lay-search=""></select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">Trader:</label>
+            <div class="layui-input-block" style="margin-left: 200px;">
+                <input type="text" name="input-trader" id="input-trader" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">Account:</label>
+            <div class="layui-input-block" style="margin-left: 200px;">
+                <input type="text" name="input-account" id="input-account" class="layui-input">
             </div>
         </div>
     </form>
@@ -91,45 +73,39 @@
             {type: 'numbers'},
             {type: 'checkbox'},
             {field: 'id', title: 'id', hide: true},
-            {field: 'roleId', title: 'roleId', hide: true},
-            {field: 'name', title: 'Name', width: 180},
-            {field: 'nickName', title: 'Nick Name', width: 180},
-            {field: 'email', title: 'E-Mail', width: 250},
-            {field: 'telephone', title: 'Telephone', width: 200},
-            {field: 'locked', title: 'Locked', width: 140},
-            {field: 'roleName', title: 'Role', width: 200},
-            {field: 'lastUpdateDate', title: 'Last Update Time', width: 200},
+            {field: 'userId', title: 'userId', hide: true},
+            {field: 'userName', title: 'Name', width: 200},
+            {field: 'nickName', title: 'Nick Name', width: 200},
+            {field: 'trader', title: 'Trader', width: 250},
+            {field: 'account', title: 'Account', width: 300},
             {fixed: 'right', width: 220, align: 'center', toolbar: '#toolbar'}
         ];
 
         // 从数据库中检索所有的用户信息并渲染Table
         var tableObj = table.render({
-            elem: '#userTable' //指定原始表格元素选择器（推荐id选择器）
+            elem: '#account-table' //指定原始表格元素选择器（推荐id选择器）
             , cellMinWidth: 30
             , height: 'full-150'
             , loading: true
             , cols: [tblCols]
             , sort: true
             , page: true
-            , url: '/user/list/overview'
+            , url: '/finance/trader/account/overview'
             , limit: 15
             , where: {
-                name: $.trim($("#select-user").val())
+                trader: $.trim($("#select-trader").val())
             }
         });
 
         $("#btn-select").on('click', function () {
-            tableObj.reload({where: {name: $.trim($("#select-user").val())}});
+            tableObj.reload({where: {trader: $.trim($("#select-trader").val())}});
         });
 
         $('#btn-add').on('click', function () {
             $('#pop-div').show();
-            $("#pop-password").show();
-            $("#name").val('');
-            $("#nick-name").val('');
-            $("#email").val('');
-            $("#telephone").val('');
-            $("#select-role").find("option[value=1]").prop("selected", true);
+            $("#input-trader").val('');
+            $("#input-account").val('');
+            $("#select-user").find("option[value=1]").prop("selected", true);
             layui.form.render();
 
             layer.open({
@@ -144,15 +120,12 @@
                     var loading = layer.load(1);
 
                     var param = {
-                        'email': $("#email").val().trim(),
-                        'name': $("#name").val().trim(),
-                        'nickName': $("#nick-name").val().trim(),
-                        'password': md5($("#password").val().trim()),
-                        'telephone': $("#telephone").val().trim(),
-                        'roleId': $("#select-role").val(),
+                        'trader': $("#input-trader").val().trim(),
+                        'account': $("#input-account").val().trim(),
+                        'userId': $("#select-user").val(),
                     };
 
-                    $.post('/user/create', param, function (result) {
+                    $.post('/finance/trader/account/create', param, function (result) {
                         if (result.code == 200) {
                             layer.msg("Save Successful.");
                             tableObj.reload();
@@ -169,19 +142,16 @@
             });
         });
 
-        table.on('tool(userTable)', function (obj) {
+        table.on('tool(account-table)', function (obj) {
 
             var data = obj.data;
             var layEvent = obj.event;
 
             if (layEvent === 'edit') {
                 $('#pop-div').show();
-                $("#pop-password").hide();
-                $("#name").val(data.name);
-                $("#nick-name").val(data.nickName);
-                $("#email").val(data.email);
-                $("#telephone").val(data.telephone);
-                $("#select-role").find("option[value=" + data.roleId + "]").prop("selected", true);
+                $("#input-trader").val(data.trader);
+                $("#input-account").val(data.account);
+                $("#select-user").find("option[value=" + data.uid + "]").prop("selected", true);
                 layui.form.render();
 
                 layer.open({
@@ -197,14 +167,12 @@
 
                         var param = {
                             'id': data.id,
-                            'email': $("#email").val().trim(),
-                            'name': $("#name").val().trim(),
-                            'nickName': $("#nick-name").val().trim(),
-                            'telephone': $("#telephone").val().trim(),
-                            'roleId': $("#select-role").val(),
+                            'trader': $("#input-trader").val().trim(),
+                            'account': $("#input-account").val().trim(),
+                            'userId': $("#select-user").val(),
                         };
 
-                        $.post('/user/update', param, function (result) {
+                        $.post('/finance/trader/account/update', param, function (result) {
                             if (result.code == 200) {
                                 layer.msg("Save Successful.");
                                 tableObj.reload();
@@ -226,7 +194,7 @@
                     layer.close(index);
                     var loading = layer.load(1);
 
-                    $.get("/user/" + data.id + "/delete", {}, function (result) {
+                    $.get("/finance/trader/account/" + data.id + "/delete", {}, function (result) {
                         if (result.code == 200) {
                             layer.msg("Delete successful.");
                             tableObj.reload();
@@ -240,14 +208,14 @@
             }
         });
 
-        $.get('/refer/role/list', {}, function (data) {
+        $.get('/user/list', {}, function (data) {
             var html = "";
-            $("select[name='select-role']").empty();
+            $("select[name='select-user']").empty();
             $.each(data.data, function (index, item) {
                 html += "<option value='" + item.id + "'>" + item.name + "</option>";
             });
 
-            $("select[name='select-role']").append(html);
+            $("select[name='select-user']").append(html);
 
             layui.form.render('select');
         });

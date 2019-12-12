@@ -3,8 +3,7 @@ package com.microyum.service.impl;
 import com.microyum.common.http.BaseResponseDTO;
 import com.microyum.common.http.HttpStatus;
 import com.microyum.dao.MyStockDao;
-import com.microyum.dto.CalculateStockTransactionCostDTO;
-import com.microyum.dto.StockLatestDataDTO;
+import com.microyum.dto.CalculateStockTransactionCostDto;
 import com.microyum.model.MyStockBase;
 import com.microyum.model.MyStockData;
 import com.microyum.service.StockService;
@@ -54,7 +53,7 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
-    public BaseResponseDTO calculateStockTransactionCost(CalculateStockTransactionCostDTO dto) {
+    public BaseResponseDTO calculateStockTransactionCost(CalculateStockTransactionCostDto dto) {
 
         BigDecimal buyTotal = dto.getStockPrice().multiply(dto.getStockCount());
         BigDecimal sellTotal = dto.getStockObjectPrice().multiply(dto.getStockCount());
@@ -134,7 +133,7 @@ public class StockServiceImpl implements StockService {
     }
 
     public static void main(String[] args) {
-        CalculateStockTransactionCostDTO dto;
+        CalculateStockTransactionCostDto dto;
 
         BigDecimal stockPrice = BigDecimal.valueOf(5);
         BigDecimal stockObjectPrice = BigDecimal.valueOf(5.01);
@@ -144,7 +143,7 @@ public class StockServiceImpl implements StockService {
 
 
         for (int i = 1; i <= 10; i++) {
-            dto = new CalculateStockTransactionCostDTO();
+            dto = new CalculateStockTransactionCostDto();
             dto.setTradingObject("1");
             dto.setStockPrice(stockPrice);
             dto.setStockObjectPrice(stockObjectPrice);

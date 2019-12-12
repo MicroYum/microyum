@@ -4,16 +4,16 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AlbumRequestDTO {
+public class TraderAccountDto {
 
     private Long id;
     private Long userId;
-    private String summary;
-    private String cover;
-    private List<String> paths;
+    private String userName;
+    private String nickName;
+    private String trader;
+    private String account;
+
 }

@@ -6,7 +6,7 @@ import com.microyum.bo.StockStrategyBO;
 import com.microyum.common.util.DateUtils;
 import com.microyum.common.util.MailUtils;
 import com.microyum.dao.MyStockDao;
-import com.microyum.dto.StockLatestDataDTO;
+import com.microyum.dto.StockLatestDataDto;
 import com.microyum.model.MyStockBase;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,6 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 /**
  * 投资策略定时任务
@@ -47,7 +46,7 @@ public class InvestmentStrategySchedule {
             // 将数据分为四档：低估5%, 低档15%, 中档60%, 高档15%, 高估5%
             BigDecimal interval = highest.subtract(lowest).divide(BigDecimal.valueOf(20));
 
-            StockLatestDataDTO latestStock = stockDao.referLatestStockData(stockBase.getStockCode());
+            StockLatestDataDto latestStock = stockDao.referLatestStockData(stockBase.getStockCode());
 
             if (interval.multiply(BigDecimal.valueOf(4)).add(lowest).compareTo(latestStock.getHfqClose()) == 1) {
 

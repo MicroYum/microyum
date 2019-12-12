@@ -1,6 +1,6 @@
 package com.microyum.dao;
 
-import com.microyum.dto.StockLatestDataDTO;
+import com.microyum.dto.StockLatestDataDto;
 import com.microyum.model.MyStockBase;
 import com.microyum.model.MyStockData;
 import com.microyum.model.MyStockDataDetail;
@@ -149,15 +149,15 @@ public class MyStockDao {
         return jdbcTemplate.queryForObject(sql, new Object[]{stockCode}, BigDecimal.class);
     }
 
-    public StockLatestDataDTO referLatestStockData(String stockCode) {
+    public StockLatestDataDto referLatestStockData(String stockCode) {
 
         String sql = "select b.stock_code, b.stock_name, d.`open`, d.`close`, d.high, d.low, d.percent, d.chg, " +
                 " d.trade_amount, d.trade_count, d.trade_date, d.hfq_close from my_stock_data d, my_stock_base b where " +
                 " d.trade_date = (SELECT max(t.trade_date) from my_stock_data t where t.symbol = ?) and " +
                 " d.symbol = ? and d.symbol = b.stock_code";
 
-        List<StockLatestDataDTO> list = jdbcTemplate.query(sql, new Object[]{stockCode, stockCode}, (rs, rowNum) -> {
-            StockLatestDataDTO stockData = new StockLatestDataDTO();
+        List<StockLatestDataDto> list = jdbcTemplate.query(sql, new Object[]{stockCode, stockCode}, (rs, rowNum) -> {
+            StockLatestDataDto stockData = new StockLatestDataDto();
             stockData.setStockCode(rs.getString("stock_code"));
             stockData.setStockName(rs.getString("stock_name"));
             stockData.setOpen(rs.getBigDecimal("open"));

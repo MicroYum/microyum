@@ -1,8 +1,7 @@
 package com.microyum.service;
 
 import com.microyum.common.http.BaseResponseDTO;
-import com.microyum.dto.AlbumRequestDTO;
-import com.microyum.model.MyAlbumDetail;
+import com.microyum.dto.AlbumRequestDto;
 
 public interface AlbumService {
 
@@ -10,5 +9,5 @@ public interface AlbumService {
 
     BaseResponseDTO findAlbumDetailById(Long id);
 
-    BaseResponseDTO saveAlbum(AlbumRequestDTO dto);
+    BaseResponseDTO saveAlbum(AlbumRequestDto dto);
 }

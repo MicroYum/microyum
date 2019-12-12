@@ -1,7 +1,7 @@
 package com.microyum.service;
 
 import com.microyum.common.http.BaseResponseDTO;
-import com.microyum.dto.UserDTO;
+import com.microyum.dto.UserDto;
 import com.microyum.model.MyRole;
 import com.microyum.model.MyUser;
 
@@ -13,13 +13,15 @@ public interface UserService {
 
     MyUser getUserByName(String name);
 
-    BaseResponseDTO createUser(UserDTO dto);
+    BaseResponseDTO createUser(UserDto dto);
 
-    List<UserDTO> referUserInfo(int page, int limit, String name);
+    List<UserDto> userListOverview(int page, int limit, String name);
 
     List<MyRole> referRoleList();
 
-    boolean updateUser(UserDTO dto);
+    boolean updateUser(UserDto dto);
 
     boolean deleteUser(Long id);
+
+    List<MyUser> userList();
 }

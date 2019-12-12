@@ -10,8 +10,8 @@ import com.microyum.dao.MyArticleTypeDao;
 import com.microyum.dao.MyBlogDao;
 import com.microyum.dao.MyBlogLogDao;
 import com.microyum.dto.BlogDetailPaging;
-import com.microyum.dto.BlogListDTO;
-import com.microyum.dto.BlogRequestDTO;
+import com.microyum.dto.BlogListDto;
+import com.microyum.dto.BlogRequestDto;
 import com.microyum.model.MyArticleType;
 import com.microyum.model.MyBlog;
 import com.microyum.model.MyBlogLog;
@@ -79,7 +79,7 @@ public class BlogServiceImpl implements BlogService {
     @Override
     public BaseResponseDTO listAllBlog(int pageNo, int pageSize, int article, String title) {
 
-        List<BlogListDTO> listBlog = myBlogDao.findAllBlog(pageNo, pageSize, article, title);
+        List<BlogListDto> listBlog = myBlogDao.findAllBlog(pageNo, pageSize, article, title);
 
         BaseResponseDTO responseDTO = new BaseResponseDTO(HttpStatus.OK_LAYUI, listBlog);
         responseDTO.setCount(myBlogDao.countAllBlog(article, title));
@@ -131,7 +131,7 @@ public class BlogServiceImpl implements BlogService {
     }
 
     @Override
-    public BaseResponseDTO saveBlog(BlogRequestDTO blogDto) {
+    public BaseResponseDTO saveBlog(BlogRequestDto blogDto) {
 
         MyBlog entity = new MyBlog();
         BeanUtils.copyProperties(blogDto, entity);

@@ -4,7 +4,7 @@ import com.microyum.common.http.BaseResponseDTO;
 import com.microyum.common.http.HttpStatus;
 import com.microyum.common.util.CaptchaUtils;
 import com.microyum.common.util.DateUtils;
-import com.microyum.dto.UserDTO;
+import com.microyum.dto.UserDto;
 import com.microyum.model.MyUser;
 import com.microyum.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,13 +64,13 @@ public class UserController {
     }
 
     @PostMapping(value = "/user/create")
-    public BaseResponseDTO createUser(UserDTO userDTO) {
+    public BaseResponseDTO createUser(UserDto userDTO) {
 
         return userService.createUser(userDTO);
     }
 
     @PostMapping(value = "/user/update")
-    public BaseResponseDTO updateUser(UserDTO userDTO) {
+    public BaseResponseDTO updateUser(UserDto userDTO) {
 
         boolean result = userService.updateUser(userDTO);
 
@@ -93,15 +93,18 @@ public class UserController {
         return new BaseResponseDTO(HttpStatus.ERROR_IN_DATABASE);
     }
 
-    @GetMapping(value = "/refer/user/info", produces = "application/json")
-    public BaseResponseDTO referUserInfo(int page, int limit, String name) {
+    @GetMapping(value = "/user/list/overview", produces = "application/json")
+    public BaseResponseDTO userListOverview(int page, int limit, String name) {
+        return new BaseResponseDTO(HttpStatus.OK_LAYUI, userService.userListOverview(page, limit, name));
+    }
 
-        return new BaseResponseDTO(HttpStatus.OK_LAYUI, userService.referUserInfo(page, limit, name));
+    @GetMapping(value = "/user/list", produces = "application/json")
+    public BaseResponseDTO userList() {
+        return new BaseResponseDTO(HttpStatus.OK, userService.userList());
     }
 
     @GetMapping(value = "/refer/role/list", produces = "application/json")
     public BaseResponseDTO referRoleList() {
-
         return new BaseResponseDTO(HttpStatus.OK, userService.referRoleList());
     }
 }

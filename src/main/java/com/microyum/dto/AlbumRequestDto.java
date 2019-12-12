@@ -4,15 +4,16 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class BlogListDTO {
+public class AlbumRequestDto {
 
     private Long id;
-    private String title;
-    private String status;
-    private String article;
-    private Long pageView;
-    private String createTime;
+    private Long userId;
+    private String summary;
+    private String cover;
+    private List<String> paths;
 }

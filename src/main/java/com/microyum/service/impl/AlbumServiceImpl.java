@@ -6,7 +6,7 @@ import com.microyum.common.http.BaseResponseDTO;
 import com.microyum.common.http.HttpStatus;
 import com.microyum.dao.MyAlbumDao;
 import com.microyum.dao.MyAlbumDetailDao;
-import com.microyum.dto.AlbumRequestDTO;
+import com.microyum.dto.AlbumRequestDto;
 import com.microyum.service.AlbumService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,7 +40,7 @@ public class AlbumServiceImpl implements AlbumService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = {Exception.class, RuntimeException.class})
-    public BaseResponseDTO saveAlbum(AlbumRequestDTO dto) {
+    public BaseResponseDTO saveAlbum(AlbumRequestDto dto) {
 
         Long albumId = albumDao.findIdBySummary(dto.getSummary());
         if (albumId == null) {

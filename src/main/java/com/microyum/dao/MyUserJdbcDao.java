@@ -1,6 +1,6 @@
 package com.microyum.dao;
 
-import com.microyum.dto.UserDTO;
+import com.microyum.dto.UserDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -14,14 +14,14 @@ public class MyUserJdbcDao {
     @Autowired
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-    public List<UserDTO> findByNameOrNickName(int start, int limit, String name) {
+    public List<UserDto> findByNameOrNickName(int start, int limit, String name) {
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         parameters.addValue("start", start);
         parameters.addValue("limit", limit);
         parameters.addValue("name", "%" + name + "%");
 
         return namedParameterJdbcTemplate.query(this.findUserInfoSql(true), parameters, (rs, rowNum) -> {
-            UserDTO userDTO = new UserDTO();
+            UserDto userDTO = new UserDto();
             userDTO.setId(rs.getLong("id"));
             userDTO.setName(rs.getString("name"));
             userDTO.setNickName(rs.getString("nick_name"));
@@ -35,14 +35,14 @@ public class MyUserJdbcDao {
         });
     }
 
-    public List<UserDTO> findUserInfoPaging(int start, int limit) {
+    public List<UserDto> findUserInfoPaging(int start, int limit) {
 
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         parameters.addValue("start", start);
         parameters.addValue("limit", limit);
 
         return namedParameterJdbcTemplate.query(this.findUserInfoSql(false), parameters, (rs, rowNum) -> {
-            UserDTO userDTO = new UserDTO();
+            UserDto userDTO = new UserDto();
             userDTO.setId(rs.getLong("id"));
             userDTO.setName(rs.getString("name"));
             userDTO.setNickName(rs.getString("nick_name"));

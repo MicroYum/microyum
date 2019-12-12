@@ -10,7 +10,7 @@ import java.util.Date;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class StockLatestDataDTO {
+public class StockLatestDataDto {
     // 股票代码
     private String stockCode;
     // 股票名称

@@ -2,11 +2,9 @@ package com.microyum.controller;
 
 import com.google.common.collect.Maps;
 import com.microyum.common.http.BaseResponseDTO;
-import com.microyum.common.http.HttpStatus;
 import com.microyum.common.util.UserUtils;
 import com.microyum.dto.BlogDetailPaging;
-import com.microyum.dto.BlogRequestDTO;
-import com.microyum.model.MyBlog;
+import com.microyum.dto.BlogRequestDto;
 import com.microyum.service.BlogService;
 import com.microyum.service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +53,7 @@ public class BlogController {
     }
 
     @RequestMapping(value = "/save/blog", produces = "application/json")
-    public BaseResponseDTO saveBlog(BlogRequestDTO blogDto) {
+    public BaseResponseDTO saveBlog(BlogRequestDto blogDto) {
         return blogService.saveBlog(blogDto);
     }
 

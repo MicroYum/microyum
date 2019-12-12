@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class BlogRequestDTO {
+public class BlogRequestDto {
 
     private Long id;
     private String topicImg;

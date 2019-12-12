@@ -1,7 +1,7 @@
 package com.microyum.dao;
 
 import com.microyum.common.util.DateUtils;
-import com.microyum.dto.BlogListDTO;
+import com.microyum.dto.BlogListDto;
 import com.microyum.model.MyBlog;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -54,7 +54,7 @@ public class MyBlogDao {
         return namedParameterJdbcTemplate.queryForObject(builder.toString(), parameters, Long.class);
     }
 
-    public List<BlogListDTO> findAllBlog(int pageNo, int pageSize, int article, String title) {
+    public List<BlogListDto> findAllBlog(int pageNo, int pageSize, int article, String title) {
         int start = (pageNo - 1) * pageSize;
 
         MapSqlParameterSource parameters = new MapSqlParameterSource();
@@ -90,8 +90,8 @@ public class MyBlogDao {
         builder.append("    create_time desc ");
         builder.append("    limit :start, :pageSize ");
 
-        List<BlogListDTO> listBlog = namedParameterJdbcTemplate.query(builder.toString(), parameters, (rs, rowNum) -> {
-            BlogListDTO blogDTO = new BlogListDTO();
+        List<BlogListDto> listBlog = namedParameterJdbcTemplate.query(builder.toString(), parameters, (rs, rowNum) -> {
+            BlogListDto blogDTO = new BlogListDto();
             blogDTO.setId(rs.getLong("id"));
             blogDTO.setTitle(rs.getString("title"));
             blogDTO.setArticle(rs.getString("article"));
