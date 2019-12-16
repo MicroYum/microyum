@@ -69,6 +69,7 @@
             , where: {
                 stock: $.trim($("#select-stock").val())
             }
+            , limits: [15, 30, 45, 60, 75, 90]
         });
 
         $("#btn-select-stock").on('click', function () {

@@ -152,10 +152,20 @@ public class ReferStockDataSchedule {
     }
 
     /**
-     * 补齐后复权数据
+     * 每天收盘10分钟猴开始补齐后复权数据
      */
-    @Scheduled(cron = "0 15 15 * * ? ")
+    @Scheduled(cron = "0 10 15 * * ? ")
     public void repairHfqData() {
+
+        // 定时任务运行时间每周一到周五
+        Calendar calendar = Calendar.getInstance();
+        int dayWeek = calendar.get(Calendar.DAY_OF_WEEK);
+
+        if (dayWeek == 1 || dayWeek == 7) {
+            log.info("周六、周日不补全后复权数据.");
+            return;
+        }
+
 
         log.info("开始补齐当天的后复权数据...");
 

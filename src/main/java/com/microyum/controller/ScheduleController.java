@@ -27,12 +27,6 @@ public class ScheduleController {
         return new BaseResponseDTO(HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/public/schedule/stock/value")
-    public BaseResponseDTO stockValueInterval() {
-        investmentStrategySchedule.valueInterval();
-        return new BaseResponseDTO(HttpStatus.OK);
-    }
-
     @RequestMapping(value = "/public/repair/stock/data")
     public BaseResponseDTO repairStockData() {
         stockService.repairStockData();

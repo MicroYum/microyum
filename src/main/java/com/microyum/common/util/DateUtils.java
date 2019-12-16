@@ -39,6 +39,10 @@ public class DateUtils {
         return formatDate(new Date(), DATE_TIME_FORMAT);
     }
 
+    public static String getCurrentDate() {
+        return formatDate(new Date(), DATE_FORMAT);
+    }
+
     public static long getDateDiff(Date start, Date end, TimeUnit timeUnit) {
         long diff = end.getTime() - start.getTime();
         return timeUnit.convert(diff, TimeUnit.MILLISECONDS);

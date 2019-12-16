@@ -2,18 +2,23 @@ package com.microyum.schedule;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.microyum.bo.StockStrategyBO;
+import com.microyum.common.enums.StockStrategyEnum;
 import com.microyum.common.util.DateUtils;
 import com.microyum.common.util.MailUtils;
+import com.microyum.dao.MyFinanceDao;
+import com.microyum.dao.MyStockDailyStrategyDao;
 import com.microyum.dao.MyStockDao;
-import com.microyum.dto.StockLatestDataDto;
+import com.microyum.dao.MyUserDao;
+import com.microyum.dto.AssetAllocationDto;
 import com.microyum.model.MyStockBase;
+import com.microyum.model.MyStockDailyStrategy;
+import com.microyum.model.MyUser;
+import com.microyum.strategy.StockStrategy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -27,139 +32,108 @@ public class InvestmentStrategySchedule {
     @Autowired
     private MyStockDao stockDao;
 
-    // 进入买卖区间，每天16:30执行
-    @Scheduled(cron = "0 30 16 * * ? ")
-    public void valueInterval() {
+    @Autowired
+    private MyStockDailyStrategyDao dailyStrategyDao;
 
-        log.info("买卖区判断定时任务开始...");
-        List<StockStrategyBO> strategyBOList = Lists.newArrayList();
+    @Autowired
+    private MyFinanceDao myFinanceDao;
+
+    @Autowired
+    private StockStrategy stockStrategy;
+
+    @Autowired
+    private MyUserDao userDao;
+
+    /**
+     * 交易日15:30开始，计算所有股票的价值区间，符合条件的保存到MyStockDailyStrategy表
+     */
+    @Scheduled(cron = "0 30 15 * * ? ")
+    public void calcValueRange() {
 
         // 获取所有股票的列表
         List<MyStockBase> listStock = stockDao.getObservedListNotIndex();
 
         for (MyStockBase stockBase : listStock) {
-            // 获取所有后复权数据的最高点记录、最低点记录
-            BigDecimal highest = stockDao.getHighestStock(stockBase.getStockCode());
-            BigDecimal lowest = stockDao.getLowestStock(stockBase.getStockCode());
 
+            MyStockDailyStrategy dailyStrategy = stockStrategy.calcStockValueRange(stockBase);
+            dailyStrategyDao.save(dailyStrategy);
+        }
+    }
 
-            // 将数据分为四档：低估5%, 低档15%, 中档60%, 高档15%, 高估5%
-            BigDecimal interval = highest.subtract(lowest).divide(BigDecimal.valueOf(20));
+    @Scheduled(cron = "0 0 17 * * ? ")
+    public void personalValueInterval() {
 
-            StockLatestDataDto latestStock = stockDao.referLatestStockData(stockBase.getStockCode());
+        // 检索Trader Account中已配置的账号
+        List<AssetAllocationDto> accountDtos = myFinanceDao.assetAllocationAll();
 
-            if (interval.multiply(BigDecimal.valueOf(4)).add(lowest).compareTo(latestStock.getHfqClose()) == 1) {
+        Map<Long, List<Map<String, Object>>> mapAccount = Maps.newHashMap();
+        for (AssetAllocationDto dto : accountDtos) {
+            Map<String, Object> map = Maps.newHashMap();
+            map.put("nickName", dto.getNickName());
+            map.put("trader", dto.getTrader());
+            map.put("account", dto.getAccount());
+            map.put("stockCode", dto.getStockCode());
+            map.put("stockName", dto.getAssetName());
 
-                StockStrategyBO strategyBO = new StockStrategyBO();
-                strategyBO.setStockCode(stockBase.getStockCode());
-                strategyBO.setStockName(stockBase.getStockName());
-                strategyBO.setCurrent(latestStock.getClose());
-                strategyBO.setHfqCurrent(latestStock.getHfqClose());
-                strategyBO.setTradeDate(DateUtils.formatDate(latestStock.getTradeDate(), DateUtils.DATE_FORMAT));
-
-                if (lowest.add(interval).compareTo(latestStock.getHfqClose()) == 1) {
-                    // 进入最低价 + 5%的区域
-                    strategyBO.setLow(lowest);
-                    strategyBO.setHigh(lowest.add(interval));
-
-
-                    strategyBO.setDate(stockDao.countStockDataByCode(stockBase.getStockCode(), null));
-                    Map<String, BigDecimal> lowPrice = Maps.newHashMap();
-                    lowPrice.put("lowPrice", latestStock.getHfqClose());
-                    strategyBO.setLowPriceDate(stockDao.countStockDataByCode(stockBase.getStockCode(), lowPrice));
-                    Map<String, BigDecimal> lowVolume = Maps.newHashMap();
-                    lowVolume.put("lowVolume", latestStock.getTradeCount());
-                    strategyBO.setLowVolumeDate(stockDao.countStockDataByCode(stockBase.getStockCode(), lowVolume));
-
-                    // 判断成交量，如果成交量小于5%，或者大于40%的时间，重点标注
-                    if (strategyBO.getDate() * 0.05 > strategyBO.getLowVolumeDate() || strategyBO.getDate() * 0.4 < strategyBO.getLowVolumeDate()) {
-                        strategyBO.setBuy(true);
-                    } else {
-                        strategyBO.setBuy(false);
-                    }
-
-                    strategyBOList.add(strategyBO);
-                } else {
-                    // 进入最低价 + 5% ~ 最低价 + 15%的区域
-                    strategyBO.setLow(lowest.add(interval));
-                    strategyBO.setHigh(interval.multiply(BigDecimal.valueOf(4)).add(lowest));
-                    strategyBO.setBuyObserve(true);
-                    strategyBOList.add(strategyBO);
-                }
-            } else if (highest.subtract(interval.multiply(BigDecimal.valueOf(4))).compareTo(latestStock.getHfqClose()) == -1) {
-
-                StockStrategyBO strategyBO = new StockStrategyBO();
-                strategyBO.setStockCode(stockBase.getStockCode());
-                strategyBO.setStockName(stockBase.getStockName());
-                strategyBO.setCurrent(latestStock.getClose());
-                strategyBO.setHfqCurrent(latestStock.getHfqClose());
-                strategyBO.setTradeDate(DateUtils.formatDate(latestStock.getTradeDate(), DateUtils.DATE_FORMAT));
-
-                if (highest.subtract(interval).compareTo(latestStock.getHfqClose()) == -1) {
-                    // 进入最高价 - 5%的区域
-                    strategyBO.setHigh(highest);
-                    strategyBO.setLow(highest.subtract(interval));
-                    strategyBO.setSell(true);
-
-                    strategyBO.setDate(stockDao.countStockDataByCode(stockBase.getStockCode(), null));
-                    strategyBO.setHighPriceDate(stockDao.countStockDataByCode(stockBase.getStockCode(), (Map<String, BigDecimal>) Maps.newHashMap().put("highPrice", latestStock.getHfqClose())));
-                    strategyBO.setHighVolumeDate(stockDao.countStockDataByCode(stockBase.getStockCode(), (Map<String, BigDecimal>) Maps.newHashMap().put("highVolume", latestStock.getTradeCount())));
-
-                    strategyBOList.add(strategyBO);
-                } else {
-                    // 进入最高价 - 15% ~ 最高价 - 5%的区域
-                    strategyBO.setHigh(highest.subtract(interval));
-                    strategyBO.setLow(highest.subtract(interval.multiply(BigDecimal.valueOf(4))));
-                    strategyBO.setSellObserve(true);
-                    strategyBOList.add(strategyBO);
-                }
+            if (mapAccount.containsKey(dto.getUid())) {
+                mapAccount.get(dto.getUid()).add(map);
+            } else {
+                List<Map<String, Object>> list = Lists.newArrayList();
+                list.add(map);
+                mapAccount.put(dto.getUid(), list);
             }
         }
 
-        // 进入低档和高档区间后，发邮件提升
-        if (strategyBOList.size() > 0) {
-            String title = "股票买卖提示邮件";
+        String title = "股票买卖提示邮件";
+
+        for (Long uid : mapAccount.keySet()) {
+            MyUser user = userDao.findByUId(uid);
             StringBuilder body = new StringBuilder();
-            for (StockStrategyBO bo : strategyBOList) {
+            body.append(" Dear, ").append(user.getNickName()).append("<br/><br/>");
+            Map<String, Boolean> repetition = Maps.newHashMap();
 
-                if (bo.isBuy()) {
-                    body.append("股票: <font color='red'><b>").append(bo.getStockName()).append("[").append(bo.getStockCode()).append("]</b></font>, ");
-                    body.append("已进入低估区，截至到: ").append(bo.getTradeDate()).append(", ");
-                    body.append("现价为: ").append(bo.getCurrent()).append(", 后复权价格为: ").append(bo.getHfqCurrent());
-                    body.append("。低估区域: ").append(bo.getLow()).append(" ~ ").append(bo.getHigh()).append("。");
-                    body.append("交易天数共计: ").append(bo.getDate()).append("天，");
-                    body.append("比当前价格低的天数: ").append(bo.getLowPriceDate()).append("天，");
-                    body.append("比当前交易量低的天数: ").append(bo.getLowVolumeDate()).append("天，");
-                    body.append("需要密切关注。<br/><br/>");
+            for (Map<String, Object> item : mapAccount.get(uid)) {
 
-                } else if (bo.isBuyObserve()) {
-                    body.append("股票: ").append(bo.getStockName()).append("[").append(bo.getStockCode()).append("], ");
-                    body.append("已进入低档区，现价为: ").append(bo.getCurrent()).append(", 后复权价格为: ").append(bo.getHfqCurrent());
-                    body.append("。低档区域: ").append(bo.getLow()).append(" ~ ").append(bo.getHigh()).append("。<br/><br/>");
-                } else if (bo.isSell()) {
-                    body.append("股票: <font color='blue'><b>").append(bo.getStockName()).append("[").append(bo.getStockCode()).append("]</b></font>, ");
-                    body.append("已进入高估区，截至到: ").append(bo.getTradeDate()).append(", ");
-                    body.append("现价为: ").append(bo.getCurrent()).append(", 后复权价格为: ").append(bo.getHfqCurrent());
-                    body.append("。高估区域: ").append(bo.getLow()).append(" ~ ").append(bo.getHigh()).append("。");
-                    body.append("交易天数共计: ").append(bo.getDate()).append("天，");
-                    body.append("比当前价格高的天数: ").append(bo.getHighPriceDate()).append("天，");
-                    body.append("比当前交易量高的天数: ").append(bo.getHighVolumeDate()).append("天，");
-                    body.append("需要密切关注。<br/><br/>");
-                } else if (bo.isSellObserve()) {
-                    body.append("股票: ").append(bo.getStockName()).append("[").append(bo.getStockCode()).append("], ");
-                    body.append("已进入高档区，现价为: ").append(bo.getCurrent()).append(", 后复权价格为: ").append(bo.getHfqCurrent());
-                    body.append("。高档区域: ").append(bo.getLow()).append(" ~ ").append(bo.getHigh()).append("。<br/><br/>");
+                // 避免同一个人名下，又多个股票账户中出现同一个股票而造成的反复
+                if (repetition.containsKey(item.get("stockCode"))) {
+                    continue;
+                } else {
+                    repetition.put(String.valueOf(item.get("stockCode")), true);
+                }
+
+                // 2、匹配MyStockDailyStrategy表，如果条件满足则列入List
+                MyStockDailyStrategy strategy = dailyStrategyDao.findByStockCodeAndTradeDate(String.valueOf(item.get("stockCode")),  DateUtils.getCurrentDate());
+
+                if (strategy.getStrategy().equals(StockStrategyEnum.STRATEGY_BUYING.getCode())) {
+                    body.append("股票: <font color='red'><b>").append(item.get("stockName")).append("[").append(strategy.getStockCode()).append("]</b></font>已进入买入区, ");
+                    body.append("交易日: ").append(DateUtils.formatDate(strategy.getTradeDate(), DateUtils.DATE_FORMAT)).append(", ");
+                    body.append("现价为: ").append(strategy.getLatestPrice()).append(", 后复权价格为: ").append(strategy.getLatestHfqPrice());
+                    body.append("。买入区域(后复权): ").append(strategy.getBuyingMin()).append(" ~ ").append(strategy.getBuyingMax()).append("，建议买入<br/><br/>");
+                } else if (strategy.getStrategy().equals(StockStrategyEnum.STRATEGY_UNDER_VALUE.getCode())) {
+                    body.append("股票: ").append(item.get("stockName")).append("[").append(strategy.getStockCode()).append("]已进入低估区, ");
+                    body.append("交易日: ").append(DateUtils.formatDate(strategy.getTradeDate(), DateUtils.DATE_FORMAT)).append(", ");
+                    body.append("现价为: ").append(strategy.getLatestPrice()).append(", 后复权价格为: ").append(strategy.getLatestHfqPrice());
+                    body.append("。低估区域(后复权): ").append(strategy.getUnderMin()).append(" ~ ").append(strategy.getUnderMax()).append("。<br/><br/>");
+                } else if (strategy.getStrategy().equals(StockStrategyEnum.STRATEGY_OVER_VALUE.getCode())) {
+                    body.append("股票: ").append(item.get("stockName")).append("[").append(strategy.getStockCode()).append("]已进入高估区, ");
+                    body.append("交易日: ").append(DateUtils.formatDate(strategy.getTradeDate(), DateUtils.DATE_FORMAT)).append(", ");
+                    body.append("现价为: ").append(strategy.getLatestPrice()).append(", 后复权价格为: ").append(strategy.getLatestHfqPrice());
+                    body.append("。高估区域(后复权): ").append(strategy.getOverMin()).append(" ~ ").append(strategy.getOverMax()).append("。<br/><br/>");
+                } else if (strategy.getStrategy().equals(StockStrategyEnum.STRATEGY_SELLING.getCode())) {
+                    body.append("股票: <font color='blue'><b>").append(item.get("stockName")).append("[").append(strategy.getStockCode()).append("]</b></font>已进入卖出区, ");
+                    body.append("交易日: ").append(DateUtils.formatDate(strategy.getTradeDate(), DateUtils.DATE_FORMAT)).append(", ");
+                    body.append("现价为: ").append(strategy.getLatestPrice()).append(", 后复权价格为: ").append(strategy.getLatestHfqPrice());
+                    body.append("。卖出区域(后复权): ").append(strategy.getSellingMin()).append(" ~ ").append(strategy.getSellingMax()).append("，请密切关注<br/><br/>");
                 }
             }
 
+            // 3、将List中的标的信息，邮件发送给user表中的email账号
             try {
-                MailUtils.sendMail(title, body.toString());
+                MailUtils.sendMail(title, user.getEmail(), user.getNickName(), body.toString());
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-
-        log.info("买卖区判断定时任务结束.");
     }
 
     // 可转债定时任务

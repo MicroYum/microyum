@@ -20,6 +20,26 @@ public class MyFinanceDao {
     @Resource
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
+    public List<TraderAccountDto> traderAccountAll() {
+
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        StringBuilder builder = new StringBuilder();
+        builder.append("select ta.id, mu.id as uid, mu.name, mu.nick_name, ta.trader, ta.account ");
+        builder.append(" from my_user mu inner join my_finance_trader_account ta on mu.id = ta.uid ");
+        builder.append(" order by mu.id ");
+
+        return namedParameterJdbcTemplate.query(builder.toString(), parameters, (rs, rowNum) -> {
+            TraderAccountDto dto = new TraderAccountDto();
+            dto.setId(rs.getLong("id"));
+            dto.setUserId(rs.getLong("uid"));
+            dto.setUserName(rs.getString("name"));
+            dto.setNickName(rs.getString("nick_name"));
+            dto.setTrader(rs.getString("trader"));
+            dto.setAccount(rs.getString("account"));
+            return dto;
+        });
+    }
+
     public Long traderAccountOverviewCount(String trader) {
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         StringBuilder builder = new StringBuilder();
@@ -114,6 +134,40 @@ public class MyFinanceDao {
         return namedParameterJdbcTemplate.queryForObject(builder.toString(), parameters, Long.class);
     }
 
+    public List<AssetAllocationDto> assetAllocationAll() {
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        StringBuilder builder = new StringBuilder();
+        builder.append("select fc.id, fc.`type`, fc.amount, fc.currency, ta.id as ta_id,  ");
+        builder.append(" ta.trader, ta.account, mu.id as uid, mu.`name` as user_name, ");
+        builder.append(" mu.nick_name, sb.stock_code, fc.name as stock_name ");
+        builder.append(" from my_finance_config fc ");
+        builder.append(" inner join my_finance_trader_account ta on fc.ta_id = ta.id ");
+        builder.append(" inner join my_user mu on ta.uid = mu.id ");
+        builder.append(" inner join my_stock_base sb on sb.stock_name = fc.name ");
+        builder.append(" order by mu.id, ta.id, fc.name ");
+
+        return namedParameterJdbcTemplate.query(builder.toString(), parameters, (rs, rowNum) -> {
+            AssetAllocationDto dto = new AssetAllocationDto();
+            dto.setId(rs.getLong("id"));
+            dto.setAssetType(rs.getString("type"));
+            dto.setAmount(rs.getString("amount"));
+            dto.setCurrency(rs.getString("currency"));
+
+            dto.setTaId(rs.getLong("ta_id"));
+            dto.setTrader(rs.getString("trader"));
+            dto.setAccount(rs.getString("account"));
+
+            dto.setUid(rs.getLong("uid"));
+            dto.setUserName(rs.getString("user_name"));
+            dto.setNickName(rs.getString("nick_name"));
+
+            dto.setAssetName(rs.getString("stock_name"));
+            dto.setStockCode(rs.getString("stock_code"));
+
+            return dto;
+        });
+    }
+
     public List<AssetAllocationDto> assetAllocationOverview(int start, int limit, String trader, String stock) {
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         StringBuilder builder = new StringBuilder();
@@ -138,7 +192,7 @@ public class MyFinanceDao {
             parameters.addValue("trader", "%" + trader + "%");
         }
 
-        builder.append(" order by mu.id ");
+        builder.append(" order by mu.id, ta.id, fc.name ");
         builder.append(" limit :start, :limit ");
 
         parameters.addValue("start", start);
