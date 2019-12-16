@@ -1,16 +1,30 @@
 package com.microyum.service;
 
+import com.microyum.common.http.BaseResponseDTO;
+import com.microyum.dto.AssetAllocationDto;
 import com.microyum.dto.TraderAccountDto;
+import com.microyum.model.MyFinanceTraderAccount;
 
 import java.util.List;
+import java.util.Map;
 
 public interface FinanceService {
 
-    List<TraderAccountDto> traderAccountOverview(int page, int limit, String trader);
+    BaseResponseDTO traderAccountOverview(int page, int limit, String trader);
 
     boolean traderAccountCreate(TraderAccountDto dto);
 
     boolean traderAccountUpdate(TraderAccountDto dto);
 
     boolean traderAccountDelete(Long id);
+
+    Map<Long, String> traderAccountByUid(Long uid);
+
+    BaseResponseDTO assetAllocationOverview(int page, int limit, String trader, String stock);
+
+    boolean assetAllocationCreate(AssetAllocationDto dto);
+
+    boolean assetAllocationUpdate(AssetAllocationDto dto);
+
+    boolean assetAllocationDelete(Long id);
 }

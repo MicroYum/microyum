@@ -14,13 +14,19 @@ public class MyUserJdbcDao {
     @Autowired
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
+    public Long findByNameOrNickNameCount(String name) {
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        parameters.addValue("name", "%" + name + "%");
+        return namedParameterJdbcTemplate.queryForObject(this.findUserInfoSql(true, true), parameters, Long.class);
+    }
+
     public List<UserDto> findByNameOrNickName(int start, int limit, String name) {
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         parameters.addValue("start", start);
         parameters.addValue("limit", limit);
         parameters.addValue("name", "%" + name + "%");
 
-        return namedParameterJdbcTemplate.query(this.findUserInfoSql(true), parameters, (rs, rowNum) -> {
+        return namedParameterJdbcTemplate.query(this.findUserInfoSql(true, false), parameters, (rs, rowNum) -> {
             UserDto userDTO = new UserDto();
             userDTO.setId(rs.getLong("id"));
             userDTO.setName(rs.getString("name"));
@@ -33,6 +39,11 @@ public class MyUserJdbcDao {
             userDTO.setLocked(rs.getString("locked"));
             return userDTO;
         });
+    }
+
+    public Long findUserInfoCount() {
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        return namedParameterJdbcTemplate.queryForObject(this.findUserInfoSql(false, true), parameters, Long.class);
     }
 
     public List<UserDto> findUserInfoPaging(int start, int limit) {
@@ -41,7 +52,7 @@ public class MyUserJdbcDao {
         parameters.addValue("start", start);
         parameters.addValue("limit", limit);
 
-        return namedParameterJdbcTemplate.query(this.findUserInfoSql(false), parameters, (rs, rowNum) -> {
+        return namedParameterJdbcTemplate.query(this.findUserInfoSql(false, false), parameters, (rs, rowNum) -> {
             UserDto userDTO = new UserDto();
             userDTO.setId(rs.getLong("id"));
             userDTO.setName(rs.getString("name"));
@@ -57,17 +68,26 @@ public class MyUserJdbcDao {
 
     }
 
-    private String findUserInfoSql(boolean hasCondition) {
+    private String findUserInfoSql(boolean hasCondition, boolean isCount) {
         StringBuilder builder = new StringBuilder();
-        builder.append("select mu.id as id, mu.name as name, mu.nick_name as nick_name, mu.email as email, ");
-        builder.append(" mu.telephone as telephone, DATE_FORMAT(mu.last_update_time,'%Y-%m-%d %H:%i:%s') as last_update_time, ");
-        builder.append(" mr.name as role_name, mr.id as role_id, case mu.locked when true then 'Yes' else 'No' end as locked ");
+
+        if (isCount) {
+            builder.append("select count(1) ");
+        } else {
+            builder.append("select mu.id as id, mu.name as name, mu.nick_name as nick_name, mu.email as email, ");
+            builder.append(" mu.telephone as telephone, DATE_FORMAT(mu.last_update_time,'%Y-%m-%d %H:%i:%s') as last_update_time, ");
+            builder.append(" mr.name as role_name, mr.id as role_id, case mu.locked when true then 'Yes' else 'No' end as locked ");
+        }
+
         builder.append(" from my_user mu inner join my_user_role ur on ur.user_id = mu.id ");
         builder.append(" inner join my_role mr on mr.id = ur.role_id ");
         if (hasCondition) {
             builder.append(" where mu.name like :name or mu.nick_name like :name ");
         }
-        builder.append(" limit :start, :limit");
+
+        if (!isCount) {
+            builder.append(" limit :start, :limit");
+        }
 
         return builder.toString();
     }

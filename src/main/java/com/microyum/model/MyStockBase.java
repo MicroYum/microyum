@@ -29,7 +29,7 @@ public class MyStockBase extends BaseModel {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String introduction;
     // 列表排序序号
-    private Integer listSort;
+    private String listSort;
     // 是否列入观察
     private Byte observe;
     // 日数据开始日期

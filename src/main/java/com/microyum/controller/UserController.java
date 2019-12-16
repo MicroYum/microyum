@@ -1,5 +1,6 @@
 package com.microyum.controller;
 
+import com.google.common.collect.Lists;
 import com.microyum.common.http.BaseResponseDTO;
 import com.microyum.common.http.HttpStatus;
 import com.microyum.common.util.CaptchaUtils;
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -95,7 +97,8 @@ public class UserController {
 
     @GetMapping(value = "/user/list/overview", produces = "application/json")
     public BaseResponseDTO userListOverview(int page, int limit, String name) {
-        return new BaseResponseDTO(HttpStatus.OK_LAYUI, userService.userListOverview(page, limit, name));
+
+        return userService.userListOverview(page, limit, name);
     }
 
     @GetMapping(value = "/user/list", produces = "application/json")

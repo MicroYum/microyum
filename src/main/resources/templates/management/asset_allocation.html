@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>渠道账户配置</title>
+    <title>资产配置</title>
     <link rel="stylesheet" href="/static/layui/css/layui.css">
 </head>
 <body>
@@ -10,21 +10,23 @@
     <div class="layadmin-tabsbody-item layui-show">
         <div class="layui-fluid" style="margin: 15px;">
             <div class="layui-form-item">
-                <label class="layui-form-label" style="width: 100px;">Trader Name: </label>
+                <label class="layui-form-label" style="width: 80px;">Trader: </label>
                 <div class="layui-input-inline" style="width: 300px;">
-                    <input type="text" id="select-trader" lay-verify="required" placeholder="Please input trader name"
-                           autocomplete="off" class="layui-input">
+                    <input type="text" id="select-trader" lay-verify="required" placeholder="Please input trader name" autocomplete="off" class="layui-input">
+                </div>
+                <label class="layui-form-label" style="width: 50px;">Stock: </label>
+                <div class="layui-input-inline" style="width: 300px;">
+                    <input type="text" id="select-stock" lay-verify="required" placeholder="Please input stock code or name" autocomplete="off" class="layui-input">
                 </div>
                 <a href="javascript:;" class="layui-btn layui-btn-small" id="btn-select"><i
                         class="layui-icon layui-icon-refresh"></i> Select</a>
                 <a href="javascript:;" class="layui-btn layui-btn-small" id="btn-add"><i
-                        class="layui-icon layui-icon-add-circle"></i> Add Account</a>
+                        class="layui-icon layui-icon-add-circle"></i> Add</a>
             </div>
         </div>
 
         <div style="padding: 15px; overflow:auto;">
-            <table class="layui-table" id="account-table" lay-filter="account-table" width="auto"
-                   style="white-space:nowrap"></table>
+            <table class="layui-table" id="asset-table" lay-filter="asset-table" width="auto" style="white-space:nowrap"></table>
             <script type="text/html" id="toolbar">
                 <a class="layui-btn layui-btn-xs" lay-event="edit">
                     <i class="layui-icon">&#xe642;</i>Edit
@@ -40,21 +42,39 @@
 <div style="margin: 15px; display: none" id="pop-div">
     <form class="layui-form">
         <div class="layui-form-item">
-            <label class="layui-form-label">User:</label>
+            <label class="layui-form-label" style="width: 150px;">User:</label>
             <div class="layui-input-block" style="margin-left: 200px;">
-                <select class="layui-select" name="select-user" id="select-user" lay-search=""></select>
+                <select class="layui-select" name="select-user" id="select-user" lay-search="" lay-filter="select-user"></select>
             </div>
         </div>
         <div class="layui-form-item">
-            <label class="layui-form-label">Trader:</label>
+            <label class="layui-form-label" style="width: 150px;">Trader Account:</label>
             <div class="layui-input-block" style="margin-left: 200px;">
-                <input type="text" name="input-trader" id="input-trader" class="layui-input">
+                <select class="layui-select" name="select-account" id="select-account" lay-search=""></select>
             </div>
         </div>
         <div class="layui-form-item">
-            <label class="layui-form-label">Account:</label>
+            <label class="layui-form-label" style="width: 150px;">Asset Type:</label>
             <div class="layui-input-block" style="margin-left: 200px;">
-                <input type="text" name="input-account" id="input-account" class="layui-input">
+                <select class="layui-select" name="select-type" id="select-type" lay-search=""></select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label" style="width: 150px;">Asset Name:</label>
+            <div class="layui-input-block" style="margin-left: 200px;">
+                <input type="text" name="input-name" id="input-name" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label" style="width: 150px;">Asset Amount:</label>
+            <div class="layui-input-block" style="margin-left: 200px;">
+                <input type="text" name="input-amount" id="input-amount" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label" style="width: 150px;">Asset Currency:</label>
+            <div class="layui-input-block" style="margin-left: 200px;">
+                <select class="layui-select" name="select-currency" id="select-currency" lay-search=""></select>
             </div>
         </div>
     </form>
@@ -73,39 +93,51 @@
             {type: 'numbers'},
             {type: 'checkbox'},
             {field: 'id', title: 'id', hide: true},
+            {field: 'taId', title: 'taId', hide: true},
+            {field: 'uid', title: 'uid', hide: true},
             {field: 'userId', title: 'userId', hide: true},
-            {field: 'userName', title: 'Name', width: 200},
-            {field: 'nickName', title: 'Nick Name', width: 200},
-            {field: 'trader', title: 'Trader', width: 250},
-            {field: 'account', title: 'Account', width: 300},
-            {fixed: 'right', width: 220, align: 'center', toolbar: '#toolbar'}
+            {field: 'userName', title: 'User Name', width: 150},
+            {field: 'nickName', title: 'Nick Name', width: 150},
+            {field: 'trader', title: 'Trader', width: 150},
+            {field: 'account', title: 'Account', width: 250},
+            {field: 'assetType', title: 'Asset Type', width: 150}, // 资产类型
+            {field: 'assetName', title: 'Asset Name', width: 200}, // 资产名称
+            {field: 'amount', title: 'Amount', width: 200}, // 资产数量
+            {field: 'currency', title: 'Currency', width: 120}, // 资产货币单位
+            {fixed: 'right', width: 200, align: 'center', toolbar: '#toolbar'}
         ];
 
         // 从数据库中检索所有的用户信息并渲染Table
         var tableObj = table.render({
-            elem: '#account-table' //指定原始表格元素选择器（推荐id选择器）
+            elem: '#asset-table' //指定原始表格元素选择器（推荐id选择器）
             , cellMinWidth: 30
             , height: 'full-150'
             , loading: true
             , cols: [tblCols]
             , sort: true
             , page: true
-            , url: '/finance/trader/account/overview'
+            , url: '/finance/asset/allocation/overview'
             , limit: 15
             , where: {
                 trader: $.trim($("#select-trader").val())
+                , stock: $.trim($("#select-stock").val())
             }
         });
 
         $("#btn-select").on('click', function () {
-            tableObj.reload({where: {trader: $.trim($("#select-trader").val())}});
+            tableObj.reload({where: {trader: $.trim($("#select-trader").val()), stock: $.trim($("#select-stock").val())}});
         });
 
         $('#btn-add').on('click', function () {
             $('#pop-div').show();
-            $("#input-trader").val('');
-            $("#input-account").val('');
+            $("#input-name").val('');
+            $("#input-amount").val('');
             $("#select-user").find("option[value=1]").prop("selected", true);
+            traderAccount(1);
+            $("#select-type").find("option[value=1]").prop("selected", true);
+            $("#select-currency").find("option[value=1]").prop("selected", true);
+
+            layui.form.render('select');
             layui.form.render();
 
             layer.open({
@@ -120,12 +152,14 @@
                     var loading = layer.load(1);
 
                     var param = {
-                        'trader': $("#input-trader").val().trim(),
-                        'account': $("#input-account").val().trim(),
-                        'userId': $("#select-user").val(),
+                        'taId': $("#select-account").val(),
+                        'assetName': $.trim($("#input-name").val()),
+                        'amount': $.trim($("#input-amount").val()),
+                        'currency': $.trim($("#select-currency").val()),
+                        'assetType': $.trim($("#select-type").val())
                     };
 
-                    $.post('/finance/trader/account/create', param, function (result) {
+                    $.post('/finance/asset/allocation/create', param, function (result) {
                         if (result.code == 200) {
                             layer.msg("Save Successful.");
                             tableObj.reload();
@@ -142,7 +176,7 @@
             });
         });
 
-        table.on('tool(account-table)', function (obj) {
+        table.on('tool(asset-table)', function (obj) {
 
             var data = obj.data;
             var layEvent = obj.event;
@@ -167,12 +201,14 @@
 
                         var param = {
                             'id': data.id,
-                            'trader': $("#input-trader").val().trim(),
-                            'account': $("#input-account").val().trim(),
-                            'userId': $("#select-user").val(),
+                            'taId': $("#select-account").val(),
+                            'assetName': $.trim($("#input-name").val()),
+                            'amount': $.trim($("#input-amount").val()),
+                            'currency': $.trim($("#select-currency").val()),
+                            'assetType': $.trim($("#select-type").val())
                         };
 
-                        $.post('/finance/trader/account/update', param, function (result) {
+                        $.post('/finance/asset/allocation/update', param, function (result) {
                             if (result.code == 200) {
                                 layer.msg("Save Successful.");
                                 tableObj.reload();
@@ -194,7 +230,7 @@
                     layer.close(index);
                     var loading = layer.load(1);
 
-                    $.get("/finance/trader/account/" + data.id + "/delete", {}, function (result) {
+                    $.get("/finance/asset/allocation/" + data.id + "/delete", {}, function (result) {
                         if (result.code == 200) {
                             layer.msg("Delete successful.");
                             tableObj.reload();
@@ -214,11 +250,50 @@
             $.each(data.data, function (index, item) {
                 html += "<option value='" + item.id + "'>" + item.name + ' - ' + item.nickName + "</option>";
             });
-
             $("select[name='select-user']").append(html);
-
+            traderAccount(data.data[0].id);
             layui.form.render('select');
         });
+
+
+        function traderAccount(uid) {
+            $.get('/finance/trader/account/search/uid', {'uid': uid}, function (taData) {
+                var taHtml = "";
+                $("select[name='select-account']").empty();
+                $.each(taData.data, function (index, item) {
+                    taHtml += "<option value='" + index + "'>" + item + "</option>";
+                });
+                $("select[name='select-account']").append(taHtml);
+                layui.form.render('select');
+            });
+        }
+
+        $.get('/enum/finance/type', {}, function (data) {
+            var html = "";
+            $("select[name='select-type']").empty();
+            $.each(data.data, function (index, item) {
+                html += "<option value='" + item.code + "'>" + item.name + "</option>";
+            });
+            $("select[name='select-type']").append(html);
+            layui.form.render('select');
+        });
+
+        $.get('/enum/currency', {}, function (data) {
+            var html = "";
+            $("select[name='select-currency']").empty();
+            $.each(data.data, function (index, item) {
+                html += "<option value='" + item.code + "'>" + item.name + "</option>";
+            });
+            $("select[name='select-currency']").append(html);
+            layui.form.render('select');
+        });
+
+        layui.form.on('select(select-user)', function(data){
+            console.log(data.value);
+            traderAccount(data.value);
+            layui.form.render('select');
+        });
+        
     });
 </script>
 </body>

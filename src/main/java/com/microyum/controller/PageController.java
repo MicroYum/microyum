@@ -103,6 +103,11 @@ public class PageController {
         return new ModelAndView("management/trader_account");
     }
 
+    @RequestMapping(value = "/management/asset/allocation")
+    public ModelAndView financeConfig() {
+        return new ModelAndView("management/asset_allocation");
+    }
+
     @RequestMapping(value = "/management/exit")
     public ModelAndView managementExit() {
         SecurityContext context = SecurityContextHolder.getContext();

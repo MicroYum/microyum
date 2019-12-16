@@ -15,7 +15,7 @@ public interface UserService {
 
     BaseResponseDTO createUser(UserDto dto);
 
-    List<UserDto> userListOverview(int page, int limit, String name);
+    BaseResponseDTO userListOverview(int page, int limit, String name);
 
     List<MyRole> referRoleList();
 

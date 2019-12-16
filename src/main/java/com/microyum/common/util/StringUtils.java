@@ -55,6 +55,14 @@ public class StringUtils {
         return org.apache.commons.lang3.StringUtils.isNotBlank(str);
     }
 
+    public static boolean equals(String str1, String str2) {
+        return org.apache.commons.lang3.StringUtils.equals(str1, str2);
+    }
+
+    public static boolean equalsIgnoreCase(String str1, String str2) {
+        return org.apache.commons.lang3.StringUtils.equalsIgnoreCase(str1, str2);
+    }
+
     public static void main(String[] args) {
 
         System.out.println(StringUtils.md5Encrypt("password"));

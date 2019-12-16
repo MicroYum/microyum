@@ -78,7 +78,6 @@
     </form>
 </div>
 
-<script type="text/javascript" src="/static/js/util/md5.min.js"></script>
 <script type="text/javascript" src="/static/layui/layui.js"></script>
 <script type="text/javascript" src="/static/layui/lay/modules/laypage.js"></script>
 <script src="/static/js/jquery.min.js"></script>
@@ -91,7 +90,6 @@
             {type: 'numbers'},
             {type: 'checkbox'},
             {field: 'id', title: 'id', hide: true},
-            {field: 'roleId', title: 'roleId', hide: true},
             {field: 'name', title: 'Name', width: 180},
             {field: 'nickName', title: 'Nick Name', width: 180},
             {field: 'email', title: 'E-Mail', width: 250},
@@ -110,147 +108,16 @@
             , loading: true
             , cols: [tblCols]
             , sort: true
-            , page: true
             , url: '/user/list/overview'
             , limit: 15
             , where: {
                 name: $.trim($("#select-user").val())
             }
+            , page: true
         });
 
         $("#btn-select").on('click', function () {
             tableObj.reload({where: {name: $.trim($("#select-user").val())}});
-        });
-
-        $('#btn-add').on('click', function () {
-            $('#pop-div').show();
-            $("#pop-password").show();
-            $("#name").val('');
-            $("#nick-name").val('');
-            $("#email").val('');
-            $("#telephone").val('');
-            $("#password").val('');
-            $("#select-role").find("option[value=1]").prop("selected", true);
-            layui.form.render();
-
-            layer.open({
-                type: 1,
-                shadeClose: false,
-                title: 'Add',
-                btn: ['Save', 'Cancel'],
-                area: ['640px', '550px'],
-                content: $('#pop-div'),
-                yes: function (index) {
-                    layer.close(index);
-                    var loading = layer.load(1);
-
-                    var param = {
-                        'email': $("#email").val().trim(),
-                        'name': $("#name").val().trim(),
-                        'nickName': $("#nick-name").val().trim(),
-                        'password': md5($("#password").val().trim()),
-                        'telephone': $("#telephone").val().trim(),
-                        'roleId': $("#select-role").val(),
-                    };
-
-                    $.post('/user/create', param, function (result) {
-                        if (result.code == 200) {
-                            layer.msg("Save Successful.");
-                            tableObj.reload();
-                        } else {
-                            layer.alert("Save failed.");
-                            console.log(result.msg)
-                        }
-                        layer.close(loading);
-                    }, "json");
-                },
-                end: function () {
-                    $('#pop-div').hide();
-                }
-            });
-        });
-
-        table.on('tool(user-table)', function (obj) {
-
-            var data = obj.data;
-            var layEvent = obj.event;
-
-            if (layEvent === 'edit') {
-                $('#pop-div').show();
-                $("#pop-password").hide();
-                $("#name").val(data.name);
-                $("#nick-name").val(data.nickName);
-                $("#email").val(data.email);
-                $("#telephone").val(data.telephone);
-                $("#select-role").find("option[value=" + data.roleId + "]").prop("selected", true);
-                layui.form.render();
-
-                layer.open({
-                    type: 1,
-                    shadeClose: false,
-                    title: 'Add',
-                    btn: ['Save', 'Cancel'],
-                    area: ['640px', '500px'],
-                    content: $('#pop-div'),
-                    yes: function (index) {
-                        layer.close(index);
-                        var loading = layer.load(1);
-
-                        var param = {
-                            'id': data.id,
-                            'email': $("#email").val().trim(),
-                            'name': $("#name").val().trim(),
-                            'nickName': $("#nick-name").val().trim(),
-                            'telephone': $("#telephone").val().trim(),
-                            'roleId': $("#select-role").val(),
-                        };
-
-                        $.post('/user/update', param, function (result) {
-                            if (result.code == 200) {
-                                layer.msg("Save Successful.");
-                                tableObj.reload();
-                            } else {
-                                layer.alert("Save failed.");
-                                console.log(result.msg)
-                            }
-                            layer.close(loading);
-                        }, "json");
-                    },
-                    end: function () {
-                        $('#pop-div').hide();
-                    }
-                });
-            } else if (layEvent == 'delete') {
-                layer.confirm('Do you want to delete it?', {
-                    btn: ['Confirm', 'Cancel'], title: false
-                }, function (index) {
-                    layer.close(index);
-                    var loading = layer.load(1);
-
-                    $.get("/user/" + data.id + "/delete", {}, function (result) {
-                        if (result.code == 200) {
-                            layer.msg("Delete successful.");
-                            tableObj.reload();
-                        } else {
-                            layer.alert("Delete failed.");
-                            console.log(result.msg)
-                        }
-                        layer.close(loading);
-                    });
-                });
-            }
-        });
-
-        $.get('/refer/role/list', {}, function (data) {
-            var html = "";
-            $("select[name='select-role']").empty();
-            $.each(data.data, function (index, item) {
-                html += "<option value='" + item.id + "'>" + item.name + "</option>";
-            });
-
-            $("select[name='select-role']").append(html);
-
-            layui.form.render('select');
         });
     });
 </script>

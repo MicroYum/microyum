@@ -100,7 +100,7 @@ public class MyStockDao {
             stockBase.setStockName(rs.getString("stock_name"));
             stockBase.setListingDate(rs.getDate("listing_date"));
             stockBase.setArea(rs.getString("area"));
-            stockBase.setListSort(rs.getInt("list_sort"));
+            stockBase.setListSort(rs.getString("list_sort"));
             stockBase.setCirculationCapital(rs.getDouble("circulation_capital"));
             stockBase.setTotalCapital(rs.getDouble("total_capital"));
             stockBase.setObserve(rs.getByte("observe"));

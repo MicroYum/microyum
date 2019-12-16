@@ -96,16 +96,23 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDto> userListOverview(int page, int limit, String name) {
+    public BaseResponseDTO userListOverview(int page, int limit, String name) {
 
         int start = (page - 1) * limit;
+        long count;
         List<UserDto> userList;
-        if (org.apache.commons.lang3.StringUtils.isNotBlank(name)) {
+        if (StringUtils.isNotBlank(name)) {
             userList = myUserJdbcDao.findByNameOrNickName(start, limit, name);
+            count = myUserJdbcDao.findByNameOrNickNameCount(name);
         } else {
             userList = myUserJdbcDao.findUserInfoPaging(start, limit);
+            count = myUserJdbcDao.findUserInfoCount();
         }
-        return userList;
+
+        BaseResponseDTO responseDTO = new BaseResponseDTO(HttpStatus.OK_LAYUI, userList);
+        responseDTO.setCount(count);
+
+        return responseDTO;
     }
 
     @Override

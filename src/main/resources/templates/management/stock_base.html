@@ -49,8 +49,8 @@
             {field: 'stockCode', title: '股票代碼', width: 180},
             {field: 'stockName', title: '股票名稱', width: 180},
             {field: 'listingDate', title: '上市日期', width: 180},
-            {field: 'totalCapital', title: '總股本(千億)', width: 200},
-            {field: 'circulationCapital', title: '流通股本(千億)', width: 200},
+            {field: 'totalCapital', title: '總股本(億)', width: 200},
+            {field: 'circulationCapital', title: '流通股本(億)', width: 200},
             {field: 'observe', title: '是否關注', width: 150},
             {fixed: 'right', width: 220, align: 'center', toolbar: '#toolbar'}
         ];
@@ -67,12 +67,12 @@
             , url: '/public/stock/list'
             , limit: 15
             , where: {
-                selectStock: $.trim($("#select-stock").val())
+                stock: $.trim($("#select-stock").val())
             }
         });
 
         $("#btn-select-stock").on('click', function () {
-            tableObj.reload({where: {selectStock: $.trim($("#select-stock").val())}});
+            tableObj.reload({where: {stock: $.trim($("#select-stock").val())}});
         });
     });
 </script>

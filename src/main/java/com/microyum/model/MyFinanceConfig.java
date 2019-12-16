@@ -14,10 +14,10 @@ public class MyFinanceConfig extends BaseModel {
 
     // TraderAccount表ID
     @Column(nullable = false)
-    private String taId;
-    // 类型(1: 股票, 2: 债券, 3: 基金, 4: 贵金属)
+    private Long taId;
+    // 类型，参考：FinanceTypeEnum
     @Column(nullable = false)
-    private Byte type;
+    private String type;
     // 名称
     private String name;
     // 份额
