@@ -32,4 +32,16 @@ public class ScheduleController {
         stockService.repairStockData();
         return new BaseResponseDTO(HttpStatus.OK);
     }
+
+    @RequestMapping(value = "/public/schedule/value/range")
+    public BaseResponseDTO calcValueRange() {
+        investmentStrategySchedule.calcValueRange();
+        return new BaseResponseDTO(HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/public/schedule/mail/buying/stock")
+    public BaseResponseDTO mailBuyingStock() {
+        investmentStrategySchedule.mailBuyingStock();
+        return new BaseResponseDTO(HttpStatus.OK);
+    }
 }

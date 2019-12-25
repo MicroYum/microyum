@@ -12,5 +12,4 @@ public interface MyUserDao extends JpaRepository<MyUser, Long> {
 
     @Query(value = "select * from my_user where id = ?1", nativeQuery = true)
     MyUser findByUId(Long id);
-
 }

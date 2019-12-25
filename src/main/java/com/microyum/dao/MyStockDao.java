@@ -1,7 +1,9 @@
 package com.microyum.dao;
 
+import com.microyum.bo.BuyingStockBO;
 import com.microyum.dto.StockLatestDataDto;
 import com.microyum.model.MyStockBase;
+import com.microyum.model.MyStockDailyStrategy;
 import com.microyum.model.MyStockData;
 import com.microyum.model.MyStockDataDetail;
 import org.apache.commons.lang3.StringUtils;
@@ -315,5 +317,39 @@ public class MyStockDao {
         });
 
         return list;
+    }
+
+    public List<BuyingStockBO> referBuyingStock() {
+        StringBuilder builder = new StringBuilder();
+        builder.append(" SELECT ");
+        builder.append("    t.stock_code ");
+        builder.append("    ,b.stock_name ");
+        builder.append("    ,t.latest_price ");
+        builder.append("    ,t.latest_hfq_price ");
+        builder.append("    ,t.buying_min ");
+        builder.append("    ,t.buying_max ");
+        builder.append("    ,t.under_min ");
+        builder.append("    ,t.under_max ");
+        builder.append("    ,t.trade_count ");
+        builder.append("    ,t.volume_rate ");
+        builder.append(" FROM my_stock_daily_strategy t ");
+        builder.append(" LEFT JOIN my_stock_base b ON t.stock_code = b.stock_code ");
+        builder.append(" WHERE t.strategy = 1 and date_format( t.trade_date, '%Y-%m-%d' ) = date_format( now(), '%Y-%m-%d' )  ");
+        builder.append(" ORDER BY t.trade_date DESC, t.stock_code ASC ");
+
+        return jdbcTemplate.query(builder.toString(), new Object[]{}, (rs, rowNum) -> {
+            BuyingStockBO bo = new BuyingStockBO();
+            bo.setStockCode(rs.getString("stock_code"));
+            bo.setStockName(rs.getString("stock_name"));
+            bo.setLatestPrice(rs.getBigDecimal("latest_price"));
+            bo.setLatestHfqPrice(rs.getBigDecimal("latest_hfq_price"));
+            bo.setBuyingMin(rs.getBigDecimal("buying_min"));
+            bo.setBuyingMax(rs.getBigDecimal("buying_max"));
+            bo.setUnderMin(rs.getBigDecimal("under_min"));
+            bo.setUnderMax(rs.getBigDecimal("under_max"));
+            bo.setTradeCount(rs.getInt("trade_count"));
+            bo.setVolumeRate(rs.getBigDecimal("volume_rate"));
+            return bo;
+        });
     }
 }

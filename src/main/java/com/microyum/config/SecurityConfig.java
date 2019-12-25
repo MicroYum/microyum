@@ -19,7 +19,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private UserService userService;
 
     private static String[] antPatterns = new String[]{"/", "/favicon.ico", "/index", "/wealth", "/album", "/about",
-            "/user/captcha", "/user/login", "/blog/image/**/**", "/public/**/**/**", "/public/**/**"};
+            "/user/captcha", "/user/login", "/blog/image/**/**", "/public/**/**", "/public/**/**/**", "/public/**/**/**/**"};
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {

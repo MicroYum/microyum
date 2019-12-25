@@ -4,6 +4,7 @@ import com.microyum.common.util.StringUtils;
 
 public enum StockStrategyEnum {
 
+    STRATEGY_NO_ADVICE(0, "NO ADVICE"),
     STRATEGY_BUYING(1, "BUYING"),
     STRATEGY_UNDER_VALUE(2, "UNDER VALUE"),
     STRATEGY_MIDDLE_VALUE(3, "MIDDLE VALUE"),

@@ -38,4 +38,7 @@ public class MyUser extends BaseModel {
 
     @Column(nullable = false, length = 80)
     private String salt;
+
+    @Column(nullable = false, columnDefinition = "tinyint default 1")
+    private Byte notification;
 }
