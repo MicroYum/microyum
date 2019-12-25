@@ -147,6 +147,12 @@ public class InvestmentStrategySchedule {
 
         for (Long uid : mapAccount.keySet()) {
             MyUser user = userDao.findByUId(uid);
+
+            // 0表示不发送邮件
+            if (user.getNotification().intValue() == 0) {
+                continue;
+            }
+
             StringBuilder body = new StringBuilder();
             body.append(" Dear, ").append(user.getNickName()).append("<br/><br/>");
             Map<String, Boolean> repetition = Maps.newHashMap();
