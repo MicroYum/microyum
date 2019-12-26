@@ -7,7 +7,11 @@ import com.microyum.common.Constants;
 import com.microyum.common.enums.StockStrategyEnum;
 import com.microyum.common.util.DateUtils;
 import com.microyum.common.util.MailUtils;
-import com.microyum.dao.*;
+import com.microyum.dao.jdbc.MyFinanceJdbcDao;
+import com.microyum.dao.jdbc.MyMailJdbcDao;
+import com.microyum.dao.jdbc.MyStockJdbcDao;
+import com.microyum.dao.jpa.MyStockDailyStrategyDao;
+import com.microyum.dao.jpa.MyUserDao;
 import com.microyum.dto.AssetAllocationDto;
 import com.microyum.model.MyMailTemplate;
 import com.microyum.model.MyStockBase;
@@ -31,13 +35,13 @@ import java.util.Map;
 public class InvestmentStrategySchedule {
 
     @Autowired
-    private MyStockDao stockDao;
+    private MyStockJdbcDao stockJdbcDao;
 
     @Autowired
     private MyStockDailyStrategyDao dailyStrategyDao;
 
     @Autowired
-    private MyFinanceDao myFinanceDao;
+    private MyFinanceJdbcDao myFinanceDao;
 
     @Autowired
     private StockStrategy stockStrategy;
@@ -45,7 +49,7 @@ public class InvestmentStrategySchedule {
     @Autowired
     private MyUserDao userDao;
     @Autowired
-    private MyMailDao mailDao;
+    private MyMailJdbcDao mailDao;
 
     /**
      * 交易日15:30开始，计算所有股票的价值区间，保存到MyStockDailyStrategy表
@@ -63,7 +67,7 @@ public class InvestmentStrategySchedule {
         }
 
         // 获取所有股票的列表
-        List<MyStockBase> listStock = stockDao.getObservedListNotIndex();
+        List<MyStockBase> listStock = stockJdbcDao.getObservedListNotIndex();
 
         for (MyStockBase stockBase : listStock) {
 
@@ -90,7 +94,7 @@ public class InvestmentStrategySchedule {
         MyMailTemplate mailBuyingTemplate = mailDao.findTemplateByName(Constants.MAIL_NAME_BUYING_STOCK);
         MyMailTemplate mailBuyingTableTemplate = mailDao.findTemplateByName(Constants.MAIL_NAME_BUYING_STOCK_TABLE);
 
-        List<BuyingStockBO> stockBOList = stockDao.referBuyingStock();
+        List<BuyingStockBO> stockBOList = stockJdbcDao.referBuyingStock();
         StringBuilder builder = new StringBuilder();
         for (BuyingStockBO stockBO : stockBOList) {
             String mailTable = mailBuyingTableTemplate.getMailBody();

@@ -3,7 +3,7 @@ package com.microyum.schedule;
 import com.microyum.common.Constants;
 import com.microyum.common.util.DateUtils;
 import com.microyum.common.util.StockUtils;
-import com.microyum.dao.MyStockDao;
+import com.microyum.dao.jdbc.MyStockJdbcDao;
 import com.microyum.model.MyStockBase;
 import com.microyum.model.MyStockData;
 import com.microyum.model.MyStockDataDetail;
@@ -34,7 +34,7 @@ import java.util.Map;
 public class ReferStockDataSchedule {
 
     @Autowired
-    private MyStockDao stockDao;
+    private MyStockJdbcDao stockJdbcDao;
 
     @Value("${python.script.repair.latest.hfqdata}")
     private String repairLatestScript;
@@ -66,7 +66,7 @@ public class ReferStockDataSchedule {
         log.info("获取股票数据定时任务开始...");
 
         CloseableHttpClient httpclient = HttpClients.createDefault();
-        List<MyStockBase> stockBaseList = stockDao.getObservedList();
+        List<MyStockBase> stockBaseList = stockJdbcDao.getObservedList();
 
         try {
             for (MyStockBase stockBase : stockBaseList) {
@@ -93,14 +93,14 @@ public class ReferStockDataSchedule {
                         MyStockData stockData = this.tidyStockData(mapStack);
                         MyStockDataDetail stockDataDetail = this.tidyStockDataDetail(mapStack);
 
-                        stockDao.saveStockDataDetail(stockDataDetail);
-                        MyStockData stock = stockDao.selectTradeDateStock(stockData.getSymbol(), stockData.getTradeDate());
+                        stockJdbcDao.saveStockDataDetail(stockDataDetail);
+                        MyStockData stock = stockJdbcDao.selectTradeDateStock(stockData.getSymbol(), stockData.getTradeDate());
                         if (stock == null) {
                             // insert
-                            stockDao.saveStockData(stockData);
+                            stockJdbcDao.saveStockData(stockData);
                         } else {
                             // update
-                            stockDao.updateStockData(stockData);
+                            stockJdbcDao.updateStockData(stockData);
                         }
                     }
                 } finally {

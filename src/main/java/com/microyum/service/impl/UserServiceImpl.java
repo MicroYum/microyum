@@ -3,10 +3,10 @@ package com.microyum.service.impl;
 import com.microyum.common.http.BaseResponseDTO;
 import com.microyum.common.http.HttpStatus;
 import com.microyum.common.util.StringUtils;
-import com.microyum.dao.MyRoleDao;
-import com.microyum.dao.MyUserDao;
-import com.microyum.dao.MyUserJdbcDao;
-import com.microyum.dao.MyUserRoleDao;
+import com.microyum.dao.jpa.MyRoleDao;
+import com.microyum.dao.jpa.MyUserDao;
+import com.microyum.dao.jdbc.MyUserJdbcDao;
+import com.microyum.dao.jpa.MyUserRoleDao;
 import com.microyum.dto.UserDto;
 import com.microyum.model.MyRole;
 import com.microyum.model.MyUser;
@@ -32,7 +32,7 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private MyUserRoleDao myUserRoleDao;
     @Autowired
-    private MyUserJdbcDao myUserJdbcDao;
+    private MyUserJdbcDao userJdbcDao;
 
     @Override
     public boolean checkUserLogin(String userName, String password) {
@@ -102,11 +102,11 @@ public class UserServiceImpl implements UserService {
         long count;
         List<UserDto> userList;
         if (StringUtils.isNotBlank(name)) {
-            userList = myUserJdbcDao.findByNameOrNickName(start, limit, name);
-            count = myUserJdbcDao.findByNameOrNickNameCount(name);
+            userList = userJdbcDao.findByNameOrNickName(start, limit, name);
+            count = userJdbcDao.findByNameOrNickNameCount(name);
         } else {
-            userList = myUserJdbcDao.findUserInfoPaging(start, limit);
-            count = myUserJdbcDao.findUserInfoCount();
+            userList = userJdbcDao.findUserInfoPaging(start, limit);
+            count = userJdbcDao.findUserInfoCount();
         }
 
         BaseResponseDTO responseDTO = new BaseResponseDTO(HttpStatus.OK_LAYUI, userList);

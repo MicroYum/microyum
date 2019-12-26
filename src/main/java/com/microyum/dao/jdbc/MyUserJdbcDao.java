@@ -1,4 +1,4 @@
-package com.microyum.dao;
+package com.microyum.dao.jdbc;
 
 import com.microyum.dto.UserDto;
 import org.springframework.beans.factory.annotation.Autowired;

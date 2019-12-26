@@ -1,4 +1,4 @@
-package com.microyum.dao;
+package com.microyum.dao.jdbc;
 
 import com.microyum.model.MyMailTemplate;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -8,7 +8,7 @@ import javax.annotation.Resource;
 import java.util.List;
 
 @Repository
-public class MyMailDao {
+public class MyMailJdbcDao {
 
     @Resource
     private JdbcTemplate jdbcTemplate;

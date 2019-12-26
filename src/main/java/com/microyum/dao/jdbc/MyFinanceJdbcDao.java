@@ -1,4 +1,4 @@
-package com.microyum.dao;
+package com.microyum.dao.jdbc;
 
 import com.microyum.common.util.StringUtils;
 import com.microyum.dto.AssetAllocationDto;
@@ -13,7 +13,7 @@ import javax.annotation.Resource;
 import java.util.List;
 
 @Repository
-public class MyFinanceDao {
+public class MyFinanceJdbcDao {
 
     @Resource
     private JdbcTemplate jdbcTemplate;

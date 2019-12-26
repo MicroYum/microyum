@@ -1,4 +1,4 @@
-package com.microyum.dao;
+package com.microyum.dao.jdbc;
 
 import com.microyum.common.util.DateUtils;
 import com.microyum.dto.BlogListDto;
@@ -15,7 +15,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 @Repository
-public class MyBlogDao {
+public class MyBlogJdbcDao {
 
     @Resource
     private JdbcTemplate jdbcTemplate;

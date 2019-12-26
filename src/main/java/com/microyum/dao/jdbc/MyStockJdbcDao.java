@@ -1,4 +1,4 @@
-package com.microyum.dao;
+package com.microyum.dao.jdbc;
 
 import com.microyum.bo.BuyingStockBO;
 import com.microyum.dto.StockLatestDataDto;
@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 @Repository
-public class MyStockDao {
+public class MyStockJdbcDao {
 
     @Resource
     private JdbcTemplate jdbcTemplate;

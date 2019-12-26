@@ -1,4 +1,4 @@
-package com.microyum.dao;
+package com.microyum.dao.jpa;
 
 import com.microyum.model.MyRole;
 import org.springframework.data.jpa.repository.JpaRepository;

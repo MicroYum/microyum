@@ -1,4 +1,4 @@
-package com.microyum.dao;
+package com.microyum.dao.jdbc;
 
 import com.google.common.collect.Maps;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 @Repository
-public class MyAlbumDetailDao {
+public class MyAlbumDetailJdbcDao {
 
     @Resource
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;

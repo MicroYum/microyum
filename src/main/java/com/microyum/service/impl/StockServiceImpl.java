@@ -2,7 +2,7 @@ package com.microyum.service.impl;
 
 import com.microyum.common.http.BaseResponseDTO;
 import com.microyum.common.http.HttpStatus;
-import com.microyum.dao.MyStockDao;
+import com.microyum.dao.jdbc.MyStockJdbcDao;
 import com.microyum.dto.CalculateStockTransactionCostDto;
 import com.microyum.model.MyStockBase;
 import com.microyum.model.MyStockData;
@@ -23,7 +23,7 @@ import java.util.List;
 public class StockServiceImpl implements StockService {
 
     @Autowired
-    private MyStockDao stockDao;
+    private MyStockJdbcDao stockJdbcDao;
 
     @Value("${python.script.repair.stock.hfqdata}")
     private String repairStockScript;
@@ -31,10 +31,10 @@ public class StockServiceImpl implements StockService {
     @Override
     public BaseResponseDTO referStockList(int pageNo, int pageSize, String stock) {
 
-        List<MyStockBase> listStock = stockDao.referStockList(pageNo, pageSize, stock);
+        List<MyStockBase> listStock = stockJdbcDao.referStockList(pageNo, pageSize, stock);
 
         BaseResponseDTO responseDTO = new BaseResponseDTO(HttpStatus.OK_LAYUI, listStock);
-        responseDTO.setCount(stockDao.countAllStockBase(stock));
+        responseDTO.setCount(stockJdbcDao.countAllStockBase(stock));
 
         return responseDTO;
     }
@@ -42,14 +42,14 @@ public class StockServiceImpl implements StockService {
     @Override
     public BaseResponseDTO referStockDetail(String stockCode, String startDate, String endDate) {
 
-        List<MyStockData> stockDaoList = stockDao.referStockData(stockCode, startDate, endDate);
+        List<MyStockData> stockDaoList = stockJdbcDao.referStockData(stockCode, startDate, endDate);
         return new BaseResponseDTO(HttpStatus.OK, stockDaoList);
     }
 
     @Override
     public BaseResponseDTO referStockTradeDayDetail(String stockCode) {
 
-        return new BaseResponseDTO(HttpStatus.OK, stockDao.referLatestStockData(stockCode));
+        return new BaseResponseDTO(HttpStatus.OK, stockJdbcDao.referLatestStockData(stockCode));
     }
 
     @Override
@@ -132,26 +132,23 @@ public class StockServiceImpl implements StockService {
         log.info("补齐股票数据结束.");
     }
 
-    public static void main(String[] args) {
-        CalculateStockTransactionCostDto dto;
+    @Override
+    public BaseResponseDTO referStockBase(Long id) {
+        return null;
+    }
 
-        BigDecimal stockPrice = BigDecimal.valueOf(5);
-        BigDecimal stockObjectPrice = BigDecimal.valueOf(5.01);
-        BigDecimal baseCount = BigDecimal.valueOf(1000);
+    @Override
+    public BaseResponseDTO saveStockBase(MyStockBase stockBase) {
+        return null;
+    }
 
-        StockServiceImpl stockService = new StockServiceImpl();
+    @Override
+    public BaseResponseDTO updateStockBase(MyStockBase stockBase) {
+        return null;
+    }
 
-
-        for (int i = 1; i <= 10; i++) {
-            dto = new CalculateStockTransactionCostDto();
-            dto.setTradingObject("1");
-            dto.setStockPrice(stockPrice);
-            dto.setStockObjectPrice(stockObjectPrice);
-            dto.setStockCount(baseCount.multiply(BigDecimal.valueOf(i)));
-            dto.setCommissionRate(BigDecimal.valueOf(0.025));
-            stockService.calculateStockTransactionCost(dto);
-
-            System.out.println(dto);
-        }
+    @Override
+    public BaseResponseDTO deleteStockBase(Long id) {
+        return null;
     }
 }

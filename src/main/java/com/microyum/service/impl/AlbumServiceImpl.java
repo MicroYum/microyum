@@ -4,8 +4,8 @@ import com.google.common.collect.Maps;
 import com.microyum.common.Constants;
 import com.microyum.common.http.BaseResponseDTO;
 import com.microyum.common.http.HttpStatus;
-import com.microyum.dao.MyAlbumDao;
-import com.microyum.dao.MyAlbumDetailDao;
+import com.microyum.dao.jdbc.MyAlbumJdbcDao;
+import com.microyum.dao.jdbc.MyAlbumDetailJdbcDao;
 import com.microyum.dto.AlbumRequestDto;
 import com.microyum.service.AlbumService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +21,9 @@ import java.util.Map;
 public class AlbumServiceImpl implements AlbumService {
 
     @Autowired
-    private MyAlbumDao albumDao;
+    private MyAlbumJdbcDao albumJdbcDao;
     @Autowired
-    private MyAlbumDetailDao albumDetailDao;
+    private MyAlbumDetailJdbcDao albumDetailJdbcDao;
 
     @Override
     public BaseResponseDTO listActiveAlbum(int pageNo, int pageSize) {
@@ -33,7 +33,7 @@ public class AlbumServiceImpl implements AlbumService {
     @Override
     public BaseResponseDTO findAlbumDetailById(Long id) {
 
-        List<Map<String, String>> listAlbumDetail = albumDetailDao.findAlbumDetailById(id);
+        List<Map<String, String>> listAlbumDetail = albumDetailJdbcDao.findAlbumDetailById(id);
 
         return new BaseResponseDTO(HttpStatus.OK, listAlbumDetail);
     }
@@ -42,16 +42,16 @@ public class AlbumServiceImpl implements AlbumService {
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = {Exception.class, RuntimeException.class})
     public BaseResponseDTO saveAlbum(AlbumRequestDto dto) {
 
-        Long albumId = albumDao.findIdBySummary(dto.getSummary());
+        Long albumId = albumJdbcDao.findIdBySummary(dto.getSummary());
         if (albumId == null) {
             Map<String, Object> mapAlbum = Maps.newHashMap();
             mapAlbum.put("userId", 1L);
             mapAlbum.put("summary", dto.getSummary());
             mapAlbum.put("cover", dto.getCover());
             mapAlbum.put("status", Constants.BLOG_STATUS_ACTIVE);
-            albumDao.save(mapAlbum);
+            albumJdbcDao.save(mapAlbum);
 
-            albumId = albumDao.findIdBySummary(dto.getSummary());
+            albumId = albumJdbcDao.findIdBySummary(dto.getSummary());
             if (albumId == null) {
                 return new BaseResponseDTO(HttpStatus.ERROR_IN_DATABASE);
             }
@@ -65,7 +65,7 @@ public class AlbumServiceImpl implements AlbumService {
             map.put("status", Constants.BLOG_STATUS_ACTIVE);
             maps[i] = map;
         }
-        albumDetailDao.batchSave(maps);
+        albumDetailJdbcDao.batchSave(maps);
 
         return new BaseResponseDTO(HttpStatus.OK);
     }
