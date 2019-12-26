@@ -34,14 +34,78 @@
     </div>
 </div>
 
+<div style="margin: 15px; display: none" id="pop-div">
+    <form class="layui-form">
+        <div class="layui-form-item" id="pop-stock-code">
+            <label class="layui-form-label">股票代碼:</label>
+            <div class="layui-input-block" style="margin-left: 200px;">
+                <input type="text" name="stock-code" id="stock-code" class="layui-input">
+                <span id="stock-code-message"></span>
+            </div>
+        </div>
+        <div class="layui-form-item" id="pop-stock-name">
+            <label class="layui-form-label" style="width: 100px;">股票名稱:</label>
+            <div class="layui-input-block" style="margin-left: 200px;">
+                <input type="text" name="stock-name" id="stock-name" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item" id="pop-company-introduction">
+            <label class="layui-form-label" style="width: 100px;">公司簡介:</label>
+            <div class="layui-input-block" style="margin-left: 200px;">
+                <textarea name="company-introduction" id="company-introduction" class="layui-textarea"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item" id="pop-listing-date">
+            <label class="layui-form-label" style="width: 100px;">上市日期:</label>
+            <div class="layui-input-block" style="margin-left: 200px;">
+                <input type="text" name="listing-date" id="listing-date" class="layui-input" placeholder="yyyy-MM-dd">
+            </div>
+        </div>
+        <div class="layui-form-item" id="pop-circulation-capital">
+            <label class="layui-form-label" style="width: 100px;">流通股本(亿):</label>
+            <div class="layui-input-block" style="margin-left: 200px;">
+                <input type="text" name="circulation-capital" id="circulation-capital" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item" id="pop-total-capital">
+            <label class="layui-form-label" style="width: 100px;">总股本(亿):</label>
+            <div class="layui-input-block" style="margin-left: 200px;">
+                <input type="text" name="total-capital" id="total-capital" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label" style="width: 100px;">地域:</label>
+            <div class="layui-input-block" style="margin-left: 200px;">
+                <input type="radio" name="stock-area" value="sh" title="滬市" checked>
+                <input type="radio" name="stock-area" value="sz" title="深市">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label" style="width: 100px;">類型:</label>
+            <div class="layui-input-block" style="margin-left: 200px;">
+                <input type="radio" name="stock-type" value="1" title="股票" checked>
+                <input type="radio" name="stock-type" value="2" title="可轉債">
+                <input type="radio" name="stock-type" value="3" title="國債">
+                <input type="radio" name="stock-type" value="4" title="企業債">
+            </div>
+        </div>
+    </form>
+</div>
+
 <script type="text/javascript" src="/static/layui/layui.js"></script>
 <script type="text/javascript" src="/static/layui/lay/modules/laypage.js"></script>
 <script src="/static/js/jquery.min.js"></script>
 <script type="text/javascript">
-    layui.use(['table', 'form'], function () {
+    layui.use(['table', 'form', 'laydate'], function () {
         var $ = layui.jquery,
             layer = layui.layer;
         var table = layui.table;
+        var laydate = layui.laydate;
+
+        laydate.render({
+            elem: '#listing-date'
+        });
+
         var tblCols = [
             {type: 'numbers'},
             {type: 'checkbox'},
@@ -74,6 +138,82 @@
 
         $("#btn-select-stock").on('click', function () {
             tableObj.reload({where: {stock: $.trim($("#select-stock").val())}});
+        });
+
+        $("#stock-code").blur(function () {
+            var value = $(this).val();
+            if ($.trim(value) == '') {
+                return;
+            }
+
+            $.get('/stock/base/' + value + '/exist', {}, function (data) {
+                if (data.data == true) {
+                    $("#stock-code-message").html('<font color="red">股票代碼已存在</font>');
+                } else {
+                    $("#stock-code-message").html('');
+                }
+            });
+        });
+
+        $('#btn-add-stock').on('click', function () {
+            $('#pop-div').show();
+            $("#stock-code").val('');
+            $("#stock-name").val('');
+            $("#company-introduction").val('');
+            $("#listing-date").val('');
+            laydate.render({
+                elem: '#listing-date'
+                ,value: '2019-12-26'
+                ,isInitValue: true
+            });
+            $("#circulation-capital").val('');
+            $("#total-capital").val('');
+            $("input[name='stock-area'][value='sh']").attr('checked', "checked");
+            $("input[name='stock-type'][value='1']").attr('checked', "checked");
+
+            layui.laydate.render();
+            layui.form.render();
+
+            layer.open({
+                type: 1,
+                shadeClose: false,
+                title: 'Add',
+                btn: ['Save', 'Cancel'],
+                area: ['640px', '550px'],
+                content: $('#pop-div'),
+                yes: function (index) {
+                    layer.close(index);
+                    var loading = layer.load(1);
+
+                    var param = {
+                        'stockCode': $("#stock-code").val().trim(),
+                        'stockName': $("#stock-name").val().trim(),
+                        'introduction': $("#company-introduction").val().trim(),
+                        'listingDate': $("#listing-date").val().trim(),
+                        'circulationCapital': $("#circulation-capital").val().trim(),
+                        'totalCapital': $("#total-capital").val().trim(),
+                        'area': $('input[name="stock-area"]:checked').val(),
+                        'type': $('input[name="stock-type"]:checked').val()
+                    };
+
+                    debugger;
+                    console.log(param);
+
+                    $.post('/stock/base/save', param, function (result) {
+                        if (result.code == 200) {
+                            layer.msg("Save Successful.");
+                            tableObj.reload();
+                        } else {
+                            layer.alert("Save failed.");
+                            console.log(result.msg)
+                        }
+                        layer.close(loading);
+                    }, "json");
+                },
+                end: function () {
+                    $('#pop-div').hide();
+                }
+            });
         });
     });
 </script>
