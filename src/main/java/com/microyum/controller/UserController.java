@@ -1,12 +1,11 @@
 package com.microyum.controller;
 
-import com.google.common.collect.Lists;
 import com.microyum.common.http.BaseResponseDTO;
 import com.microyum.common.http.HttpStatus;
 import com.microyum.common.util.CaptchaUtils;
 import com.microyum.common.util.DateUtils;
 import com.microyum.dto.UserDto;
-import com.microyum.model.MyUser;
+import com.microyum.model.common.MyUser;
 import com.microyum.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +16,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.List;
 import java.util.Map;
 
 @RestController

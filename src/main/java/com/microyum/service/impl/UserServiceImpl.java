@@ -3,14 +3,14 @@ package com.microyum.service.impl;
 import com.microyum.common.http.BaseResponseDTO;
 import com.microyum.common.http.HttpStatus;
 import com.microyum.common.util.StringUtils;
-import com.microyum.dao.MyRoleDao;
-import com.microyum.dao.MyUserDao;
-import com.microyum.dao.MyUserJdbcDao;
-import com.microyum.dao.MyUserRoleDao;
+import com.microyum.dao.jpa.MyRoleDao;
+import com.microyum.dao.jpa.MyUserDao;
+import com.microyum.dao.jdbc.MyUserJdbcDao;
+import com.microyum.dao.jpa.MyUserRoleDao;
 import com.microyum.dto.UserDto;
-import com.microyum.model.MyRole;
-import com.microyum.model.MyUser;
-import com.microyum.model.MyUserRole;
+import com.microyum.model.common.MyRole;
+import com.microyum.model.common.MyUser;
+import com.microyum.model.common.MyUserRole;
 import com.microyum.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -26,20 +26,20 @@ import java.util.UUID;
 public class UserServiceImpl implements UserService {
 
     @Autowired
-    private MyUserDao myUserDao;
+    private MyUserDao userDao;
     @Autowired
-    private MyRoleDao myRoleDao;
+    private MyRoleDao roleDao;
     @Autowired
-    private MyUserRoleDao myUserRoleDao;
+    private MyUserRoleDao userRoleDao;
     @Autowired
-    private MyUserJdbcDao myUserJdbcDao;
+    private MyUserJdbcDao userJdbcDao;
 
     @Override
     public boolean checkUserLogin(String userName, String password) {
 
-        MyUser myUser = myUserDao.findByName(userName);
+        MyUser myUser = userDao.findByName(userName);
 
-        myUser = myUserDao.findByNameAndPassword(userName, StringUtils.md5EncryptSlat(password, myUser.getSalt()));
+        myUser = userDao.findByNameAndPassword(userName, StringUtils.md5EncryptSlat(password, myUser.getSalt()));
         if (myUser != null) {
             return true;
         }
@@ -50,7 +50,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public MyUser getUserByName(String userName) {
 
-        MyUser myUser = myUserDao.findByName(userName);
+        MyUser myUser = userDao.findByName(userName);
 
         if (myUser == null) {
             return null;
@@ -65,7 +65,7 @@ public class UserServiceImpl implements UserService {
 
         try {
 
-            MyUser user = myUserDao.findByName(dto.getName());
+            MyUser user = userDao.findByName(dto.getName());
             if (user != null) {
                 return new BaseResponseDTO(HttpStatus.DATA_SHOULD_NOT_EXIST, "user name not unique.");
             }
@@ -80,13 +80,13 @@ public class UserServiceImpl implements UserService {
             if (dto.getParentId() != null) {
                 entity.setParentId(Long.valueOf(dto.getParentId()));
             }
-            myUserDao.save(entity);
+            userDao.save(entity);
 
-            MyUser myUser = myUserDao.findByName(entity.getName());
+            MyUser myUser = userDao.findByName(entity.getName());
             MyUserRole userRole = new MyUserRole();
             userRole.setUserId(myUser.getId());
             userRole.setRoleId(dto.getRoleId());
-            myUserRoleDao.save(userRole);
+            userRoleDao.save(userRole);
         } catch (Exception e) {
 
             return new BaseResponseDTO(HttpStatus.ERROR_IN_DATABASE);
@@ -102,11 +102,11 @@ public class UserServiceImpl implements UserService {
         long count;
         List<UserDto> userList;
         if (StringUtils.isNotBlank(name)) {
-            userList = myUserJdbcDao.findByNameOrNickName(start, limit, name);
-            count = myUserJdbcDao.findByNameOrNickNameCount(name);
+            userList = userJdbcDao.findByNameOrNickName(start, limit, name);
+            count = userJdbcDao.findByNameOrNickNameCount(name);
         } else {
-            userList = myUserJdbcDao.findUserInfoPaging(start, limit);
-            count = myUserJdbcDao.findUserInfoCount();
+            userList = userJdbcDao.findUserInfoPaging(start, limit);
+            count = userJdbcDao.findUserInfoCount();
         }
 
         BaseResponseDTO responseDTO = new BaseResponseDTO(HttpStatus.OK_LAYUI, userList);
@@ -117,7 +117,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<MyRole> referRoleList() {
-        return myRoleDao.findAll();
+        return roleDao.findAll();
     }
 
     @Override
@@ -125,16 +125,16 @@ public class UserServiceImpl implements UserService {
     public boolean updateUser(UserDto dto) {
 
         try {
-            MyUser myUser = myUserDao.findByUId(dto.getId());
+            MyUser myUser = userDao.findByUId(dto.getId());
             myUser.setName(dto.getName());
             myUser.setNickName(dto.getNickName());
             myUser.setTelephone(dto.getTelephone());
             myUser.setEmail(dto.getEmail());
-            myUserDao.save(myUser);
+            userDao.save(myUser);
 
-            MyUserRole userRole = myUserRoleDao.findByUserId(dto.getId());
+            MyUserRole userRole = userRoleDao.findByUserId(dto.getId());
             userRole.setRoleId(dto.getRoleId());
-            myUserRoleDao.save(userRole);
+            userRoleDao.save(userRole);
         } catch (Exception e) {
             log.error("Update User Error, ", e);
             return false;
@@ -148,8 +148,8 @@ public class UserServiceImpl implements UserService {
     public boolean deleteUser(Long id) {
 
         try {
-            myUserDao.deleteById(id);
-            myUserRoleDao.deleteByUserId(id);
+            userDao.deleteById(id);
+            userRoleDao.deleteByUserId(id);
         } catch (Exception e) {
             log.error("Delete User Error, ", e);
             return false;
@@ -160,6 +160,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<MyUser> userList() {
-        return myUserDao.findAll();
+        return userDao.findAll();
     }
 }

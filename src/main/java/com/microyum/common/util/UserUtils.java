@@ -1,6 +1,6 @@
 package com.microyum.common.util;
 
-import com.microyum.model.MyUser;
+import com.microyum.model.common.MyUser;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.servlet.http.HttpServletRequest;

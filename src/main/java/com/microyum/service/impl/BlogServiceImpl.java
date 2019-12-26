@@ -6,15 +6,15 @@ import com.microyum.common.Constants;
 import com.microyum.common.http.BaseResponseDTO;
 import com.microyum.common.http.HttpStatus;
 import com.microyum.common.util.DateUtils;
-import com.microyum.dao.MyArticleTypeDao;
-import com.microyum.dao.MyBlogDao;
-import com.microyum.dao.MyBlogLogDao;
+import com.microyum.dao.jpa.MyArticleTypeDao;
+import com.microyum.dao.jdbc.MyBlogJdbcDao;
+import com.microyum.dao.jpa.MyBlogLogDao;
 import com.microyum.dto.BlogDetailPaging;
 import com.microyum.dto.BlogListDto;
 import com.microyum.dto.BlogRequestDto;
-import com.microyum.model.MyArticleType;
-import com.microyum.model.MyBlog;
-import com.microyum.model.MyBlogLog;
+import com.microyum.model.common.MyArticleType;
+import com.microyum.model.blog.MyBlog;
+import com.microyum.model.blog.MyBlogLog;
 import com.microyum.service.BlogService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -34,18 +34,18 @@ import java.util.concurrent.TimeUnit;
 public class BlogServiceImpl implements BlogService {
 
     @Autowired
-    private MyBlogDao myBlogDao;
+    private MyBlogJdbcDao blogJdbcDao;
     @Autowired
-    private MyBlogLogDao myBlogLogDao;
+    private MyBlogLogDao blogLogDao;
     @Autowired
-    private MyArticleTypeDao myArticleTypeDao;
+    private MyArticleTypeDao articleTypeDao;
 
     @Override
     public BaseResponseDTO listActiveBlog(int pageNo, int pageSize, int article) {
 
         Map<String, Object> result = Maps.newHashMap();
-        List<MyBlog> listBlog = myBlogDao.findActiveBlogList(pageNo, pageSize, article, "", true);
-        Integer total = myBlogDao.activeBlogTotal(article);
+        List<MyBlog> listBlog = blogJdbcDao.findActiveBlogList(pageNo, pageSize, article, "", true);
+        Integer total = blogJdbcDao.activeBlogTotal(article);
 
         List<String> list = Lists.newArrayList();
         for (MyBlog myBlog : listBlog) {
@@ -79,24 +79,24 @@ public class BlogServiceImpl implements BlogService {
     @Override
     public BaseResponseDTO listAllBlog(int pageNo, int pageSize, int article, String title) {
 
-        List<BlogListDto> listBlog = myBlogDao.findAllBlog(pageNo, pageSize, article, title);
+        List<BlogListDto> listBlog = blogJdbcDao.findAllBlog(pageNo, pageSize, article, title);
 
         BaseResponseDTO responseDTO = new BaseResponseDTO(HttpStatus.OK_LAYUI, listBlog);
-        responseDTO.setCount(myBlogDao.countAllBlog(article, title));
+        responseDTO.setCount(blogJdbcDao.countAllBlog(article, title));
 
         return responseDTO;
     }
 
     @Override
     public BaseResponseDTO findAllArticleType() {
-        List<MyArticleType> list = myArticleTypeDao.findAllArticleType();
+        List<MyArticleType> list = articleTypeDao.findAllArticleType();
         return new BaseResponseDTO(HttpStatus.OK, list);
     }
 
     @Override
     public MyArticleType findArticleTypeById(Long id) {
 
-        Optional<MyArticleType> articleType = myArticleTypeDao.findById(id);
+        Optional<MyArticleType> articleType = articleTypeDao.findById(id);
         return articleType.get();
     }
 
@@ -105,13 +105,13 @@ public class BlogServiceImpl implements BlogService {
     @Transactional
     public MyBlog findBlogDetailById(Long id, String ip, String contextPath) {
 
-        MyBlog blog = myBlogDao.findBlogDetailById(id);
-        myBlogDao.updatePageView(id, blog.getPageView() + 1);
+        MyBlog blog = blogJdbcDao.findBlogDetailById(id);
+        blogJdbcDao.updatePageView(id, blog.getPageView() + 1);
 
         MyBlogLog blogLog = new MyBlogLog();
         blogLog.setIpAddr(ip);
         blogLog.setRequestPath(contextPath);
-        myBlogLogDao.save(blogLog);
+        blogLogDao.save(blogLog);
 
         return blog;
     }
@@ -120,11 +120,11 @@ public class BlogServiceImpl implements BlogService {
     public BaseResponseDTO findBlogDetailPaging(Long id, BlogDetailPaging blogDetailPaging, String ip, String contextPath) {
 
         MyBlog blog;
-        MyArticleType articleType = myArticleTypeDao.findByName(blogDetailPaging.getArticle());
+        MyArticleType articleType = articleTypeDao.findByName(blogDetailPaging.getArticle());
         if (StringUtils.equals(blogDetailPaging.getKbn(), "pre")) {
-            blog = myBlogDao.findPostBlogDetail(id, articleType.getId());
+            blog = blogJdbcDao.findPostBlogDetail(id, articleType.getId());
         } else {
-            blog = myBlogDao.findPreBlogDetail(id, articleType.getId());
+            blog = blogJdbcDao.findPreBlogDetail(id, articleType.getId());
         }
 
         return new BaseResponseDTO(HttpStatus.OK, blog);
@@ -143,7 +143,7 @@ public class BlogServiceImpl implements BlogService {
         }
 
         try {
-            myBlogDao.save(entity);
+            blogJdbcDao.save(entity);
         } catch (Exception e) {
             log.error("Save blog error.", e);
             return new BaseResponseDTO(HttpStatus.INTERNAL_SERVER_ERROR);

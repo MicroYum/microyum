@@ -4,10 +4,10 @@ import com.microyum.common.enums.CurrencyEnum;
 import com.microyum.common.enums.FinanceTypeEnum;
 import com.microyum.common.http.BaseResponseDTO;
 import com.microyum.common.http.HttpStatus;
-import com.microyum.dao.MyFinanceDao;
+import com.microyum.dao.jdbc.MyFinanceJdbcDao;
 import com.microyum.dto.AssetAllocationDto;
 import com.microyum.dto.TraderAccountDto;
-import com.microyum.model.MyFinanceTraderAccount;
+import com.microyum.model.finance.MyFinanceTraderAccount;
 import com.microyum.service.FinanceService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,15 +22,15 @@ import java.util.stream.Collectors;
 public class FinanceServiceImpl implements FinanceService {
 
     @Autowired
-    private MyFinanceDao myFinanceDao;
+    private MyFinanceJdbcDao financeJdbcDao;
 
     @Override
     public BaseResponseDTO traderAccountOverview(int page, int limit, String trader) {
 
         int start = (page - 1) * limit;
-        List<TraderAccountDto> dtos = myFinanceDao.traderAccountOverview(start, limit, trader);
+        List<TraderAccountDto> dtos = financeJdbcDao.traderAccountOverview(start, limit, trader);
         BaseResponseDTO responseDTO = new BaseResponseDTO(HttpStatus.OK_LAYUI, dtos);
-        responseDTO.setCount(myFinanceDao.traderAccountOverviewCount(trader));
+        responseDTO.setCount(financeJdbcDao.traderAccountOverviewCount(trader));
         return responseDTO;
     }
 
@@ -38,7 +38,7 @@ public class FinanceServiceImpl implements FinanceService {
     public boolean traderAccountCreate(TraderAccountDto dto) {
 
         try {
-            int result = myFinanceDao.traderAccountCreate(dto);
+            int result = financeJdbcDao.traderAccountCreate(dto);
             if (result != 1) {
                 log.info("Create trader account error, result = " + result);
                 return false;
@@ -55,7 +55,7 @@ public class FinanceServiceImpl implements FinanceService {
     public boolean traderAccountUpdate(TraderAccountDto dto) {
 
         try {
-            int result = myFinanceDao.traderAccountUpdate(dto);
+            int result = financeJdbcDao.traderAccountUpdate(dto);
             if (result != 1) {
                 log.info("Update trader account error, result = " + result);
                 return false;
@@ -72,7 +72,7 @@ public class FinanceServiceImpl implements FinanceService {
     public boolean traderAccountDelete(Long id) {
 
         try {
-            int result = myFinanceDao.traderAccountDelete(id);
+            int result = financeJdbcDao.traderAccountDelete(id);
             if (result != 1) {
                 log.info("Delete trader account error, result = " + result);
                 return false;
@@ -88,7 +88,7 @@ public class FinanceServiceImpl implements FinanceService {
     @Override
     public Map<Long, String> traderAccountByUid(Long uid) {
 
-        List<MyFinanceTraderAccount> traderAccountList = myFinanceDao.traderAccountByUid(uid);
+        List<MyFinanceTraderAccount> traderAccountList = financeJdbcDao.traderAccountByUid(uid);
         return traderAccountList.stream().collect(Collectors.toMap(MyFinanceTraderAccount::getId, MyFinanceTraderAccount::getTrader));
     }
 
@@ -97,10 +97,10 @@ public class FinanceServiceImpl implements FinanceService {
 
         int start = (page - 1) * limit;
 
-        List<AssetAllocationDto> dtos = myFinanceDao.assetAllocationOverview(start, limit, trader, stock);
+        List<AssetAllocationDto> dtos = financeJdbcDao.assetAllocationOverview(start, limit, trader, stock);
 
         BaseResponseDTO responseDTO = new BaseResponseDTO(HttpStatus.OK_LAYUI, dtos);
-        responseDTO.setCount(myFinanceDao.assetAllocationOverviewCount(trader, stock));
+        responseDTO.setCount(financeJdbcDao.assetAllocationOverviewCount(trader, stock));
 
         return responseDTO;
     }
@@ -112,7 +112,7 @@ public class FinanceServiceImpl implements FinanceService {
         dto.setCurrency(CurrencyEnum.of(Integer.parseInt(dto.getCurrency())).getName());
 
         try {
-            int result = myFinanceDao.assetAllocationCreate(dto);
+            int result = financeJdbcDao.assetAllocationCreate(dto);
             if (result != 1) {
                 log.info("Create asset allocation error, result = " + result);
                 return false;
@@ -129,7 +129,7 @@ public class FinanceServiceImpl implements FinanceService {
     public boolean assetAllocationUpdate(AssetAllocationDto dto) {
 
         try {
-            int result = myFinanceDao.assetAllocationUpdate(dto);
+            int result = financeJdbcDao.assetAllocationUpdate(dto);
             if (result != 1) {
                 log.info("Update asset allocation error, result = " + result);
                 return false;
@@ -146,7 +146,7 @@ public class FinanceServiceImpl implements FinanceService {
     public boolean assetAllocationDelete(Long id) {
 
         try {
-            int result = myFinanceDao.assetAllocationDelete(id);
+            int result = financeJdbcDao.assetAllocationDelete(id);
             if (result != 1) {
                 log.info("Delete asset allocation error, result = " + result);
                 return false;

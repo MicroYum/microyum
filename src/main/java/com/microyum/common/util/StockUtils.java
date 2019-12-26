@@ -2,7 +2,6 @@ package com.microyum.common.util;
 
 import com.google.common.collect.Maps;
 import com.microyum.bo.StockStrategyBO;
-import com.microyum.model.MyStockData;
 
 import java.math.BigDecimal;
 import java.util.Map;

@@ -21,10 +21,8 @@ public class Constants {
     public static final String BLOG_DETAIL_KBN_POST = "post";
 
     public static final String STOCK_SINA_URL = "http://hq.sinajs.cn/list=";
+    public static final Integer STOCK_BASE_COUNT = 500;
 
-    public static final String MAIL_TEMPLATE_STOCK_BUY = "";
-    public static final String MAIL_TEMPLATE_STOCK_BUY_OBSERVE = "";
-    public static final String MAIL_TEMPLATE_STOCK_SELL = "";
-    public static final String MAIL_TEMPLATE_STOCK_SELL_OBSERVE = "";
-    public static final String MAIL_ADMIN_ADDR = "microyum@163.com";
+    public static final String MAIL_NAME_BUYING_STOCK = "BUYING_STOCK";
+    public static final String MAIL_NAME_BUYING_STOCK_TABLE = "BUYING_STOCK_TABLE";
 }
