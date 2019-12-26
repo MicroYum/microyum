@@ -3,7 +3,7 @@ package com.microyum.dao.jdbc;
 import com.microyum.common.util.StringUtils;
 import com.microyum.dto.AssetAllocationDto;
 import com.microyum.dto.TraderAccountDto;
-import com.microyum.model.MyFinanceTraderAccount;
+import com.microyum.model.finance.MyFinanceTraderAccount;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;

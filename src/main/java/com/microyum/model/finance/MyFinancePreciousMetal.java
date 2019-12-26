@@ -1,4 +1,4 @@
-package com.microyum.model;
+package com.microyum.model.finance;
 
 /**
  * 家庭财务 - 贵金属

@@ -1,4 +1,4 @@
-package com.microyum.model;
+package com.microyum.model.stock;
 
 /**
  * 资产负债表

@@ -1,6 +1,6 @@
 package com.microyum.dao.jpa;
 
-import com.microyum.model.MyUser;
+import com.microyum.model.common.MyUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

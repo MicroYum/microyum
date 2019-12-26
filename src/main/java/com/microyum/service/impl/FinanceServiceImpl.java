@@ -7,7 +7,7 @@ import com.microyum.common.http.HttpStatus;
 import com.microyum.dao.jdbc.MyFinanceJdbcDao;
 import com.microyum.dto.AssetAllocationDto;
 import com.microyum.dto.TraderAccountDto;
-import com.microyum.model.MyFinanceTraderAccount;
+import com.microyum.model.finance.MyFinanceTraderAccount;
 import com.microyum.service.FinanceService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

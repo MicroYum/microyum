@@ -1,6 +1,6 @@
 package com.microyum.dao.jdbc;
 
-import com.microyum.model.MyMailTemplate;
+import com.microyum.model.common.MyMailTemplate;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 

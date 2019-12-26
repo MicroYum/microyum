@@ -1,4 +1,4 @@
-package com.microyum.model;
+package com.microyum.model.stock;
 
 /**
  * 利润表

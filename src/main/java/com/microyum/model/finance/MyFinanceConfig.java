@@ -1,5 +1,6 @@
-package com.microyum.model;
+package com.microyum.model.finance;
 
+import com.microyum.model.BaseModel;
 import lombok.Data;
 
 import javax.persistence.Column;

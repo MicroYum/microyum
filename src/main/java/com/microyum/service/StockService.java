@@ -2,7 +2,7 @@ package com.microyum.service;
 
 import com.microyum.common.http.BaseResponseDTO;
 import com.microyum.dto.CalculateStockTransactionCostDto;
-import com.microyum.model.MyStockBase;
+import com.microyum.model.stock.MyStockBase;
 
 public interface StockService {
 

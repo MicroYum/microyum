@@ -2,10 +2,9 @@ package com.microyum.dao.jdbc;
 
 import com.microyum.bo.BuyingStockBO;
 import com.microyum.dto.StockLatestDataDto;
-import com.microyum.model.MyStockBase;
-import com.microyum.model.MyStockDailyStrategy;
-import com.microyum.model.MyStockData;
-import com.microyum.model.MyStockDataDetail;
+import com.microyum.model.stock.MyStockBase;
+import com.microyum.model.stock.MyStockData;
+import com.microyum.model.stock.MyStockDataDetail;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;

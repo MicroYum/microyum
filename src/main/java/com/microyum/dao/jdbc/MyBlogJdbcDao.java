@@ -2,7 +2,7 @@ package com.microyum.dao.jdbc;
 
 import com.microyum.common.util.DateUtils;
 import com.microyum.dto.BlogListDto;
-import com.microyum.model.MyBlog;
+import com.microyum.model.blog.MyBlog;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;

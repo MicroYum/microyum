@@ -2,8 +2,8 @@ package com.microyum.controller;
 
 import com.microyum.common.util.DateUtils;
 import com.microyum.common.util.UserUtils;
-import com.microyum.model.MyBlog;
-import com.microyum.model.MyUser;
+import com.microyum.model.blog.MyBlog;
+import com.microyum.model.common.MyUser;
 import com.microyum.service.BlogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContext;

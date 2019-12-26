@@ -1,4 +1,4 @@
-package com.microyum.model;
+package com.microyum.model.finance;
 
 import java.util.Date;
 

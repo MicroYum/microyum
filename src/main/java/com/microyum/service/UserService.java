@@ -2,8 +2,8 @@ package com.microyum.service;
 
 import com.microyum.common.http.BaseResponseDTO;
 import com.microyum.dto.UserDto;
-import com.microyum.model.MyRole;
-import com.microyum.model.MyUser;
+import com.microyum.model.common.MyRole;
+import com.microyum.model.common.MyUser;
 
 import java.util.List;
 

@@ -12,9 +12,9 @@ import com.microyum.dao.jpa.MyBlogLogDao;
 import com.microyum.dto.BlogDetailPaging;
 import com.microyum.dto.BlogListDto;
 import com.microyum.dto.BlogRequestDto;
-import com.microyum.model.MyArticleType;
-import com.microyum.model.MyBlog;
-import com.microyum.model.MyBlogLog;
+import com.microyum.model.common.MyArticleType;
+import com.microyum.model.blog.MyBlog;
+import com.microyum.model.blog.MyBlogLog;
 import com.microyum.service.BlogService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -36,9 +36,9 @@ public class BlogServiceImpl implements BlogService {
     @Autowired
     private MyBlogJdbcDao blogJdbcDao;
     @Autowired
-    private MyBlogLogDao myBlogLogDao;
+    private MyBlogLogDao blogLogDao;
     @Autowired
-    private MyArticleTypeDao myArticleTypeDao;
+    private MyArticleTypeDao articleTypeDao;
 
     @Override
     public BaseResponseDTO listActiveBlog(int pageNo, int pageSize, int article) {
@@ -89,14 +89,14 @@ public class BlogServiceImpl implements BlogService {
 
     @Override
     public BaseResponseDTO findAllArticleType() {
-        List<MyArticleType> list = myArticleTypeDao.findAllArticleType();
+        List<MyArticleType> list = articleTypeDao.findAllArticleType();
         return new BaseResponseDTO(HttpStatus.OK, list);
     }
 
     @Override
     public MyArticleType findArticleTypeById(Long id) {
 
-        Optional<MyArticleType> articleType = myArticleTypeDao.findById(id);
+        Optional<MyArticleType> articleType = articleTypeDao.findById(id);
         return articleType.get();
     }
 
@@ -111,7 +111,7 @@ public class BlogServiceImpl implements BlogService {
         MyBlogLog blogLog = new MyBlogLog();
         blogLog.setIpAddr(ip);
         blogLog.setRequestPath(contextPath);
-        myBlogLogDao.save(blogLog);
+        blogLogDao.save(blogLog);
 
         return blog;
     }
@@ -120,7 +120,7 @@ public class BlogServiceImpl implements BlogService {
     public BaseResponseDTO findBlogDetailPaging(Long id, BlogDetailPaging blogDetailPaging, String ip, String contextPath) {
 
         MyBlog blog;
-        MyArticleType articleType = myArticleTypeDao.findByName(blogDetailPaging.getArticle());
+        MyArticleType articleType = articleTypeDao.findByName(blogDetailPaging.getArticle());
         if (StringUtils.equals(blogDetailPaging.getKbn(), "pre")) {
             blog = blogJdbcDao.findPostBlogDetail(id, articleType.getId());
         } else {

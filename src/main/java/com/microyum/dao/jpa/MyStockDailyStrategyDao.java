@@ -1,6 +1,6 @@
 package com.microyum.dao.jpa;
 
-import com.microyum.model.MyStockDailyStrategy;
+import com.microyum.model.stock.MyStockDailyStrategy;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

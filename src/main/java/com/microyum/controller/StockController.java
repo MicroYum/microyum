@@ -2,7 +2,7 @@ package com.microyum.controller;
 
 import com.microyum.common.http.BaseResponseDTO;
 import com.microyum.dto.CalculateStockTransactionCostDto;
-import com.microyum.model.MyStockBase;
+import com.microyum.model.stock.MyStockBase;
 import com.microyum.service.StockService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;

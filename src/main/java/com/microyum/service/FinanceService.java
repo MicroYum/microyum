@@ -3,9 +3,7 @@ package com.microyum.service;
 import com.microyum.common.http.BaseResponseDTO;
 import com.microyum.dto.AssetAllocationDto;
 import com.microyum.dto.TraderAccountDto;
-import com.microyum.model.MyFinanceTraderAccount;
 
-import java.util.List;
 import java.util.Map;
 
 public interface FinanceService {

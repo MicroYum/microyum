@@ -1,6 +1,6 @@
 package com.microyum.filter;
 
-import com.microyum.model.MyUser;
+import com.microyum.model.common.MyUser;
 import com.microyum.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;

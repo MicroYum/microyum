@@ -1,5 +1,8 @@
-package com.microyum.model;
+package com.microyum.model.blog;
 
+import com.microyum.model.BaseModel;
+import com.microyum.model.common.MyArticleType;
+import com.microyum.model.common.MyUser;
 import lombok.Data;
 
 import javax.persistence.Column;
