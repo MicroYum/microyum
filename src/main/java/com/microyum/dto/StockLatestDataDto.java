@@ -13,6 +13,7 @@ import java.util.Date;
 public class StockLatestDataDto {
     // 股票代码
     private String stockCode;
+    private String area;
     // 股票名称
     private String stockName;
     // 交易日

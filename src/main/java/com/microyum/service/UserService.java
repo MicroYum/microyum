@@ -15,7 +15,7 @@ public interface UserService {
 
     BaseResponseDTO createUser(UserDto dto);
 
-    BaseResponseDTO userListOverview(int page, int limit, String name);
+    BaseResponseDTO userListOverview(int page, int limit, long userId, String name);
 
     List<MyRole> referRoleList();
 
@@ -23,5 +23,7 @@ public interface UserService {
 
     boolean deleteUser(Long id);
 
-    List<MyUser> userList();
+    List<MyUser> userList(Long userId);
+
+    String referUserRoleName(Long userId);
 }

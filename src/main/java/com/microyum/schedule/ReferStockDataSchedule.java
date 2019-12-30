@@ -4,6 +4,8 @@ import com.microyum.common.Constants;
 import com.microyum.common.util.DateUtils;
 import com.microyum.common.util.StockUtils;
 import com.microyum.dao.jdbc.MyStockJdbcDao;
+import com.microyum.dao.jpa.MyStockDataDao;
+import com.microyum.dao.jpa.MyStockDataDetailDao;
 import com.microyum.model.stock.MyStockBase;
 import com.microyum.model.stock.MyStockData;
 import com.microyum.model.stock.MyStockDataDetail;
@@ -35,6 +37,10 @@ public class ReferStockDataSchedule {
 
     @Autowired
     private MyStockJdbcDao stockJdbcDao;
+    @Autowired
+    private MyStockDataDetailDao stockDataDetailDao;
+    @Autowired
+    private MyStockDataDao stockDataDao;
 
     @Value("${python.script.repair.latest.hfqdata}")
     private String repairLatestScript;
@@ -91,17 +97,16 @@ public class ReferStockDataSchedule {
                         }
 
                         MyStockData stockData = this.tidyStockData(mapStack);
+                        stockData.setArea(stockBase.getArea());
                         MyStockDataDetail stockDataDetail = this.tidyStockDataDetail(mapStack);
+                        stockDataDetail.setArea(stockBase.getArea());
 
-                        stockJdbcDao.saveStockDataDetail(stockDataDetail);
-                        MyStockData stock = stockJdbcDao.selectTradeDateStock(stockData.getSymbol(), stockData.getTradeDate());
-                        if (stock == null) {
-                            // insert
-                            stockJdbcDao.saveStockData(stockData);
-                        } else {
-                            // update
-                            stockJdbcDao.updateStockData(stockData);
+                        stockDataDetailDao.save(stockDataDetail);
+                        MyStockData stock = stockJdbcDao.selectTradeDateStock(stockData.getStockCode(), stockData.getArea(), stockData.getTradeDate());
+                        if (stock != null) {
+                            stockData.setId(stock.getId());
                         }
+                        stockDataDao.save(stockData);
                     }
                 } finally {
                     response.close();
@@ -109,7 +114,6 @@ public class ReferStockDataSchedule {
             }
         } catch (Exception e) {
             log.error("请求/解析新浪股票接口错误", e);
-            e.printStackTrace();
         } finally {
             // 关闭连接,释放资源
             try {
@@ -125,7 +129,7 @@ public class ReferStockDataSchedule {
     private MyStockData tidyStockData(Map<String, String> mapStack) {
 
         MyStockData stockData = new MyStockData();
-        stockData.setSymbol(mapStack.get("symbol"));
+        stockData.setStockCode(mapStack.get("stockCode"));
         stockData.setTradeDate(DateUtils.parseDate(mapStack.get("tradeDate"), DateUtils.DATE_FORMAT));
         stockData.setOpen(new BigDecimal(mapStack.get("open")));
         stockData.setClose(new BigDecimal(mapStack.get("close")));
@@ -142,7 +146,7 @@ public class ReferStockDataSchedule {
     private MyStockDataDetail tidyStockDataDetail(Map<String, String> mapStack) {
 
         MyStockDataDetail stockDataDetail = new MyStockDataDetail();
-        stockDataDetail.setSymbol(mapStack.get("symbol"));
+        stockDataDetail.setStockCode(mapStack.get("stockCode"));
         stockDataDetail.setTradeDatetime(DateUtils.parseDate(mapStack.get("tradeDate") + " " + mapStack.get("tradeTime"), DateUtils.DATE_TIME_FORMAT));
         stockDataDetail.setCurrent(new BigDecimal(mapStack.get("close")));
         stockDataDetail.setTradeCount(new BigDecimal(mapStack.get("tradeCount")));
