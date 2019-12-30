@@ -18,6 +18,9 @@
                 <a href="javascript:;" class="layui-btn layui-btn-small" id="btn-select-title">
                     <i class="layui-icon layui-icon-refresh"></i> Select
                 </a>
+                <a href="javascript:;" class="layui-btn layui-btn-small" id="btn-add-blog">
+                    <i class="layui-icon layui-icon-add-circle"></i> Add
+                </a>
             </div>
         </div>
 
@@ -36,14 +39,54 @@
     </div>
 </div>
 
+<div style="margin: 15px; display: none" id="pop-div">
+    <form class="layui-form">
+        <div class="layui-form-item" id="pop-blog-title">
+            <label class="layui-form-label">Title:</label>
+            <div class="layui-input-block" style="margin-left: 200px;">
+                <input type="text" name="blog-title" id="input-blog-title" class="layui-input">
+                <span id="stock-code-message"></span>
+            </div>
+        </div>
+        <div class="layui-form-item" id="pop-blog-summary">
+            <label class="layui-form-label" style="width: 100px;">Summary:</label>
+            <div class="layui-input-block" style="margin-left: 200px;">
+                <input type="text" name="blog-summary" id="input-blog-summary" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item" id="pop-topic-picture">
+            <label class="layui-form-label" style="width: 100px;">Topic Picture:</label>
+            <div class="layui-input-block" style="margin-left: 200px;">
+                <input type="file" id="topic-picture" onchange="uploadTopicImg()">
+                <input type="hidden" value="" id="hidden-topic-picture-url">
+            </div>
+        </div>
+        <div class="layui-form-item" id="pop-blog-body">
+            <textarea id="input-blog-body"></textarea>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label" style="width: 100px;">Blog Type:</label>
+            <div class="layui-input-block" style="margin-left: 200px;">
+                <input type="radio" name="blog-type" value="0" title="随笔" checked>
+                <input type="radio" name="blog-type" value="1" title="编程">
+                <input type="radio" name="blog-type" value="2" title="理财">
+                <input type="radio" name="blog-type" value="3" title="优选">
+                <input type="radio" name="blog-type" value="4" title="日语">
+            </div>
+        </div>
+    </form>
+</div>
+
 <script type="text/javascript" src="/static/layui/layui.js"></script>
 <script type="text/javascript" src="/static/layui/lay/modules/laypage.js"></script>
 <script src="/static/js/jquery.min.js"></script>
 <script type="text/javascript">
-    layui.use(['table', 'form'], function () {
+    layui.use(['table', 'form', 'layedit'], function () {
         var $ = layui.jquery,
             layer = layui.layer;
         var table = layui.table;
+        var layedit = layui.layedit;
+
         var tblCols = [
             {type: 'numbers'},
             {type: 'checkbox'},
@@ -77,7 +120,85 @@
         $("#btn-select-title").on('click', function () {
             tableObj.reload({where: {selectTitle: $.trim($("#select-title").val()), article: -1}});
         });
+
+        $('#btn-add-blog').on('click', function () {
+
+            $('#pop-div').show();
+            $("#input-blog-title").val('');
+            $("#input-blog-summary").val('');
+            $("#hidden-topic-picture-url").val('');
+            $("#input-blog-body").val('');
+            $("input[name='blog-type'][value='0']").attr('checked', "checked");
+
+            var editorIndex;
+
+            layer.open({
+                type: 1,
+                shadeClose: false,
+                title: 'Add',
+                btn: ['Save', 'Cancel'],
+                area: ['840px', '650px'],
+                content: $('#pop-div'),
+                yes: function (index) {
+                    layer.close(index);
+                    var loading = layer.load(1);
+
+                    var summary = $.trim($("#input-blog-summary").val());
+                    if (summary.length == 0) {
+                        summary = layedit.getText(editorIndex).replace(/[\r\n]/g, "");
+                        if (summary.length > 120) {
+                            summary = summary.substr(0, 120) + "...";
+                        }
+                    }
+
+                    var param = {
+                        title: $.trim($("#input-blog-title").val()),
+                        summary: summary,
+                        content: layedit.getContent(editorIndex),
+                        topicImg: $("#hidden-topic-picture-url").val(),
+                        status: 1,
+                        articleId: $('input[name="blog-type"]:checked').val()
+                    };
+
+                    console.log(param);
+
+                    $.post('/blog/save', param, function (result) {
+                        if (result.code == 200) {
+                            layer.msg("Save Successful.");
+                            tableObj.reload();
+                        } else {
+                            layer.alert("Save failed.");
+                            console.log(result.msg)
+                        }
+                        layer.close(loading);
+                    }, "json");
+                },
+                end: function () {
+                    $('#pop-div').hide();
+                }
+            });
+
+            editorIndex = layedit.build('input-blog-body');
+            layui.form.render();
+        });
     });
+
+    function uploadTopicImg() {
+        var fd = new FormData();
+        fd.append("imgFile", document.getElementById("topic-picture").files[0]);
+        $.ajax({
+            url: "/upload/blog/picture",
+            type: "post",
+            data: fd,
+            processData: false,
+            contentType: false,
+            success: function (res) {
+                console.log(res.url);
+                $("#hidden-topic-picture-url").val(res.url);
+            },
+            dataType: "json"
+        })
+    }
 </script>
 </body>
 </html>

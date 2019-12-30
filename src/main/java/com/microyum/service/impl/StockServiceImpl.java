@@ -5,8 +5,10 @@ import com.microyum.common.http.HttpStatus;
 import com.microyum.common.util.DateUtils;
 import com.microyum.dao.jdbc.MyStockJdbcDao;
 import com.microyum.dao.jpa.MyStockBaseDao;
+import com.microyum.dao.jpa.MyStockDataDao;
 import com.microyum.dto.CalculateStockTransactionCostDto;
 import com.microyum.dto.StockBaseDto;
+import com.microyum.dto.StockBaseListDto;
 import com.microyum.model.stock.MyStockBase;
 import com.microyum.model.stock.MyStockData;
 import com.microyum.service.StockService;
@@ -32,6 +34,8 @@ public class StockServiceImpl implements StockService {
     private MyStockJdbcDao stockJdbcDao;
     @Autowired
     private MyStockBaseDao stockBaseDao;
+    @Autowired
+    private MyStockDataDao stockDataDao;
 
     @Value("${python.script.repair.stock.hfqdata}")
     private String repairStockScript;
@@ -39,7 +43,7 @@ public class StockServiceImpl implements StockService {
     @Override
     public BaseResponseDTO referStockList(int pageNo, int pageSize, String stock) {
 
-        List<MyStockBase> listStock = stockJdbcDao.referStockList(pageNo, pageSize, stock);
+        List<StockBaseListDto> listStock = stockJdbcDao.referStockList(pageNo, pageSize, stock);
 
         BaseResponseDTO responseDTO = new BaseResponseDTO(HttpStatus.OK_LAYUI, listStock);
         responseDTO.setCount(stockJdbcDao.countAllStockBase(stock));
@@ -126,18 +130,26 @@ public class StockServiceImpl implements StockService {
         return new BaseResponseDTO(HttpStatus.OK, dto);
     }
 
-    public void repairStockData() {
+    public void repairStockData(String area, String stockCode) {
 
         log.info("开始补齐股票数据...");
-
+        Process proc;
         try {
-            Runtime.getRuntime().exec(repairStockScript);
+            if (StringUtils.isNotBlank(stockCode)) {
+                proc = Runtime.getRuntime().exec(repairStockScript + " " + area + " " + stockCode);
+            } else {
+                proc = Runtime.getRuntime().exec(repairStockScript);
+            }
+
+            if (proc.waitFor() == 0) {
+                log.info("补齐股票数据结束.");
+                return;
+            }
+
         } catch (Exception e) {
             log.error("补齐股票数据失败, ", e);
             return;
         }
-
-        log.info("补齐股票数据结束.");
     }
 
     @Override
@@ -184,7 +196,19 @@ public class StockServiceImpl implements StockService {
         entity.setTotalCapital(Double.valueOf(stockBase.getTotalCapital()));
         entity.setObserve(Byte.valueOf("1"));
         entity.setListSort(stockBase.getStockCode());
+
+
+        // 調用脚本補全數據
+        this.repairStockData(entity.getArea(), entity.getStockCode());
+
+        // 獲取補全的數據的開始日期，更新到MyStockBase表
+        Date minTradeDate = stockDataDao.findMinTradeDateByStock(entity.getArea(), entity.getStockCode());
+        if (minTradeDate != null) {
+            entity.setDailyDate(minTradeDate);
+        }
+
         stockBaseDao.save(entity);
+
         return new BaseResponseDTO(HttpStatus.OK);
     }
 

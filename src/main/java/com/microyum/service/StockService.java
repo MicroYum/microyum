@@ -15,7 +15,7 @@ public interface StockService {
 
     BaseResponseDTO calculateStockTransactionCost(CalculateStockTransactionCostDto dto);
 
-    void repairStockData();
+    void repairStockData(String area, String stockCode);
 
     BaseResponseDTO referStockBase(Long id);
     BaseResponseDTO saveStockBase(StockBaseDto stockBase);

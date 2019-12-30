@@ -42,7 +42,7 @@
         <div class="layui-side-scroll">
             <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
             <ul class="layui-nav layui-nav-tree" lay-filter="test">
-                <li class="layui-nav-item layui-nav-itemed">
+                <li class="layui-nav-item layui-nav-itemed" th:if="${userRole} eq 'ADMIN'">
                     <a class="" href="javascript:;">内容管理</a>
                     <dl class="layui-nav-child">
                         <dd><a href="javascript:target('/management/blog');">新建博客</a></dd>
@@ -53,12 +53,12 @@
                 <li class="layui-nav-item">
                     <a href="javascript:;">投资管理</a>
                     <dl class="layui-nav-child">
-                        <dd><a href="javascript:target('/management/stock/base');">股票信息配置</a></dd>
+                        <dd th:if="${userRole} eq 'ADMIN'"><a href="javascript:target('/management/stock/base');">股票信息配置</a></dd>
                         <dd><a href="javascript:target('/management/trader/account');">渠道账户配置</a></dd>
                         <dd><a href="javascript:target('/management/asset/allocation');">资产配置</a></dd>
                     </dl>
                 </li>
-                <li class="layui-nav-item">
+                <li class="layui-nav-item" th:if="${userRole} eq 'ADMIN'">
                     <a class="" href="javascript:;">系统管理</a>
                     <dl class="layui-nav-child">
                         <dd><a href="javascript:target('/management/system/user');">用户管理</a></dd>

@@ -27,6 +27,7 @@ public class StockStrategy {
         Integer tradeCount = stockJdbcDao.countStockDataByCode(stockBase.getStockCode(), null);
 
         MyStockDailyStrategy dailyStrategy = new MyStockDailyStrategy();
+        dailyStrategy.setArea(stockBase.getArea());
         dailyStrategy.setStockCode(stockBase.getStockCode());
         dailyStrategy.setTradeDate(new Date());
 

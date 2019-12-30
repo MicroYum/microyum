@@ -23,5 +23,6 @@ public class AssetAllocationDto {
     private String userName;
     private String nickName;
 
+    private String area;
     private String stockCode;
 }

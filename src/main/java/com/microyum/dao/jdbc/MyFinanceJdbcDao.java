@@ -139,7 +139,7 @@ public class MyFinanceJdbcDao {
         StringBuilder builder = new StringBuilder();
         builder.append("select fc.id, fc.`type`, fc.amount, fc.currency, ta.id as ta_id,  ");
         builder.append(" ta.trader, ta.account, mu.id as uid, mu.`name` as user_name, ");
-        builder.append(" mu.nick_name, sb.stock_code, fc.name as stock_name ");
+        builder.append(" mu.nick_name, sb.area, sb.stock_code, fc.name as stock_name ");
         builder.append(" from my_finance_config fc ");
         builder.append(" inner join my_finance_trader_account ta on fc.ta_id = ta.id ");
         builder.append(" inner join my_user mu on ta.uid = mu.id ");
@@ -161,6 +161,7 @@ public class MyFinanceJdbcDao {
             dto.setUserName(rs.getString("user_name"));
             dto.setNickName(rs.getString("nick_name"));
 
+            dto.setArea(rs.getString("area"));
             dto.setAssetName(rs.getString("stock_name"));
             dto.setStockCode(rs.getString("stock_code"));
 

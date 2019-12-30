@@ -52,13 +52,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public MyUser getUserByName(String userName) {
 
-        MyUser myUser = userDao.findByName(userName);
-
-        if (myUser == null) {
-            return null;
-        }
-
-        return myUser;
+        return userDao.findByName(userName);
     }
 
     @Override
@@ -184,14 +178,14 @@ public class UserServiceImpl implements UserService {
 
         if (StringUtils.equals(Constants.USER_ROLE_ADMIN, roleName)) {
             return userDao.findAll();
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     @Override
     public String referUserRoleName(Long userId) {
 
-        return null;
+        return roleDao.findRoleNameByUserId(userId);
     }
 }

@@ -110,12 +110,13 @@
             {type: 'numbers'},
             {type: 'checkbox'},
             {field: 'id', title: 'id', hide: true},
-            {field: 'stockCode', title: '股票代碼', width: 180},
-            {field: 'stockName', title: '股票名稱', width: 180},
-            {field: 'listingDate', title: '上市日期', width: 180},
-            {field: 'totalCapital', title: '總股本(億)', width: 200},
-            {field: 'circulationCapital', title: '流通股本(億)', width: 200},
-            {field: 'observe', title: '是否關注', width: 150},
+            {field: 'stockCode', title: '代碼', width: 180},
+            {field: 'stockName', title: '名稱', width: 180},
+            {field: 'type', title: '類型', width: 180},
+            {field: 'capital', title: '流通股本/縂股本(億)', width: 200},
+            {field: 'startDate', title: '記錄開始日期', width: 200},
+            {field: 'strategy', title: '推薦等級', width: 150},
+            {field: 'strategyDate', title: '等級日期', width: 150},
             {fixed: 'right', width: 220, align: 'center', toolbar: '#toolbar'}
         ];
 
@@ -195,9 +196,6 @@
                         'area': $('input[name="stock-area"]:checked').val(),
                         'type': $('input[name="stock-type"]:checked').val()
                     };
-
-                    debugger;
-                    console.log(param);
 
                     $.post('/stock/base/save', param, function (result) {
                         if (result.code == 200) {

@@ -98,10 +98,11 @@ public class ReferStockDataSchedule {
 
                         MyStockData stockData = this.tidyStockData(mapStack);
                         stockData.setArea(stockBase.getArea());
-                        MyStockDataDetail stockDataDetail = this.tidyStockDataDetail(mapStack);
-                        stockDataDetail.setArea(stockBase.getArea());
 
-                        stockDataDetailDao.save(stockDataDetail);
+                        // 2019-12-30 感每分鐘的記錄覺意義不大
+                        // MyStockDataDetail stockDataDetail = this.tidyStockDataDetail(mapStack);
+                        // stockDataDetail.setArea(stockBase.getArea());
+                        // stockDataDetailDao.save(stockDataDetail);
                         MyStockData stock = stockJdbcDao.selectTradeDateStock(stockData.getStockCode(), stockData.getArea(), stockData.getTradeDate());
                         if (stock != null) {
                             stockData.setId(stock.getId());

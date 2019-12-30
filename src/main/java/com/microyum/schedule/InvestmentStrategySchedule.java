@@ -135,6 +135,7 @@ public class InvestmentStrategySchedule {
             map.put("nickName", dto.getNickName());
             map.put("trader", dto.getTrader());
             map.put("account", dto.getAccount());
+            map.put("area", dto.getArea());
             map.put("stockCode", dto.getStockCode());
             map.put("stockName", dto.getAssetName());
 
@@ -171,7 +172,7 @@ public class InvestmentStrategySchedule {
                 }
 
                 // 2、匹配MyStockDailyStrategy表，如果条件满足则列入List
-                MyStockDailyStrategy strategy = dailyStrategyDao.findByStockCodeAndTradeDate(String.valueOf(item.get("stockCode")), DateUtils.getCurrentDate());
+                MyStockDailyStrategy strategy = dailyStrategyDao.findByStockAndTradeDate(String.valueOf(item.get("area")), String.valueOf(item.get("stockCode")), DateUtils.getCurrentDate());
 
                 if (strategy.getStrategy().intValue() == StockStrategyEnum.STRATEGY_BUYING.getCode()) {
                     body.append("股票: <font color='red'><b>").append(item.get("stockName")).append("[").append(strategy.getStockCode()).append("]</b></font>已进入买入区, ");

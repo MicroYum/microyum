@@ -1,6 +1,10 @@
 package com.microyum.dao.jdbc;
 
 import com.microyum.bo.BuyingStockBO;
+import com.microyum.common.enums.StockStrategyEnum;
+import com.microyum.common.enums.StockTypeEnum;
+import com.microyum.common.util.DateUtils;
+import com.microyum.dto.StockBaseListDto;
 import com.microyum.dto.StockLatestDataDto;
 import com.microyum.model.stock.MyStockBase;
 import com.microyum.model.stock.MyStockData;
@@ -70,7 +74,7 @@ public class MyStockJdbcDao {
         return namedParameterJdbcTemplate.queryForObject(builder.toString(), parameters, Integer.class);
     }
 
-    public List<MyStockBase> referStockList(int pageNo, int pageSize, String stock) {
+    public List<StockBaseListDto> referStockList(int pageNo, int pageSize, String stock) {
 
         int start = (pageNo - 1) * pageSize;
         MapSqlParameterSource parameters = new MapSqlParameterSource();
@@ -78,33 +82,44 @@ public class MyStockJdbcDao {
         parameters.addValue("pageSize", pageSize);
 
         StringBuilder builder = new StringBuilder();
-        builder.append("select * ");
-        builder.append(" from `my_stock_base`");
+        builder.append("SELECT ");
+        builder.append(" b.area, b.stock_code, b.stock_name, b.type, b.total_capital,");
+        builder.append(" b.circulation_capital, b.daily_date, s.strategy, s.trade_date ");
+        builder.append("FROM ");
+        builder.append(" my_stock_base b ");
+        builder.append(" LEFT JOIN ( SELECT area, stock_code, max( trade_date ) trade_date FROM my_stock_daily_strategy GROUP BY area, stock_code ) t ON t.area = b.area ");
+        builder.append(" AND t.stock_code = b.stock_code");
+        builder.append(" LEFT JOIN my_stock_daily_strategy s ON s.area = t.area ");
+        builder.append(" AND s.stock_code = t.stock_code ");
+        builder.append(" AND s.trade_date = t.trade_date ");
 
         if (StringUtils.isNotBlank(stock)) {
             builder.append(" where ");
-            builder.append(" stock_code like :stockCode ");
+            builder.append(" b.stock_code like :stockCode ");
             parameters.addValue("stockCode", "%" + stock + "%");
             builder.append(" or ");
-            builder.append(" stock_name like :stockName ");
+            builder.append(" b.stock_name like :stockName ");
             parameters.addValue("stockName", "%" + stock + "%");
         }
 
         builder.append(" order by ");
-        builder.append("    list_sort desc ");
+        builder.append("    s.strategy, b.list_sort desc ");
         builder.append("    limit :start, :pageSize ");
 
-        List<MyStockBase> stockBaseList = namedParameterJdbcTemplate.query(builder.toString(), parameters, (rs, rowNum) -> {
-            MyStockBase stockBase = new MyStockBase();
-            stockBase.setId(rs.getLong("id"));
+        List<StockBaseListDto> stockBaseList = namedParameterJdbcTemplate.query(builder.toString(), parameters, (rs, rowNum) -> {
+            StockBaseListDto stockBase = new StockBaseListDto();
+            stockBase.setArea(rs.getString("area"));
             stockBase.setStockCode(rs.getString("stock_code"));
             stockBase.setStockName(rs.getString("stock_name"));
-            stockBase.setListingDate(rs.getDate("listing_date"));
-            stockBase.setArea(rs.getString("area"));
-            stockBase.setListSort(rs.getString("list_sort"));
-            stockBase.setCirculationCapital(rs.getDouble("circulation_capital"));
-            stockBase.setTotalCapital(rs.getDouble("total_capital"));
-            stockBase.setObserve(rs.getByte("observe"));
+            stockBase.setType(StockTypeEnum.of(rs.getInt("type")).getName());
+            stockBase.setCapital(String.format("%s / %s", rs.getString("circulation_capital"), rs.getString("total_capital")));
+            stockBase.setStartDate(DateUtils.formatDate(rs.getDate("daily_date"), DateUtils.DATE_FORMAT));
+
+            if (rs.getString("strategy") != null) {
+                stockBase.setStrategy(StockStrategyEnum.of(Integer.valueOf(rs.getInt("strategy"))).getName());
+                stockBase.setStrategyDate(DateUtils.formatDate(rs.getDate("trade_date"), DateUtils.DATE_FORMAT));
+            }
+
             return stockBase;
         });
 
