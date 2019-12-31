@@ -26,7 +26,7 @@ public class MyStockBase extends BaseModel {
     private Double totalCapital;
     // 流通股本(亿)
     private Double circulationCapital;
-    // 公司简介
+    // 公司簡介
     @Column(nullable = false, columnDefinition = "TEXT")
     private String introduction;
     // 列表排序序号

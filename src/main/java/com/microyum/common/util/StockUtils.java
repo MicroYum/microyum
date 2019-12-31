@@ -13,11 +13,11 @@ public class StockUtils {
     /**
      * 解析新浪股票数据
      *
-     * @param stockId
+     * @param stockCode
      * @param strStock
      * @return
      */
-    public static Map<String, String> parseSinaStock(String stockId, String strStock) {
+    public static Map<String, String> parseSinaStock(String stockCode, String strStock) {
 
         Map<String, String> result = Maps.newHashMap();
         String content = "";
@@ -29,7 +29,7 @@ public class StockUtils {
 
         String[] stock = content.split(",");
 
-        result.put("symbol", stockId);
+        result.put("stockCode", stockCode);
         result.put("tradeDate", stock[30]);
         result.put("tradeTime", stock[31]);
         result.put("open", stock[1]);       // 今日开盘价

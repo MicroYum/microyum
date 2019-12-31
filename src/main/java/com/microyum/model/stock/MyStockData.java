@@ -15,7 +15,8 @@ import java.util.Date;
 public class MyStockData extends BaseModel {
 
     // 股票代码
-    private String symbol;
+    private String stockCode;
+    private String area;
     // 交易日
     private Date tradeDate;
 

@@ -1,9 +1,11 @@
 package com.microyum.controller;
 
+import com.google.common.collect.Lists;
 import com.microyum.common.http.BaseResponseDTO;
 import com.microyum.common.http.HttpStatus;
 import com.microyum.common.util.CaptchaUtils;
 import com.microyum.common.util.DateUtils;
+import com.microyum.common.util.UserUtils;
 import com.microyum.dto.UserDto;
 import com.microyum.model.common.MyUser;
 import com.microyum.service.UserService;
@@ -16,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -96,12 +99,22 @@ public class UserController {
     @GetMapping(value = "/user/list/overview", produces = "application/json")
     public BaseResponseDTO userListOverview(int page, int limit, String name) {
 
-        return userService.userListOverview(page, limit, name);
+        MyUser user = UserUtils.currentUser();
+
+        return userService.userListOverview(page, limit, user.getId(), name);
     }
 
     @GetMapping(value = "/user/list", produces = "application/json")
     public BaseResponseDTO userList() {
-        return new BaseResponseDTO(HttpStatus.OK, userService.userList());
+
+        MyUser user = UserUtils.currentUser();
+        List<MyUser> userList = userService.userList(user.getId());
+        if (userList == null) {
+            userList = Lists.newArrayList();
+            userList.add(user);
+        }
+
+        return new BaseResponseDTO(HttpStatus.OK, userList);
     }
 
     @GetMapping(value = "/refer/role/list", produces = "application/json")

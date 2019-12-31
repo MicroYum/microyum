@@ -5,6 +5,9 @@ public class Constants {
     public static final String COMMON_MD5 = "MD5";
     public static final String COMMON_DEFAULT_ENCODE = "UTF-8";
 
+    public static final String USER_ROLE_ADMIN = "ADMIN";
+    public static final String USER_ROLE_GUEST = "GUEST";
+
     public static final String ALBUM_FILE_ACTUAL_PICTURE_DIR = "/data/album/";
     public static final String ALBUM_FILE_VIRTUAL_PICTURE_DIR = "/album/image/";
 

@@ -2,6 +2,7 @@ package com.microyum.service;
 
 import com.microyum.common.http.BaseResponseDTO;
 import com.microyum.dto.CalculateStockTransactionCostDto;
+import com.microyum.dto.StockBaseDto;
 import com.microyum.model.stock.MyStockBase;
 
 public interface StockService {
@@ -14,10 +15,12 @@ public interface StockService {
 
     BaseResponseDTO calculateStockTransactionCost(CalculateStockTransactionCostDto dto);
 
-    void repairStockData();
+    void repairStockData(String area, String stockCode);
 
     BaseResponseDTO referStockBase(Long id);
-    BaseResponseDTO saveStockBase(MyStockBase stockBase);
+    BaseResponseDTO saveStockBase(StockBaseDto stockBase);
     BaseResponseDTO updateStockBase(MyStockBase stockBase);
     BaseResponseDTO deleteStockBase(Long id);
+
+    BaseResponseDTO checkStockExist(String code);
 }

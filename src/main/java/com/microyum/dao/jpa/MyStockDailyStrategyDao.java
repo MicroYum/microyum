@@ -7,6 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 public interface MyStockDailyStrategyDao extends JpaRepository<MyStockDailyStrategy, Long> {
 
 
-    @Query(value = " select * from my_stock_daily_strategy where stock_code = ?1 and date_format(trade_date, '%Y-%m-%d') = ?2", nativeQuery = true)
-    MyStockDailyStrategy findByStockCodeAndTradeDate(String stockCode, String tradeDate);
+    @Query(value = " select * from my_stock_daily_strategy where area = ?1 and stock_code = ?2 and date_format(trade_date, '%Y-%m-%d') = ?2", nativeQuery = true)
+    MyStockDailyStrategy findByStockAndTradeDate(String area, String stockCode, String tradeDate);
 }

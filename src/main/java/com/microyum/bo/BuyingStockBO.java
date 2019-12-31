@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 public class BuyingStockBO {
 
     private String stockCode;
+    private String area;
     private String stockName;
     private BigDecimal latestPrice;
     private BigDecimal latestHfqPrice;

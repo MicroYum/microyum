@@ -29,7 +29,13 @@ public class ScheduleController {
 
     @RequestMapping(value = "/public/repair/stock/data")
     public BaseResponseDTO repairStockData() {
-        stockService.repairStockData();
+        stockService.repairStockData(null, null);
+        return new BaseResponseDTO(HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/public/repair/hfq/data")
+    public BaseResponseDTO repairHfqData() {
+        referStockDataSchedule.repairHfqData();
         return new BaseResponseDTO(HttpStatus.OK);
     }
 

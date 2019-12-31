@@ -5,6 +5,7 @@ import com.microyum.common.util.UserUtils;
 import com.microyum.model.blog.MyBlog;
 import com.microyum.model.common.MyUser;
 import com.microyum.service.BlogService;
+import com.microyum.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,6 +22,8 @@ public class PageController {
 
     @Autowired
     private BlogService blogService;
+    @Autowired
+    private UserService userService;
 
     @RequestMapping
     public ModelAndView mainPage() {
@@ -65,6 +68,7 @@ public class PageController {
 
         MyUser myUser = (MyUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         mv.addObject("nickName", myUser.getNickName());
+        mv.addObject("userRole", userService.referUserRoleName(myUser.getId()));
 
         return mv;
     }

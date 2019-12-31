@@ -52,7 +52,7 @@ public class BlogController {
         return responseDTO;
     }
 
-    @RequestMapping(value = "/save/blog", produces = "application/json")
+    @RequestMapping(value = "/blog/save", produces = "application/json")
     public BaseResponseDTO saveBlog(BlogRequestDto blogDto) {
         return blogService.saveBlog(blogDto);
     }

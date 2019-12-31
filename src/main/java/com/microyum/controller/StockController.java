@@ -2,6 +2,7 @@ package com.microyum.controller;
 
 import com.microyum.common.http.BaseResponseDTO;
 import com.microyum.dto.CalculateStockTransactionCostDto;
+import com.microyum.dto.StockBaseDto;
 import com.microyum.model.stock.MyStockBase;
 import com.microyum.service.StockService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +50,7 @@ public class StockController {
     }
 
     @RequestMapping(value = "/stock/base/save", produces = "application/json")
-    public BaseResponseDTO saveStockBase(MyStockBase stockBase) {
+    public BaseResponseDTO saveStockBase(StockBaseDto stockBase) {
 
         return stockService.saveStockBase(stockBase);
     }
@@ -70,6 +71,11 @@ public class StockController {
     public BaseResponseDTO deleteStockBase(@PathVariable("id") Long id) {
 
         return stockService.deleteStockBase(id);
+    }
+
+    @RequestMapping(value = "/stock/base/{code}/exist", produces = "application/json")
+    public BaseResponseDTO checkStockExist(@PathVariable("code") String code) {
+        return stockService.checkStockExist(code);
     }
 
 }

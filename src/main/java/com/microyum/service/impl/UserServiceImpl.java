@@ -1,5 +1,6 @@
 package com.microyum.service.impl;
 
+import com.microyum.common.Constants;
 import com.microyum.common.http.BaseResponseDTO;
 import com.microyum.common.http.HttpStatus;
 import com.microyum.common.util.StringUtils;
@@ -13,6 +14,7 @@ import com.microyum.model.common.MyUser;
 import com.microyum.model.common.MyUserRole;
 import com.microyum.service.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.apache.bcel.generic.RET;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -50,13 +52,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public MyUser getUserByName(String userName) {
 
-        MyUser myUser = userDao.findByName(userName);
-
-        if (myUser == null) {
-            return null;
-        }
-
-        return myUser;
+        return userDao.findByName(userName);
     }
 
     @Override
@@ -96,17 +92,34 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public BaseResponseDTO userListOverview(int page, int limit, String name) {
+    public BaseResponseDTO userListOverview(int page, int limit, long userId, String name) {
+
+        String roleName = roleDao.findRoleNameByUserId(userId);
+
 
         int start = (page - 1) * limit;
         long count;
         List<UserDto> userList;
         if (StringUtils.isNotBlank(name)) {
-            userList = userJdbcDao.findByNameOrNickName(start, limit, name);
-            count = userJdbcDao.findByNameOrNickNameCount(name);
+
+            if (StringUtils.equals(roleName, Constants.USER_ROLE_ADMIN)) {
+                userList = userJdbcDao.findByNameOrNickName(start, limit, name);
+                count = userJdbcDao.findByNameOrNickNameCount(name);
+            } else {
+                userList = userJdbcDao.findByNameOrNickName(start, limit, userId, name);
+                count = userJdbcDao.findByNameOrNickNameCount(name, userId);
+            }
+
         } else {
-            userList = userJdbcDao.findUserInfoPaging(start, limit);
-            count = userJdbcDao.findUserInfoCount();
+
+            if (StringUtils.equals(roleName, Constants.USER_ROLE_ADMIN)) {
+                userList = userJdbcDao.findUserInfoPaging(start, limit, userId);
+                count = userJdbcDao.findUserInfoCount(userId);
+            } else {
+                userList = userJdbcDao.findUserInfoPaging(start, limit);
+                count = userJdbcDao.findUserInfoCount();
+            }
+
         }
 
         BaseResponseDTO responseDTO = new BaseResponseDTO(HttpStatus.OK_LAYUI, userList);
@@ -159,7 +172,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<MyUser> userList() {
-        return userDao.findAll();
+    public List<MyUser> userList(Long userId) {
+
+        String roleName = roleDao.findRoleNameByUserId(userId);
+
+        if (StringUtils.equals(Constants.USER_ROLE_ADMIN, roleName)) {
+            return userDao.findAll();
+        }
+
+        return null;
+    }
+
+    @Override
+    public String referUserRoleName(Long userId) {
+
+        return roleDao.findRoleNameByUserId(userId);
     }
 }

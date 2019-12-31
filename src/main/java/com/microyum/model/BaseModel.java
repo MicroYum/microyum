@@ -2,10 +2,7 @@ package com.microyum.model;
 
 import lombok.Data;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
+import javax.persistence.*;
 import java.util.Date;
 
 @MappedSuperclass
@@ -15,7 +12,7 @@ public abstract class BaseModel {
      * primary key to identify a record.
      */
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     /**
