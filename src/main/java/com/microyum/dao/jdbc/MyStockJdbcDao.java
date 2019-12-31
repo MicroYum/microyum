@@ -272,7 +272,7 @@ public class MyStockJdbcDao {
         StringBuilder builder = new StringBuilder();
         builder.append(" SELECT ");
         builder.append("    t.stock_code ");
-        builder.append("    t.area ");
+        builder.append("    ,t.area ");
         builder.append("    ,b.stock_name ");
         builder.append("    ,t.latest_price ");
         builder.append("    ,t.latest_hfq_price ");
