@@ -112,7 +112,7 @@ public class MyStockJdbcDao {
             stockBase.setStockCode(rs.getString("stock_code"));
             stockBase.setStockName(rs.getString("stock_name"));
             stockBase.setType(StockTypeEnum.of(rs.getInt("type")).getName());
-            stockBase.setCapital(String.format("%s / %s", rs.getString("circulation_capital"), rs.getString("total_capital")));
+            stockBase.setCapital(String.format("%s / %s", StringUtils.defaultString(rs.getString("circulation_capital")), StringUtils.defaultString(rs.getString("total_capital"))));
             stockBase.setStartDate(DateUtils.formatDate(rs.getDate("daily_date"), DateUtils.DATE_FORMAT));
 
             if (rs.getString("strategy") != null) {
@@ -228,6 +228,7 @@ public class MyStockJdbcDao {
 
         List<MyStockData> list = jdbcTemplate.query(sql, new Object[]{stockCode, area, tradeDate}, (rs, rowNum) -> {
             MyStockData stockData = new MyStockData();
+            stockData.setId(rs.getLong("id"));
             stockData.setStockCode(rs.getString("stock_code"));
             stockData.setArea(rs.getString("area"));
             stockData.setTradeDate(rs.getDate("trade_date"));

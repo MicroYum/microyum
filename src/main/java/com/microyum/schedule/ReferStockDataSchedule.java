@@ -106,6 +106,8 @@ public class ReferStockDataSchedule {
                         MyStockData stock = stockJdbcDao.selectTradeDateStock(stockData.getStockCode(), stockData.getArea(), stockData.getTradeDate());
                         if (stock != null) {
                             stockData.setId(stock.getId());
+                        } else {
+
                         }
                         stockDataDao.save(stockData);
                     }
