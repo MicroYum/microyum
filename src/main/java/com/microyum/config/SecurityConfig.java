@@ -29,7 +29,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated()
                 .and().formLogin().loginPage("/management/login").permitAll()
                 .and().logout().permitAll()
-                .and().sessionManagement().invalidSessionUrl("/management/login")
+                .and().sessionManagement().invalidSessionUrl("/index")
                 .and().csrf().disable()
                 .headers().frameOptions().sameOrigin();
 
