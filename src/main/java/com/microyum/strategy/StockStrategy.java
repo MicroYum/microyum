@@ -24,7 +24,7 @@ public class StockStrategy {
 
     public MyStockDailyStrategy calcStockValueRange(MyStockBase stockBase) {
 
-        Integer tradeCount = stockJdbcDao.countStockDataByCode(stockBase.getStockCode(), null);
+        Integer tradeCount = stockJdbcDao.countStockDataByCode(stockBase.getArea(), stockBase.getStockCode(), null);
 
         MyStockDailyStrategy dailyStrategy = new MyStockDailyStrategy();
         dailyStrategy.setArea(stockBase.getArea());
@@ -32,14 +32,14 @@ public class StockStrategy {
         dailyStrategy.setTradeDate(new Date());
 
         // 获取所有后复权数据的最高点记录、最低点记录
-        BigDecimal highest = stockJdbcDao.getHighestStock(stockBase.getStockCode());
-        BigDecimal lowest = stockJdbcDao.getLowestStock(stockBase.getStockCode());
+        BigDecimal highest = stockJdbcDao.getHighestStock(stockBase.getArea(), stockBase.getStockCode());
+        BigDecimal lowest = stockJdbcDao.getLowestStock(stockBase.getArea(), stockBase.getStockCode());
 
         // 将数据分为四档：低估5%, 低档15%, 中档60%, 高档15%, 高估5%
         BigDecimal interval = highest.subtract(lowest).divide(BigDecimal.valueOf(20));
 
         // 获取最新的标的数据
-        StockLatestDataDto latestStock = stockJdbcDao.referLatestStockData(stockBase.getStockCode());
+        StockLatestDataDto latestStock = stockJdbcDao.referLatestStockData(stockBase.getArea(), stockBase.getStockCode());
 
         dailyStrategy.setLatestPrice(latestStock.getClose());
         dailyStrategy.setLatestHfqPrice(latestStock.getHfqClose());
@@ -60,12 +60,12 @@ public class StockStrategy {
 
         Map<String, BigDecimal> lowPrice = Maps.newHashMap();
         lowPrice.put("lowPrice", latestStock.getHfqClose());
-        Integer lowPriceDays = stockJdbcDao.countStockDataByCode(stockBase.getStockCode(), lowPrice);
+        Integer lowPriceDays = stockJdbcDao.countStockDataByCode(stockBase.getArea(), stockBase.getStockCode(), lowPrice);
         dailyStrategy.setPriceRate(new BigDecimal(df.format((float) lowPriceDays / dailyStrategy.getTradeCount())));
 
         Map<String, BigDecimal> lowVolume = Maps.newHashMap();
         lowVolume.put("lowVolume", latestStock.getTradeCount());
-        Integer lowVolumeDays = stockJdbcDao.countStockDataByCode(stockBase.getStockCode(), lowVolume);
+        Integer lowVolumeDays = stockJdbcDao.countStockDataByCode(stockBase.getArea(), stockBase.getStockCode(), lowVolume);
         dailyStrategy.setVolumeRate(new BigDecimal(df.format((float) lowVolumeDays / dailyStrategy.getTradeCount())));
 
         // 小于500个交易日不做建议判断

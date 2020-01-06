@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tag列表</title>
+    <link rel="stylesheet" href="/static/layui/css/layui.css">
+</head>
+<body>
+<div id="LAY_app_body">
+    <div class="layadmin-tabsbody-item layui-show">
+        <div class="layui-fluid" style="margin: 15px;">
+            <div class="layui-form-item">
+                <label class="layui-form-label" style="width: 80px;">Name: </label>
+                <div class="layui-input-inline" style="width: 300px;">
+                    <input type="text" id="select-name" lay-verify="required" placeholder="Please input name"
+                           autocomplete="off" class="layui-input">
+                </div>
+                <a href="javascript:;" class="layui-btn layui-btn-small" id="btn-select"><i
+                        class="layui-icon layui-icon-refresh"></i> Select</a>
+                <a href="javascript:;" class="layui-btn layui-btn-small" id="btn-add"><i
+                        class="layui-icon layui-icon-add-circle"></i> Add Tag</a>
+            </div>
+        </div>
+
+        <div style="padding: 15px; overflow:auto;">
+            <table class="layui-table" id="user-table" lay-filter="user-table" width="auto"
+                   style="white-space:nowrap"></table>
+            <script type="text/html" id="toolbar">
+                <a class="layui-btn layui-btn-xs" lay-event="edit" id="editForm">
+                    <i class="layui-icon">&#xe642;</i>Edit
+                </a>
+                <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete">
+                    <i class="layui-icon">&#xe640;</i>Delete
+                </a>
+            </script>
+        </div>
+    </div>
+</div>
+
+<div style="margin: 15px; display: none" id="pop-div">
+    <form class="layui-form">
+        <div class="layui-form-item">
+            <label class="layui-form-label">Name:</label>
+            <div class="layui-input-block" style="margin-left: 200px;">
+                <input type="text" name="input-name" id="input-name" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">Category:</label>
+            <div class="layui-input-block" style="margin-left: 200px;">
+                <select class="layui-select" name="select-category" id="select-category"></select>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript" src="/static/layui/layui.js"></script>
+<script type="text/javascript" src="/static/layui/lay/modules/laypage.js"></script>
+<script src="/static/js/jquery.min.js"></script>
+<script type="text/javascript">
+    layui.use(['table', 'form'], function () {
+        var $ = layui.jquery,
+            layer = layui.layer;
+        var table = layui.table;
+        var tblCols = [
+            {type: 'numbers'},
+            {type: 'checkbox'},
+            {field: 'id', title: 'id', hide: true},
+            {field: 'name', title: 'Name', width: 180},
+            {field: 'category', title: 'Category', width: 200},
+            {field: 'items', title: 'Items', width: 200},
+            {field: 'lastUpdateDate', title: 'Last Update Time', width: 200},
+            {fixed: 'right', width: 220, align: 'center', toolbar: '#toolbar'}
+        ];
+
+        // 从数据库中检索所有的用户信息并渲染Table
+        var tableObj = table.render({
+            elem: '#user-table' //指定原始表格元素选择器（推荐id选择器）
+            , cellMinWidth: 30
+            , height: 'full-150'
+            , loading: true
+            , cols: [tblCols]
+            , sort: true
+            , url: '/tag/overview'
+            , limit: 15
+            , where: {
+                name: $.trim($("#select-name").val())
+            }
+            , page: true
+            , limits: [15, 30, 45, 60, 75, 90]
+        });
+
+        $("#btn-select").on('click', function () {
+            tableObj.reload({where: {name: $.trim($("#select-user").val())}});
+        });
+
+        $('#btn-add').on('click', function () {
+            $('#pop-div').show();
+            $("#pop-password").show();
+            $("#name").val('');
+            $("#nick-name").val('');
+            $("#email").val('');
+            $("#telephone").val('');
+            $("#password").val('');
+            $("#select-role").find("option[value=1]").prop("selected", true);
+            layui.form.render();
+
+            layer.open({
+                type: 1,
+                shadeClose: false,
+                title: 'Add',
+                btn: ['Save', 'Cancel'],
+                area: ['640px', '550px'],
+                content: $('#pop-div'),
+                yes: function (index) {
+                    layer.close(index);
+                    var loading = layer.load(1);
+
+                    var param = {
+                        'email': $("#email").val().trim(),
+                        'name': $("#name").val().trim(),
+                        'nickName': $("#nick-name").val().trim(),
+                        'password': md5($("#password").val().trim()),
+                        'telephone': $("#telephone").val().trim(),
+                        'roleId': $("#select-role").val(),
+                    };
+
+                    $.post('/user/create', param, function (result) {
+                        if (result.code == 200) {
+                            layer.msg("Save Successful.");
+                            tableObj.reload();
+                        } else {
+                            layer.alert("Save failed.");
+                            console.log(result.msg)
+                        }
+                        layer.close(loading);
+                    }, "json");
+                },
+                end: function () {
+                    $('#pop-div').hide();
+                }
+            });
+        });
+
+        table.on('tool(user-table)', function (obj) {
+
+            var data = obj.data;
+            var layEvent = obj.event;
+
+            if (layEvent === 'edit') {
+                $('#pop-div').show();
+                $("#pop-password").hide();
+                $("#name").val(data.name);
+                $("#nick-name").val(data.nickName);
+                $("#email").val(data.email);
+                $("#telephone").val(data.telephone);
+                $("#select-role").find("option[value=" + data.roleId + "]").prop("selected", true);
+                layui.form.render();
+
+                layer.open({
+                    type: 1,
+                    shadeClose: false,
+                    title: 'Add',
+                    btn: ['Save', 'Cancel'],
+                    area: ['640px', '500px'],
+                    content: $('#pop-div'),
+                    yes: function (index) {
+                        layer.close(index);
+                        var loading = layer.load(1);
+
+                        var param = {
+                            'id': data.id,
+                            'email': $("#email").val().trim(),
+                            'name': $("#name").val().trim(),
+                            'nickName': $("#nick-name").val().trim(),
+                            'telephone': $("#telephone").val().trim(),
+                            'roleId': $("#select-role").val(),
+                        };
+
+                        $.post('/user/update', param, function (result) {
+                            if (result.code == 200) {
+                                layer.msg("Save Successful.");
+                                tableObj.reload();
+                            } else {
+                                layer.alert("Save failed.");
+                                console.log(result.msg)
+                            }
+                            layer.close(loading);
+                        }, "json");
+                    },
+                    end: function () {
+                        $('#pop-div').hide();
+                    }
+                });
+            } else if (layEvent == 'delete') {
+                layer.confirm('Do you want to delete it?', {
+                    btn: ['Confirm', 'Cancel'], title: false
+                }, function (index) {
+                    layer.close(index);
+                    var loading = layer.load(1);
+
+                    $.get("/user/" + data.id + "/delete", {}, function (result) {
+                        if (result.code == 200) {
+                            layer.msg("Delete successful.");
+                            tableObj.reload();
+                        } else {
+                            layer.alert("Delete failed.");
+                            console.log(result.msg)
+                        }
+                        layer.close(loading);
+                    });
+                });
+            }
+        });
+
+        $.get('/refer/role/list', {}, function (data) {
+            var html = "";
+            $("select[name='select-role']").empty();
+            $.each(data.data, function (index, item) {
+                html += "<option value='" + item.id + "'>" + item.name + "</option>";
+            });
+
+            $("select[name='select-role']").append(html);
+
+            layui.form.render('select');
+        });
+    });
+</script>
+</body>
+</html>

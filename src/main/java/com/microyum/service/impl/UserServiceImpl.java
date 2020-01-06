@@ -96,7 +96,6 @@ public class UserServiceImpl implements UserService {
 
         String roleName = roleDao.findRoleNameByUserId(userId);
 
-
         int start = (page - 1) * limit;
         long count;
         List<UserDto> userList;
@@ -109,7 +108,6 @@ public class UserServiceImpl implements UserService {
                 userList = userJdbcDao.findByNameOrNickName(start, limit, userId, name);
                 count = userJdbcDao.findByNameOrNickNameCount(name, userId);
             }
-
         } else {
 
             if (StringUtils.equals(roleName, Constants.USER_ROLE_ADMIN)) {
@@ -119,7 +117,6 @@ public class UserServiceImpl implements UserService {
                 userList = userJdbcDao.findUserInfoPaging(start, limit);
                 count = userJdbcDao.findUserInfoCount();
             }
-
         }
 
         BaseResponseDTO responseDTO = new BaseResponseDTO(HttpStatus.OK_LAYUI, userList);

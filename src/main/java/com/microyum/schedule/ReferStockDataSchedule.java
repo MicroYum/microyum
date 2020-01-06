@@ -1,5 +1,6 @@
 package com.microyum.schedule;
 
+import com.google.common.collect.Lists;
 import com.microyum.common.Constants;
 import com.microyum.common.util.DateUtils;
 import com.microyum.common.util.StockUtils;
@@ -38,8 +39,6 @@ public class ReferStockDataSchedule {
     @Autowired
     private MyStockJdbcDao stockJdbcDao;
     @Autowired
-    private MyStockDataDetailDao stockDataDetailDao;
-    @Autowired
     private MyStockDataDao stockDataDao;
 
     @Value("${python.script.repair.latest.hfqdata}")
@@ -74,45 +73,43 @@ public class ReferStockDataSchedule {
         CloseableHttpClient httpclient = HttpClients.createDefault();
         List<MyStockBase> stockBaseList = stockJdbcDao.getObservedList();
 
+        List<String> stocks = Lists.newArrayList();
+        for (MyStockBase stockBase : stockBaseList) {
+            stocks.add(stockBase.getArea() + stockBase.getStockCode());
+        }
+        String requestUrl = Constants.STOCK_SINA_URL + String.join(",", stocks);
+
         try {
-            for (MyStockBase stockBase : stockBaseList) {
+            // 创建httpget.
+            HttpGet httpget = new HttpGet(requestUrl);
+            // 执行get请求.
+            CloseableHttpResponse response = httpclient.execute(httpget);
+            // 获取响应实体
+            HttpEntity entity = response.getEntity();
+            if (entity != null) {
+                String result = EntityUtils.toString(entity);
 
-                String requestUrl = Constants.STOCK_SINA_URL + stockBase.getArea() + stockBase.getStockCode();
-                // 创建httpget.
-                HttpGet httpget = new HttpGet(requestUrl);
-                // 执行get请求.
-                CloseableHttpResponse response = httpclient.execute(httpget);
-                try {
-                    // 获取响应实体
-                    HttpEntity entity = response.getEntity();
+                int index = 0;
+                for (String line : result.split("\n")) {
+                    // 解析响应内容
+                    Map<String, String> mapStack = StockUtils.parseSinaStock(stockBaseList.get(index).getStockCode(), line);
+                    index++;
 
-                    if (entity != null) {
-                        // 解析响应内容
-                        Map<String, String> mapStack = StockUtils.parseSinaStock(stockBase.getStockCode(), EntityUtils.toString(entity));
-
-                        // TODO 此处的判断，只是假设，可能会有错误，需要特别注意
-                        // 日期不相同的场合，说明可能今天停市，或者股票停牌
-                        if (!DateUtils.isSameDay(DateUtils.parseDate(mapStack.get("tradeDate"), DateUtils.DATE_FORMAT), new Date())) {
-                            return;
-                        }
-
-                        MyStockData stockData = this.tidyStockData(mapStack);
-                        stockData.setArea(stockBase.getArea());
-
-                        // 2019-12-30 感每分鐘的記錄覺意義不大
-                        // MyStockDataDetail stockDataDetail = this.tidyStockDataDetail(mapStack);
-                        // stockDataDetail.setArea(stockBase.getArea());
-                        // stockDataDetailDao.save(stockDataDetail);
-                        MyStockData stock = stockJdbcDao.selectTradeDateStock(stockData.getStockCode(), stockData.getArea(), stockData.getTradeDate());
-                        if (stock != null) {
-                            stockData.setId(stock.getId());
-                        } else {
-
-                        }
-                        stockDataDao.save(stockData);
+                    // TODO 此处的判断，只是假设，可能会有错误，需要特别注意
+                    // 日期不相同的场合，说明可能今天停市，或者股票停牌
+                    if (!DateUtils.isSameDay(DateUtils.parseDate(mapStack.get("tradeDate"), DateUtils.DATE_FORMAT), new Date())) {
+                        return;
                     }
-                } finally {
-                    response.close();
+
+                    MyStockData stockData = this.tidyStockData(mapStack);
+                    stockData.setArea(stockBaseList.get(index).getArea());
+
+                    // insert / update
+                    MyStockData stock = stockJdbcDao.selectTradeDateStock(stockData.getStockCode(), stockData.getArea(), stockData.getTradeDate());
+                    if (stock != null) {
+                        stockData.setId(stock.getId());
+                    }
+                    stockDataDao.save(stockData);
                 }
             }
         } catch (Exception e) {
@@ -144,18 +141,6 @@ public class ReferStockDataSchedule {
         stockData.setTradeAmount(new BigDecimal(mapStack.get("tradeAmount")));
 
         return stockData;
-    }
-
-    private MyStockDataDetail tidyStockDataDetail(Map<String, String> mapStack) {
-
-        MyStockDataDetail stockDataDetail = new MyStockDataDetail();
-        stockDataDetail.setStockCode(mapStack.get("stockCode"));
-        stockDataDetail.setTradeDatetime(DateUtils.parseDate(mapStack.get("tradeDate") + " " + mapStack.get("tradeTime"), DateUtils.DATE_TIME_FORMAT));
-        stockDataDetail.setCurrent(new BigDecimal(mapStack.get("close")));
-        stockDataDetail.setTradeCount(new BigDecimal(mapStack.get("tradeCount")));
-        stockDataDetail.setTradeAmount(new BigDecimal(mapStack.get("tradeAmount")));
-
-        return stockDataDetail;
     }
 
     /**

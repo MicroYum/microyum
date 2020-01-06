@@ -45,10 +45,11 @@ public class MyStockJdbcDao {
         return namedParameterJdbcTemplate.queryForObject(builder.toString(), parameters, Long.class);
     }
 
-    public Integer countStockDataByCode(String stockCode, Map<String, BigDecimal> map) {
+    public Integer countStockDataByCode(String area, String stockCode, Map<String, BigDecimal> map) {
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         StringBuilder builder = new StringBuilder();
-        builder.append("select count(1) count  from `my_stock_data` where `stock_code` = :stockCode ");
+        builder.append("select count(1) count  from `my_stock_data` where `area` = :area and `stock_code` = :stockCode ");
+        parameters.addValue("area", area);
         parameters.addValue("stockCode", stockCode);
 
         if (map != null) {
@@ -84,7 +85,8 @@ public class MyStockJdbcDao {
         StringBuilder builder = new StringBuilder();
         builder.append("SELECT ");
         builder.append(" b.area, b.stock_code, b.stock_name, b.type, b.total_capital,");
-        builder.append(" b.circulation_capital, b.daily_date, s.strategy, s.trade_date ");
+        builder.append(" b.circulation_capital, b.daily_date, s.strategy, s.trade_date, s.latest_price, ");
+        builder.append(" s.price_rate, s.volume_rate ");
         builder.append("FROM ");
         builder.append(" my_stock_base b ");
         builder.append(" LEFT JOIN ( SELECT area, stock_code, max( trade_date ) trade_date FROM my_stock_daily_strategy GROUP BY area, stock_code ) t ON t.area = b.area ");
@@ -120,6 +122,10 @@ public class MyStockJdbcDao {
                 stockBase.setStrategyDate(DateUtils.formatDate(rs.getDate("trade_date"), DateUtils.DATE_FORMAT));
             }
 
+            stockBase.setLatestPrice(rs.getString("latest_price"));
+            stockBase.setPriceRate(rs.getString("price_rate"));
+            stockBase.setVolumeRate(rs.getString("volume_rate"));
+
             return stockBase;
         });
 
@@ -153,26 +159,26 @@ public class MyStockJdbcDao {
         });
     }
 
-    public BigDecimal getHighestStock(String stockCode) {
-        String sql = "select max(t.hfq_close) from `my_stock_data` t where t.stock_code = ?";
+    public BigDecimal getHighestStock(String area, String stockCode) {
+        String sql = "select max(t.hfq_close) from `my_stock_data` t where t.area = ? and t.stock_code = ?";
 
-        return jdbcTemplate.queryForObject(sql, new Object[]{stockCode}, BigDecimal.class);
+        return jdbcTemplate.queryForObject(sql, new Object[]{area, stockCode}, BigDecimal.class);
     }
 
-    public BigDecimal getLowestStock(String stockCode) {
-        String sql = "select min(t.hfq_close) from `my_stock_data` t where t.stock_code = ?";
+    public BigDecimal getLowestStock(String area, String stockCode) {
+        String sql = "select min(t.hfq_close) from `my_stock_data` t where t.area = ? and t.stock_code = ?";
 
-        return jdbcTemplate.queryForObject(sql, new Object[]{stockCode}, BigDecimal.class);
+        return jdbcTemplate.queryForObject(sql, new Object[]{area, stockCode}, BigDecimal.class);
     }
 
-    public StockLatestDataDto referLatestStockData(String stockCode) {
+    public StockLatestDataDto referLatestStockData(String area, String stockCode) {
 
         String sql = "select b.stock_code, b.area, b.stock_name, d.`open`, d.`close`, d.high, d.low, d.percent, d.chg, " +
                 " d.trade_amount, d.trade_count, d.trade_date, d.hfq_close from my_stock_data d, my_stock_base b where " +
-                " d.trade_date = (SELECT max(t.trade_date) from my_stock_data t where t.stock_code = ?) and " +
-                " d.stock_code = ? and d.stock_code = b.stock_code";
+                " d.trade_date = (SELECT max(t.trade_date) from my_stock_data t where t.area = ? and t.stock_code = ?) and " +
+                " d.area = ? and d.stock_code = ? and d.stock_code = b.stock_code";
 
-        List<StockLatestDataDto> list = jdbcTemplate.query(sql, new Object[]{stockCode, stockCode}, (rs, rowNum) -> {
+        List<StockLatestDataDto> list = jdbcTemplate.query(sql, new Object[]{area, stockCode, area, stockCode}, (rs, rowNum) -> {
             StockLatestDataDto stockData = new StockLatestDataDto();
             stockData.setStockCode(rs.getString("stock_code"));
             stockData.setArea(rs.getString("area"));
@@ -197,11 +203,11 @@ public class MyStockJdbcDao {
         return list.get(0);
     }
 
-    public List<MyStockData> referStockData(String stockCode, String startDate, String endDate) {
+    public List<MyStockData> referStockData(String area, String stockCode, String startDate, String endDate) {
 
-        String sql = "select * from my_stock_data where stock_id = ? and trade_date between ? and ?";
+        String sql = "select * from my_stock_data where area = ? and stock_code = ? and trade_date between ? and ?";
 
-        List<MyStockData> list = jdbcTemplate.query(sql, new Object[]{stockCode, startDate, endDate}, (rs, rowNum) -> {
+        List<MyStockData> list = jdbcTemplate.query(sql, new Object[]{area, stockCode, startDate, endDate}, (rs, rowNum) -> {
 
             MyStockData stockData = new MyStockData();
             stockData.setStockCode(rs.getString("stock_code"));

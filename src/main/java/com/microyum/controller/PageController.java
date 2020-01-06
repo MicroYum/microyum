@@ -102,6 +102,11 @@ public class PageController {
         return new ModelAndView("management/users");
     }
 
+    @RequestMapping(value = "/management/system/tag")
+    public ModelAndView systemTag() {
+        return new ModelAndView("management/tags");
+    }
+
     @RequestMapping(value = "/management/trader/account")
     public ModelAndView traderAccount() {
         return new ModelAndView("management/trader_account");

@@ -9,9 +9,9 @@ public interface StockService {
 
     BaseResponseDTO referStockList(int pageNo, int pageSize, String stock);
 
-    BaseResponseDTO referStockDetail(String stockCode, String startDate, String endDate);
+    BaseResponseDTO referStockDetail(String area, String stockCode, String startDate, String endDate);
 
-    BaseResponseDTO referStockTradeDayDetail(String stockCode);
+    BaseResponseDTO referStockTradeDayDetail(String area, String stockCode);
 
     BaseResponseDTO calculateStockTransactionCost(CalculateStockTransactionCostDto dto);
 

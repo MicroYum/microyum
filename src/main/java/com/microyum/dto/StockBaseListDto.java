@@ -20,4 +20,10 @@ public class StockBaseListDto {
     private String strategy;
     // 等級日期
     private String strategyDate;
+    // 最新价格
+    private String latestPrice;
+    // 价比
+    private String priceRate;
+    // 量比
+    private String volumeRate;
 }

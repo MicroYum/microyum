@@ -10,12 +10,12 @@
     <div class="layadmin-tabsbody-item layui-show">
         <div class="layui-fluid" style="margin: 15px;">
             <div class="layui-form-item">
-                <label class="layui-form-label" style="width: 80px;">Title: </label>
+                <label class="layui-form-label" style="width: 80px;">Title: </label>personalValueInterval
                 <div class="layui-input-inline" style="width: 300px;">
                     <input type="text" id="select-stock" lay-verify="required" placeholder="Please input stock code or name" autocomplete="off" class="layui-input">
                 </div>
-                <a href="javascript:;" class="layui-btn layui-btn-small" id="btn-select-stock"><i class="layui-icon"></i> Select</a>
-                <a href="javascript:;" class="layui-btn layui-btn-small" id="btn-add-stock"><i class="layui-icon"></i> Add</a>
+                <a href="javascript:;" class="layui-btn layui-btn-small" id="btn-select-stock"><i class="layui-icon layui-icon-refresh"></i> Select</a>
+                <a href="javascript:;" class="layui-btn layui-btn-small" id="btn-add-stock"><i class="layui-icon layui-icon-add-circle"></i> Add</a>
             </div>
         </div>
 
@@ -110,14 +110,17 @@
             {type: 'numbers'},
             {type: 'checkbox'},
             {field: 'id', title: 'id', hide: true},
-            {field: 'stockCode', title: '代碼', width: 180},
-            {field: 'stockName', title: '名稱', width: 180},
+            {field: 'stockCode', title: '代碼', width: 110},
+            {field: 'stockName', title: '名稱', width: 110},
             {field: 'type', title: '類型', width: 180},
-            {field: 'capital', title: '流通股本/縂股本(億)', width: 200},
-            {field: 'startDate', title: '日流水開始日期', width: 200},
+            {field: 'capital', title: '流通股本/縂股本(億)', width: 180},
+            {field: 'startDate', title: '日流水開始日期', width: 130},
             {field: 'strategy', title: '推薦等級', width: 150},
-            {field: 'strategyDate', title: '等級日期', width: 150},
-            {fixed: 'right', width: 220, align: 'center', toolbar: '#toolbar'}
+            {field: 'strategyDate', title: '等級日期', width: 130},
+            {field: 'latestPrice', title: '最新價格', width: 120},
+            {field: 'priceRate', title: '價比', width: 120},
+            {field: 'volumeRate', title: '量比', width: 120},
+            {fixed: 'right', width: 200, align: 'center', toolbar: '#toolbar'}
         ];
 
         // 从数据库中检索所有的用户信息并渲染Table

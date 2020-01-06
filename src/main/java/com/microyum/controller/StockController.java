@@ -25,10 +25,10 @@ public class StockController {
      * @param request
      * @return
      */
-    @RequestMapping(value = "/public/stock/{id}/detail", produces = "application/json")
-    public BaseResponseDTO referStockDetail(@PathVariable("id") String id, HttpServletRequest request) {
+    @RequestMapping(value = "/public/stock/{area}/{code}/detail", produces = "application/json")
+    public BaseResponseDTO referStockDetail(@PathVariable("area") String area, @PathVariable("code") String code, HttpServletRequest request) {
 
-        return stockService.referStockDetail(id, request.getParameter("start"), request.getParameter("end"));
+        return stockService.referStockDetail(area, code, request.getParameter("start"), request.getParameter("end"));
     }
 
     @RequestMapping(value = "/public/stock/base/list", produces = "application/json")
@@ -38,9 +38,9 @@ public class StockController {
     }
 
     @RequestMapping(value = "/public/stock/data/latest", produces = "application/json")
-    public BaseResponseDTO referStockTradeDayDetail(String stockCode) {
+    public BaseResponseDTO referStockTradeDayDetail(String area, String stockCode) {
 
-        return stockService.referStockTradeDayDetail(stockCode);
+        return stockService.referStockTradeDayDetail(area, stockCode);
     }
 
     @RequestMapping(value = "/public/stock/transaction/cost", produces = "application/json")

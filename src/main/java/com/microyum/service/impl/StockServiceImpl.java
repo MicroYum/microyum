@@ -52,16 +52,16 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
-    public BaseResponseDTO referStockDetail(String stockCode, String startDate, String endDate) {
+    public BaseResponseDTO referStockDetail(String area, String stockCode, String startDate, String endDate) {
 
-        List<MyStockData> stockDaoList = stockJdbcDao.referStockData(stockCode, startDate, endDate);
+        List<MyStockData> stockDaoList = stockJdbcDao.referStockData(area, stockCode, startDate, endDate);
         return new BaseResponseDTO(HttpStatus.OK, stockDaoList);
     }
 
     @Override
-    public BaseResponseDTO referStockTradeDayDetail(String stockCode) {
+    public BaseResponseDTO referStockTradeDayDetail(String area, String stockCode) {
 
-        return new BaseResponseDTO(HttpStatus.OK, stockJdbcDao.referLatestStockData(stockCode));
+        return new BaseResponseDTO(HttpStatus.OK, stockJdbcDao.referLatestStockData(area, stockCode));
     }
 
     @Override
