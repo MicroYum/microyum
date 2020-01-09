@@ -43,7 +43,12 @@ public class StockUtils {
         // 涨跌额: 最近成交价 - 昨日收盘价
         result.put("chg", String.valueOf(chg));
         // 涨跌幅(%): (最近成交价 - 昨日收盘价) / 昨日收盘价 * 100
-        result.put("percent", String.valueOf(chg.divide(new BigDecimal(stock[2]), 4).multiply(BigDecimal.valueOf(100))));
+        try {
+            result.put("percent", String.valueOf(chg.divide(new BigDecimal(stock[2]), 4).multiply(BigDecimal.valueOf(100))));
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
 
         result.put("tradeCount", stock[8]);
         result.put("tradeAmount", stock[9]);

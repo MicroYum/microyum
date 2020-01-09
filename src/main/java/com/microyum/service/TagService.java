@@ -14,7 +14,7 @@ public interface TagService {
 
     BaseResponseDTO deleteTag(Long id);
 
-    BaseResponseDTO tagBinding(TagBindingDto tagBindingDto);
+    BaseResponseDTO tagBinding(TagBindingDto dto);
 
-    BaseResponseDTO tagUnbinding(TagBindingDto tagBindingDto);
+    BaseResponseDTO tagUnbinding(TagBindingDto dto);
 }

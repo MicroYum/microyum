@@ -121,18 +121,20 @@ public class TagServiceImpl implements TagService {
     }
 
     private void saveTagBinding(TagDto tagDto, MyTag tag) {
-        if (tagDto.getEntityIds().size() != 0) {
 
-            List<MyTagBinding> tagBindings = Lists.newArrayList();
-            for (Long entityId : tagDto.getEntityIds()) {
-                MyTagBinding tagBinding = new MyTagBinding();
-                tagBinding.setTagId(tag.getId());
-                tagBinding.setEntityId(entityId);
-                tagBinding.setCategory(tagDto.getCategory());
-                tagBindings.add(tagBinding);
-            }
-
-            tagBindingDao.saveAll(tagBindings);
+        if (tagDto.getEntityIds().size() == 0) {
+            return;
         }
+
+        List<MyTagBinding> tagBindings = Lists.newArrayList();
+        for (Long entityId : tagDto.getEntityIds()) {
+            MyTagBinding tagBinding = new MyTagBinding();
+            tagBinding.setTagId(tag.getId());
+            tagBinding.setEntityId(entityId);
+            tagBinding.setCategory(tagDto.getCategory());
+            tagBindings.add(tagBinding);
+        }
+
+        tagBindingDao.saveAll(tagBindings);
     }
 }

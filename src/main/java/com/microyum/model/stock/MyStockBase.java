@@ -18,6 +18,8 @@ public class MyStockBase extends BaseModel {
     private String stockCode;
     // 股票名字
     private String stockName;
+    // 汉字的首字母
+    private String initials;
     // 地域（SH表示上海，SZ表示深圳）
     private String area;
     // 上市日期

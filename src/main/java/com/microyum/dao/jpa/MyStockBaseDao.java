@@ -9,5 +9,5 @@ public interface MyStockBaseDao extends JpaRepository<MyStockBase, Long> {
     @Query(value = "update my_stock_base set observe = false, last_update_time = now() where id = ?1", nativeQuery = true)
     void deleteById(Long id);
 
-    MyStockBase findByStockCode(String stockCode);
+    MyStockBase findByAreaAndStockCode(String area, String stockCode);
 }

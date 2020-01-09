@@ -19,7 +19,7 @@ public class FileServiceImpl implements FileService {
     @Override
     public String saveBlogPicture(MultipartFile file) {
 
-        String dir = Constants.BLOG_FILE_ACTUAL_PICTURE_DIR + DateUtils.formatDate(new Date(), DateUtils.DATE_FORMAT_COMP_YYMMDD) + "/";
+        String dir = Constants.BLOG_FILE_ACTUAL_PICTURE_DIR + DateUtils.formatDate(new Date(), DateUtils.DATE_FORMAT_COMP) + "/";
         File path = new File(dir);
 
         if (!path.exists()) {
@@ -36,6 +36,6 @@ public class FileServiceImpl implements FileService {
             return null;
         }
 
-        return Constants.BLOG_FILE_VIRTUAL_PICTURE_DIR + DateUtils.formatDate(new Date(), DateUtils.DATE_FORMAT_COMP_YYMMDD) + "/" + fileName;
+        return Constants.BLOG_FILE_VIRTUAL_PICTURE_DIR + DateUtils.formatDate(new Date(), DateUtils.DATE_FORMAT_COMP) + "/" + fileName;
     }
 }

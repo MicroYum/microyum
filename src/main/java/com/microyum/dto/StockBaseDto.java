@@ -21,4 +21,6 @@ public class StockBaseDto {
     private String introduction;
     // 类型(1:股票; 2:可转债; 3:国债; 4:企业债;)
     private String type;
+    // 汉字首字母
+    private String initials;
 }

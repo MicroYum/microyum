@@ -10,7 +10,7 @@
     <div class="layadmin-tabsbody-item layui-show">
         <div class="layui-fluid" style="margin: 15px;">
             <div class="layui-form-item">
-                <label class="layui-form-label" style="width: 80px;">Title: </label>personalValueInterval
+                <label class="layui-form-label" style="width: 80px;">Title: </label>
                 <div class="layui-input-inline" style="width: 300px;">
                     <input type="text" id="select-stock" lay-verify="required" placeholder="Please input stock code or name" autocomplete="off" class="layui-input">
                 </div>
@@ -150,7 +150,9 @@
                 return;
             }
 
-            $.get('/stock/base/' + value + '/exist', {}, function (data) {
+            var area = $('input[name="stock-area"]:checked').val()
+
+            $.get('/stock/base/' + area + "/" + value + '/exist', {}, function (data) {
                 if (data.data == true) {
                     $("#stock-code-message").html('<font color="red">股票代碼已存在</font>');
                 } else {

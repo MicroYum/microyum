@@ -1,5 +1,6 @@
 package com.microyum.dao.jdbc;
 
+import com.google.common.collect.Maps;
 import com.microyum.bo.BuyingStockBO;
 import com.microyum.common.enums.StockStrategyEnum;
 import com.microyum.common.enums.StockTypeEnum;
@@ -37,18 +38,24 @@ public class MyStockJdbcDao {
         builder.append("select count(1) count  from `my_stock_base`");
 
         if (StringUtils.isNotBlank(stock)) {
-            builder.append(" where stock_code like :stockCode or stock_name like :stockName ");
+            builder.append(" where stock_code like :stockCode or stock_name like :stockName or b.initials like :initials");
             parameters.addValue("stockCode", "%" + stock + "%");
             parameters.addValue("stockName", "%" + stock + "%");
+            parameters.addValue("initials", "%" + stock + "%");
         }
 
         return namedParameterJdbcTemplate.queryForObject(builder.toString(), parameters, Long.class);
     }
 
-    public Integer countStockDataByCode(String area, String stockCode, Map<String, BigDecimal> map) {
+    public Integer countStockDataByCode(String area, String stockCode, Date date, Map<String, BigDecimal> map) {
+
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         StringBuilder builder = new StringBuilder();
         builder.append("select count(1) count  from `my_stock_data` where `area` = :area and `stock_code` = :stockCode ");
+        if (date != null) {
+            builder.append(" and `trade_date` <= :tradeDate ");
+            parameters.addValue("tradeDate", DateUtils.formatDate(date, DateUtils.DATE_FORMAT));
+        }
         parameters.addValue("area", area);
         parameters.addValue("stockCode", stockCode);
 
@@ -73,6 +80,11 @@ public class MyStockJdbcDao {
         }
 
         return namedParameterJdbcTemplate.queryForObject(builder.toString(), parameters, Integer.class);
+    }
+
+
+    public Integer countStockDataByCode(String area, String stockCode, Map<String, BigDecimal> map) {
+        return this.countStockDataByCode(area, stockCode, null, map);
     }
 
     public List<StockBaseListDto> referStockList(int pageNo, int pageSize, String stock) {
@@ -102,6 +114,9 @@ public class MyStockJdbcDao {
             builder.append(" or ");
             builder.append(" b.stock_name like :stockName ");
             parameters.addValue("stockName", "%" + stock + "%");
+            builder.append(" or ");
+            builder.append(" b.initials like :initials ");
+            parameters.addValue("initials", "%" + stock + "%");
         }
 
         builder.append(" order by ");
@@ -160,25 +175,80 @@ public class MyStockJdbcDao {
     }
 
     public BigDecimal getHighestStock(String area, String stockCode) {
-        String sql = "select max(t.hfq_close) from `my_stock_data` t where t.area = ? and t.stock_code = ?";
+        return this.getHighestStock(area, stockCode, null);
+    }
 
-        return jdbcTemplate.queryForObject(sql, new Object[]{area, stockCode}, BigDecimal.class);
+    public BigDecimal getHighestStock(String area, String stockCode, Date date) {
+
+        MapSqlParameterSource param = new MapSqlParameterSource();
+        StringBuilder builder = new StringBuilder();
+        builder.append(" select max(t.hfq_close) ");
+        builder.append(" from `my_stock_data` t ");
+        builder.append(" where t.area = :area  ");
+        builder.append(" and t.stock_code = :code ");
+        param.addValue("area", area);
+        param.addValue("code", stockCode);
+
+        if (date != null) {
+            builder.append(" and t.trade_date < :date ");
+            param.addValue("date", DateUtils.formatDate(date, DateUtils.DATE_FORMAT));
+        }
+
+        return namedParameterJdbcTemplate.queryForObject(builder.toString(), param, BigDecimal.class);
     }
 
     public BigDecimal getLowestStock(String area, String stockCode) {
-        String sql = "select min(t.hfq_close) from `my_stock_data` t where t.area = ? and t.stock_code = ?";
+        return this.getLowestStock(area, stockCode, null);
+    }
 
-        return jdbcTemplate.queryForObject(sql, new Object[]{area, stockCode}, BigDecimal.class);
+    public BigDecimal getLowestStock(String area, String stockCode, Date date) {
+
+        MapSqlParameterSource param = new MapSqlParameterSource();
+        StringBuilder builder = new StringBuilder();
+        builder.append(" select min(t.hfq_close) ");
+        builder.append(" from `my_stock_data` t ");
+        builder.append(" where t.area = :area  ");
+        builder.append(" and t.stock_code = :code ");
+        param.addValue("area", area);
+        param.addValue("code", stockCode);
+
+        if (date != null) {
+            builder.append(" and t.trade_date < :date ");
+            param.addValue("date", DateUtils.formatDate(date, DateUtils.DATE_FORMAT));
+        }
+
+        return namedParameterJdbcTemplate.queryForObject(builder.toString(), param, BigDecimal.class);
     }
 
     public StockLatestDataDto referLatestStockData(String area, String stockCode) {
 
-        String sql = "select b.stock_code, b.area, b.stock_name, d.`open`, d.`close`, d.high, d.low, d.percent, d.chg, " +
-                " d.trade_amount, d.trade_count, d.trade_date, d.hfq_close from my_stock_data d, my_stock_base b where " +
-                " d.trade_date = (SELECT max(t.trade_date) from my_stock_data t where t.area = ? and t.stock_code = ?) and " +
-                " d.area = ? and d.stock_code = ? and d.stock_code = b.stock_code";
+        return this.referLatestStockData(area, stockCode, null);
+    }
 
-        List<StockLatestDataDto> list = jdbcTemplate.query(sql, new Object[]{area, stockCode, area, stockCode}, (rs, rowNum) -> {
+    public StockLatestDataDto referLatestStockData(String area, String stockCode, Date date) {
+
+        Object[] params;
+
+        StringBuilder builder = new StringBuilder();
+        builder.append("select ");
+        builder.append(" b.stock_code, b.area, b.stock_name, d.`open`, ");
+        builder.append(" d.`close`, d.high, d.low, d.percent, d.chg, ");
+        builder.append(" d.trade_amount, d.trade_count, d.trade_date, d.hfq_close ");
+        builder.append(" from my_stock_data d, my_stock_base b ");
+        builder.append(" where ");
+        if (date != null) {
+            builder.append(" d.trade_date = ? ");
+            params = new Object[]{DateUtils.formatDate(date, DateUtils.DATE_FORMAT), area, stockCode};
+        } else {
+            builder.append(" d.trade_date = (SELECT max(t.trade_date) from my_stock_data t where t.area = ? and t.stock_code = ?) ");
+            params = new Object[]{area, stockCode, area, stockCode};
+        }
+
+        builder.append(" and d.area = ? ");
+        builder.append(" and d.stock_code = ? ");
+        builder.append(" and d.stock_code = b.stock_code");
+
+        List<StockLatestDataDto> list = jdbcTemplate.query(builder.toString(), params, (rs, rowNum) -> {
             StockLatestDataDto stockData = new StockLatestDataDto();
             stockData.setStockCode(rs.getString("stock_code"));
             stockData.setArea(rs.getString("area"));
@@ -287,6 +357,7 @@ public class MyStockJdbcDao {
         builder.append("    ,t.under_min ");
         builder.append("    ,t.under_max ");
         builder.append("    ,t.trade_count ");
+        builder.append("    ,t.price_rate ");
         builder.append("    ,t.volume_rate ");
         builder.append(" FROM my_stock_daily_strategy t ");
         builder.append(" LEFT JOIN my_stock_base b ON t.stock_code = b.stock_code ");
@@ -305,8 +376,46 @@ public class MyStockJdbcDao {
             bo.setUnderMin(rs.getBigDecimal("under_min"));
             bo.setUnderMax(rs.getBigDecimal("under_max"));
             bo.setTradeCount(rs.getInt("trade_count"));
+            bo.setPriceRate(rs.getBigDecimal("price_rate"));
             bo.setVolumeRate(rs.getBigDecimal("volume_rate"));
             return bo;
+        });
+    }
+
+    public List<Map<String, String>> referEntityList(Integer type) {
+
+        String sql = "select * from my_stock_base where type = :type";
+
+        return jdbcTemplate.query(sql, new Object[]{type}, (rs, rowNum) -> {
+            Map<String, String> map = Maps.newHashMap();
+            map.put("value", rs.getString("id"));
+            map.put("title", rs.getString("stock_name"));
+            return map;
+        });
+    }
+
+    public List<Map<String, String>> referMakeupStrategyDate(Date date) {
+
+        StringBuilder builder = new StringBuilder();
+        builder.append(" SELECT ");
+        builder.append("    b.area, b.stock_code, s.strategy ");
+        builder.append(" FROM ");
+        builder.append("    my_stock_base b ");
+        builder.append(" LEFT JOIN my_stock_daily_strategy s ON b.area = s.area ");
+        builder.append(" AND b.stock_code = s.stock_code ");
+        builder.append(" AND s.trade_date = :tradeDate ");
+        builder.append(" WHERE b.listing_date IS NOT NULL");
+
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        parameters.addValue("tradeDate", date);
+
+        return namedParameterJdbcTemplate.query(builder.toString(), parameters, (rs, rowNum) -> {
+
+            Map<String, String> map = Maps.newHashMap();
+            map.put("area", rs.getString("area"));
+            map.put("stockCode", rs.getString("stock_code"));
+            map.put("strategy", rs.getString("strategy"));
+            return map;
         });
     }
 }

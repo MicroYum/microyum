@@ -23,8 +23,7 @@
         </div>
 
         <div style="padding: 15px; overflow:auto;">
-            <table class="layui-table" id="user-table" lay-filter="user-table" width="auto"
-                   style="white-space:nowrap"></table>
+            <table class="layui-table" id="user-table" lay-filter="tag-table" width="auto" style="white-space:nowrap"></table>
             <script type="text/html" id="toolbar">
                 <a class="layui-btn layui-btn-xs" lay-event="edit" id="editForm">
                     <i class="layui-icon">&#xe642;</i>Edit
@@ -51,6 +50,22 @@
                 <select class="layui-select" name="select-category" id="select-category"></select>
             </div>
         </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label" style="width: 100px;">Type:</label>
+            <div class="layui-input-block" style="margin-left: 200px;">
+                <input type="radio" name="stock-type" value="1" title="股票" checked>
+                <input type="radio" name="stock-type" value="2" title="可轉債">
+                <input type="radio" name="stock-type" value="3" title="國債">
+                <input type="radio" name="stock-type" value="4" title="企業債">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">Entity:</label>
+            <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;margin-left: 200px;">
+                <legend>绑定实体</legend>
+            </fieldset>
+            <div id="tag-entity" class="demo-transfer"></div>
+        </div>
     </form>
 </div>
 
@@ -58,9 +73,11 @@
 <script type="text/javascript" src="/static/layui/lay/modules/laypage.js"></script>
 <script src="/static/js/jquery.min.js"></script>
 <script type="text/javascript">
-    layui.use(['table', 'form'], function () {
+    layui.use(['table', 'form', 'transfer'], function () {
         var $ = layui.jquery,
-            layer = layui.layer;
+            layer = layui.layer,
+            transfer = layui.transfer;
+
         var table = layui.table;
         var tblCols = [
             {type: 'numbers'},
@@ -75,7 +92,7 @@
 
         // 从数据库中检索所有的用户信息并渲染Table
         var tableObj = table.render({
-            elem: '#user-table' //指定原始表格元素选择器（推荐id选择器）
+            elem: '#tag-table' //指定原始表格元素选择器（推荐id选择器）
             , cellMinWidth: 30
             , height: 'full-150'
             , loading: true
@@ -125,7 +142,7 @@
                         'roleId': $("#select-role").val(),
                     };
 
-                    $.post('/user/create', param, function (result) {
+                    $.post('/tag/create', param, function (result) {
                         if (result.code == 200) {
                             layer.msg("Save Successful.");
                             tableObj.reload();
@@ -142,7 +159,7 @@
             });
         });
 
-        table.on('tool(user-table)', function (obj) {
+        table.on('tool(tag-table)', function (obj) {
 
             var data = obj.data;
             var layEvent = obj.event;
@@ -177,7 +194,7 @@
                             'roleId': $("#select-role").val(),
                         };
 
-                        $.post('/user/update', param, function (result) {
+                        $.post('/tag/update', param, function (result) {
                             if (result.code == 200) {
                                 layer.msg("Save Successful.");
                                 tableObj.reload();
@@ -199,7 +216,7 @@
                     layer.close(index);
                     var loading = layer.load(1);
 
-                    $.get("/user/" + data.id + "/delete", {}, function (result) {
+                    $.get("/tag/" + data.id + "/delete", {}, function (result) {
                         if (result.code == 200) {
                             layer.msg("Delete successful.");
                             tableObj.reload();
@@ -213,16 +230,14 @@
             }
         });
 
-        $.get('/refer/role/list', {}, function (data) {
-            var html = "";
-            $("select[name='select-role']").empty();
-            $.each(data.data, function (index, item) {
-                html += "<option value='" + item.id + "'>" + item.name + "</option>";
+        $.get('/refer/entity/list', {type: 1}, function (data) {
+            //显示搜索框
+            transfer.render({
+                elem: '#tag-entity'
+                ,data: data
+                ,title: ['全选', '全选']
+                ,showSearch: true
             });
-
-            $("select[name='select-role']").append(html);
-
-            layui.form.render('select');
         });
     });
 </script>

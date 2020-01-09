@@ -32,7 +32,7 @@ public class MyTagJdbcDao {
             TagDto tagDto = new TagDto();
             tagDto.setId(rs.getLong("id"));
             tagDto.setName(rs.getString("name"));
-            tagDto.setCategory(rs.getString("category"));
+            tagDto.setCategory(rs.getInt("category"));
             tagDto.setItems(rs.getLong("items"));
             return tagDto;
         });

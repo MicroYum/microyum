@@ -5,13 +5,16 @@ import com.microyum.common.http.HttpStatus;
 import com.microyum.common.util.DateUtils;
 import com.microyum.dao.jdbc.MyStockJdbcDao;
 import com.microyum.dao.jpa.MyStockBaseDao;
+import com.microyum.dao.jpa.MyStockDailyStrategyDao;
 import com.microyum.dao.jpa.MyStockDataDao;
 import com.microyum.dto.CalculateStockTransactionCostDto;
 import com.microyum.dto.StockBaseDto;
 import com.microyum.dto.StockBaseListDto;
 import com.microyum.model.stock.MyStockBase;
+import com.microyum.model.stock.MyStockDailyStrategy;
 import com.microyum.model.stock.MyStockData;
 import com.microyum.service.StockService;
+import com.microyum.strategy.StockStrategy;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -25,6 +28,7 @@ import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -36,6 +40,10 @@ public class StockServiceImpl implements StockService {
     private MyStockBaseDao stockBaseDao;
     @Autowired
     private MyStockDataDao stockDataDao;
+    @Autowired
+    private StockStrategy stockStrategy;
+    @Autowired
+    private MyStockDailyStrategyDao dailyStrategyDao;
 
     @Value("${python.script.repair.stock.hfqdata}")
     private String repairStockScript;
@@ -228,9 +236,52 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
-    public BaseResponseDTO checkStockExist(String code) {
+    public BaseResponseDTO checkStockExist(String area, String code) {
 
-        MyStockBase stockBase = stockBaseDao.findByStockCode(code);
+        MyStockBase stockBase = stockBaseDao.findByAreaAndStockCode(area, code);
         return new BaseResponseDTO(HttpStatus.OK, stockBase != null ? true : false);
+    }
+
+    @Override
+    public BaseResponseDTO referEntityList(Integer type) {
+
+        List<Map<String, String>> result = stockJdbcDao.referEntityList(type);
+        return new BaseResponseDTO(HttpStatus.OK, result);
+    }
+
+    @Override
+    public BaseResponseDTO makeupStrategy(String date) {
+
+        Date calDate = DateUtils.parseDate(date, DateUtils.DATE_FORMAT_COMP);
+
+        while (!DateUtils.isSameDay(calDate, new Date())) {
+
+            log.info(DateUtils.formatDate(calDate, DateUtils.DATE_FORMAT) + " start ...");
+
+            if (!stockStrategy.isTradingDay(calDate)) {
+                calDate = DateUtils.addDays(calDate, 1);
+                continue;
+            }
+
+            List<Map<String, String>> makeupDatas = stockJdbcDao.referMakeupStrategyDate(calDate);
+            for (Map<String, String> makeupData : makeupDatas) {
+
+                // 已经有策略的数据不做补齐
+                if (StringUtils.isNotBlank(makeupData.get("strategy"))) {
+                    continue;
+                }
+
+                MyStockDailyStrategy dailyStrategy = stockStrategy.calcStockValueRangeByDate(makeupData.get("area"), makeupData.get("stockCode"), calDate);
+                if (dailyStrategy != null) {
+                    dailyStrategyDao.save(dailyStrategy);
+                }
+
+            }
+            log.info(DateUtils.formatDate(calDate, DateUtils.DATE_FORMAT) + " end .");
+
+            calDate = DateUtils.addDays(calDate, 1);
+        }
+
+        return new BaseResponseDTO(HttpStatus.OK);
     }
 }

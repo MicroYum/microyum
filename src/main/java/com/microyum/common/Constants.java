@@ -28,4 +28,6 @@ public class Constants {
 
     public static final String MAIL_NAME_BUYING_STOCK = "BUYING_STOCK";
     public static final String MAIL_NAME_BUYING_STOCK_TABLE = "BUYING_STOCK_TABLE";
+
+    public static final String STRATEGY_DEFAULT_DATE = "2019-01-01";
 }

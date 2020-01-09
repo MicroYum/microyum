@@ -10,6 +10,7 @@ import com.microyum.dao.jpa.MyStockDataDetailDao;
 import com.microyum.model.stock.MyStockBase;
 import com.microyum.model.stock.MyStockData;
 import com.microyum.model.stock.MyStockDataDetail;
+import com.microyum.strategy.StockStrategy;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -40,6 +41,8 @@ public class ReferStockDataSchedule {
     private MyStockJdbcDao stockJdbcDao;
     @Autowired
     private MyStockDataDao stockDataDao;
+    @Autowired
+    private StockStrategy stockStrategy;
 
     @Value("${python.script.repair.latest.hfqdata}")
     private String repairLatestScript;
@@ -48,14 +51,11 @@ public class ReferStockDataSchedule {
     public synchronized void getRealtimeStockBySina() {
 
         // 定时任务运行时间每周一到周五，9:30 ~ 11:30, 13:00 ~ 15:00
-        Calendar calendar = Calendar.getInstance();
-        int dayWeek = calendar.get(Calendar.DAY_OF_WEEK);
-
-        if (dayWeek == 1 || dayWeek == 7) {
-            log.info("周六、周日不获取数据.");
+        if (!stockStrategy.isTradingDay()) {
             return;
         }
 
+        Calendar calendar = Calendar.getInstance();
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         if (!((hour >= 9 && hour <= 11) || (hour >= 13 && hour <= 15))) {
             log.info("现在是：" + hour + "点，股市还未开盘");
@@ -93,7 +93,6 @@ public class ReferStockDataSchedule {
                 for (String line : result.split("\n")) {
                     // 解析响应内容
                     Map<String, String> mapStack = StockUtils.parseSinaStock(stockBaseList.get(index).getStockCode(), line);
-                    index++;
 
                     // TODO 此处的判断，只是假设，可能会有错误，需要特别注意
                     // 日期不相同的场合，说明可能今天停市，或者股票停牌
@@ -110,6 +109,7 @@ public class ReferStockDataSchedule {
                         stockData.setId(stock.getId());
                     }
                     stockDataDao.save(stockData);
+                    index++;
                 }
             }
         } catch (Exception e) {
@@ -150,14 +150,9 @@ public class ReferStockDataSchedule {
     public void repairHfqData() {
 
         // 定时任务运行时间每周一到周五
-        Calendar calendar = Calendar.getInstance();
-        int dayWeek = calendar.get(Calendar.DAY_OF_WEEK);
-
-        if (dayWeek == 1 || dayWeek == 7) {
-            log.info("周六、周日不补全后复权数据.");
+        if (!stockStrategy.isTradingDay()) {
             return;
         }
-
 
         log.info("开始补齐当天的后复权数据...");
 

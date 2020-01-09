@@ -10,6 +10,7 @@ import com.microyum.common.util.MailUtils;
 import com.microyum.dao.jdbc.MyFinanceJdbcDao;
 import com.microyum.dao.jdbc.MyMailJdbcDao;
 import com.microyum.dao.jdbc.MyStockJdbcDao;
+import com.microyum.dao.jpa.MyDayOffDao;
 import com.microyum.dao.jpa.MyStockDailyStrategyDao;
 import com.microyum.dao.jpa.MyUserDao;
 import com.microyum.dto.AssetAllocationDto;
@@ -36,20 +37,18 @@ public class InvestmentStrategySchedule {
 
     @Autowired
     private MyStockJdbcDao stockJdbcDao;
-
     @Autowired
     private MyStockDailyStrategyDao dailyStrategyDao;
-
     @Autowired
     private MyFinanceJdbcDao myFinanceDao;
-
     @Autowired
     private StockStrategy stockStrategy;
-
     @Autowired
     private MyUserDao userDao;
     @Autowired
     private MyMailJdbcDao mailDao;
+    @Autowired
+    private MyDayOffDao dayOffDao;
 
     /**
      * 交易日15:30开始，计算所有股票的价值区间，保存到MyStockDailyStrategy表
@@ -58,11 +57,7 @@ public class InvestmentStrategySchedule {
     public void calcValueRange() {
 
         // 定时任务运行时间每周一到周五
-        Calendar calendar = Calendar.getInstance();
-        int dayWeek = calendar.get(Calendar.DAY_OF_WEEK);
-
-        if (dayWeek == 1 || dayWeek == 7) {
-            log.info("周六、周日不计算价值区间.");
+        if (!stockStrategy.isTradingDay()) {
             return;
         }
 
@@ -72,7 +67,9 @@ public class InvestmentStrategySchedule {
         for (MyStockBase stockBase : listStock) {
 
             MyStockDailyStrategy dailyStrategy = stockStrategy.calcStockValueRange(stockBase);
-            dailyStrategyDao.save(dailyStrategy);
+            if (dailyStrategy != null) {
+                dailyStrategyDao.save(dailyStrategy);
+            }
         }
     }
 
@@ -83,11 +80,7 @@ public class InvestmentStrategySchedule {
     public void mailBuyingStock() {
 
         // 定时任务运行时间每周一到周五
-        Calendar calendar = Calendar.getInstance();
-        int dayWeek = calendar.get(Calendar.DAY_OF_WEEK);
-
-        if (dayWeek == 1 || dayWeek == 7) {
-            log.info("周六、周日不发送推荐.");
+        if (!stockStrategy.isTradingDay()) {
             return;
         }
 
@@ -107,6 +100,7 @@ public class InvestmentStrategySchedule {
             mailTable = mailTable.replace(":under_min", String.valueOf(stockBO.getUnderMin()));
             mailTable = mailTable.replace(":under_max", String.valueOf(stockBO.getUnderMax()));
             mailTable = mailTable.replace(":trade_count", String.valueOf(stockBO.getTradeCount()));
+            mailTable = mailTable.replace(":price_rate", String.valueOf(stockBO.getPriceRate()));
             mailTable = mailTable.replace(":volume_rate", String.valueOf(stockBO.getVolumeRate()));
             builder.append(mailTable);
         }
@@ -223,4 +217,5 @@ public class InvestmentStrategySchedule {
             税前及税后收益率计算：使用XIRR函数。
          */
     }
+
 }

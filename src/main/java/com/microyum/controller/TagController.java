@@ -45,8 +45,9 @@ public class TagController {
      * @return
      */
     @PostMapping(value = "/tag/binding")
-    public BaseResponseDTO tagBinding(TagBindingDto tagBindingDto) {
-        return null;
+    public BaseResponseDTO tagBinding(TagBindingDto dto) {
+
+        return tagService.tagBinding(dto);
     }
 
     /**
@@ -54,7 +55,7 @@ public class TagController {
      * @return
      */
     @PostMapping(value = "/tag/unbinding")
-    public BaseResponseDTO tagUnbinding(TagBindingDto tagBindingDto) {
-        return null;
+    public BaseResponseDTO tagUnbinding(TagBindingDto dto) {
+        return tagService.tagUnbinding(dto);
     }
 }

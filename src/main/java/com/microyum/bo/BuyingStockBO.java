@@ -17,5 +17,6 @@ public class BuyingStockBO {
     private BigDecimal underMin;
     private BigDecimal underMax;
     private Integer tradeCount;
+    private BigDecimal priceRate;
     private BigDecimal volumeRate;
 }

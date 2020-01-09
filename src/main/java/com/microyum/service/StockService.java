@@ -22,5 +22,9 @@ public interface StockService {
     BaseResponseDTO updateStockBase(MyStockBase stockBase);
     BaseResponseDTO deleteStockBase(Long id);
 
-    BaseResponseDTO checkStockExist(String code);
+    BaseResponseDTO checkStockExist(String area, String code);
+
+    BaseResponseDTO referEntityList(Integer type);
+
+    BaseResponseDTO makeupStrategy(String date);
 }

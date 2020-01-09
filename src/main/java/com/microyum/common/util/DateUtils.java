@@ -24,7 +24,6 @@ public class DateUtils {
     public static final String DATE_FORMAT_COMP = "yyyyMMdd";
     public static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
     public static final String FULL_DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS";
-    public static final String DATE_FORMAT_COMP_YYMMDD = "yyyyMMdd";
     public static final String YYMMddHHmmss = "yyyyMMddHHmmss";
     public static final String DATE_TIME_FORMAT2 = "MM-dd-yyyy HH:mm:ss";
 
@@ -144,5 +143,15 @@ public class DateUtils {
         return cal1.get(Calendar.ERA) == cal2.get(Calendar.ERA) &&
                 cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
                 cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR);
+    }
+
+    public static int compare(Date date1, Date date2) {
+        if (date1.getTime() > date2.getTime()) {
+            return 1;
+        } else if (date1.getTime() < date2.getTime()) {
+            return -1;
+        }
+
+        return 0;
     }
 }
