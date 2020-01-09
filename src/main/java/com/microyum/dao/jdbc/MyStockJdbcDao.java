@@ -38,7 +38,7 @@ public class MyStockJdbcDao {
         builder.append("select count(1) count  from `my_stock_base`");
 
         if (StringUtils.isNotBlank(stock)) {
-            builder.append(" where stock_code like :stockCode or stock_name like :stockName or b.initials like :initials");
+            builder.append(" where stock_code like :stockCode or stock_name like :stockName or initials like :initials");
             parameters.addValue("stockCode", "%" + stock + "%");
             parameters.addValue("stockName", "%" + stock + "%");
             parameters.addValue("initials", "%" + stock + "%");

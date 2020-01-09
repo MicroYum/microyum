@@ -13,6 +13,7 @@ import com.microyum.dto.StockBaseListDto;
 import com.microyum.model.stock.MyStockBase;
 import com.microyum.model.stock.MyStockDailyStrategy;
 import com.microyum.model.stock.MyStockData;
+import com.microyum.service.RepairService;
 import com.microyum.service.StockService;
 import com.microyum.strategy.StockStrategy;
 import lombok.extern.slf4j.Slf4j;
@@ -44,6 +45,8 @@ public class StockServiceImpl implements StockService {
     private StockStrategy stockStrategy;
     @Autowired
     private MyStockDailyStrategyDao dailyStrategyDao;
+    @Autowired
+    private RepairService repairService;
 
     @Value("${python.script.repair.stock.hfqdata}")
     private String repairStockScript;
@@ -216,6 +219,9 @@ public class StockServiceImpl implements StockService {
         }
 
         stockBaseDao.save(entity);
+
+        // 补齐策略数据
+        repairService.repairStrategyData(entity.getArea(), entity.getStockCode());
 
         return new BaseResponseDTO(HttpStatus.OK);
     }
