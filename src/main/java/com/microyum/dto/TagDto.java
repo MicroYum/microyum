@@ -9,7 +9,8 @@ public class TagDto {
 
     private Long id;
     private String name;
-    private Integer category;
+    private String category;
     private Long items;
-    private List<Long> entityIds;
+    private String entityIds;
+    private String lastUpdateTime;
 }

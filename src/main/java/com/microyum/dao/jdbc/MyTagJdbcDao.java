@@ -1,5 +1,6 @@
 package com.microyum.dao.jdbc;
 
+import com.microyum.common.util.DateUtils;
 import com.microyum.common.util.StringUtils;
 import com.microyum.dto.TagDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,8 +33,9 @@ public class MyTagJdbcDao {
             TagDto tagDto = new TagDto();
             tagDto.setId(rs.getLong("id"));
             tagDto.setName(rs.getString("name"));
-            tagDto.setCategory(rs.getInt("category"));
+            tagDto.setCategory(rs.getString("category"));
             tagDto.setItems(rs.getLong("items"));
+            tagDto.setLastUpdateTime(DateUtils.formatDate(rs.getTimestamp("last_update_time"), DateUtils.DATE_TIME_FORMAT));
             return tagDto;
         });
     }
@@ -55,10 +57,12 @@ public class MyTagJdbcDao {
     private String findTagInfoSql(String name, boolean isCount) {
         StringBuilder builder = new StringBuilder();
 
+        builder.append("select ");
+
         if (isCount) {
-            builder.append("select count(1) ");
+            builder.append(" count(1) ");
         } else {
-            builder.append(" name, category, items");
+            builder.append(" id, name, category, items, last_update_time");
         }
 
         builder.append(" from my_tag ");

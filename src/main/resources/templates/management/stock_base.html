@@ -136,6 +136,7 @@
             , limit: 15
             , where: {
                 stock: $.trim($("#select-stock").val())
+                ,timestamp: new Date()
             }
             , limits: [15, 30, 45, 60, 75, 90]
         });

@@ -384,7 +384,7 @@ public class MyStockJdbcDao {
 
     public List<Map<String, String>> referEntityList(Integer type) {
 
-        String sql = "select * from my_stock_base where type = :type";
+        String sql = "select * from my_stock_base where type = ?";
 
         return jdbcTemplate.query(sql, new Object[]{type}, (rs, rowNum) -> {
             Map<String, String> map = Maps.newHashMap();

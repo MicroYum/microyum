@@ -1,10 +1,7 @@
 package com.microyum.controller;
 
 import com.google.common.collect.Lists;
-import com.microyum.common.enums.CurrencyEnum;
-import com.microyum.common.enums.FinanceTypeEnum;
-import com.microyum.common.enums.StockStrategyEnum;
-import com.microyum.common.enums.StockTypeEnum;
+import com.microyum.common.enums.*;
 import com.microyum.common.http.BaseResponseDTO;
 import com.microyum.dto.EnumDto;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -55,6 +52,17 @@ public class EnumController {
 
         List<EnumDto> dtoList = Lists.newArrayList();
         for (StockTypeEnum item : StockTypeEnum.values()) {
+            dtoList.add(new EnumDto(item.getCode(), item.getName()));
+        }
+
+        return BaseResponseDTO.OK(dtoList);
+    }
+
+    @GetMapping(value = "/tag/category", produces = "application/json")
+    public BaseResponseDTO tagCategory() {
+
+        List<EnumDto> dtoList = Lists.newArrayList();
+        for (TagCategoryEnum item : TagCategoryEnum.values()) {
             dtoList.add(new EnumDto(item.getCode(), item.getName()));
         }
 

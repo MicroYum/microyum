@@ -4,10 +4,10 @@ import com.microyum.common.util.StringUtils;
 
 public enum TagCategoryEnum {
 
-    TAG_CATEGORY_BLOG(1, "Blog"),
-    TAG_CATEGORY_STOCK(2, "Stock"),
-    TAG_CATEGORY_BOND(3, "Bond"),
-    TAG_CATEGORY_FINANCE(4, "Finance");
+    TAG_CATEGORY_STOCK(1, "Stock"),
+    TAG_CATEGORY_BOND(2, "Bond"),
+    TAG_CATEGORY_FINANCE(3, "Finance"),
+    TAG_CATEGORY_BLOG(4, "Blog");
 
     private int code;
     private String name;

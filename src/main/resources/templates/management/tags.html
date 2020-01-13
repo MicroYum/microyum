@@ -23,7 +23,8 @@
         </div>
 
         <div style="padding: 15px; overflow:auto;">
-            <table class="layui-table" id="user-table" lay-filter="tag-table" width="auto" style="white-space:nowrap"></table>
+            <table class="layui-table" id="tag-table" lay-filter="tag-table" width="auto"
+                   style="white-space:nowrap"></table>
             <script type="text/html" id="toolbar">
                 <a class="layui-btn layui-btn-xs" lay-event="edit" id="editForm">
                     <i class="layui-icon">&#xe642;</i>Edit
@@ -51,20 +52,8 @@
             </div>
         </div>
         <div class="layui-form-item">
-            <label class="layui-form-label" style="width: 100px;">Type:</label>
-            <div class="layui-input-block" style="margin-left: 200px;">
-                <input type="radio" name="stock-type" value="1" title="股票" checked>
-                <input type="radio" name="stock-type" value="2" title="可轉債">
-                <input type="radio" name="stock-type" value="3" title="國債">
-                <input type="radio" name="stock-type" value="4" title="企業債">
-            </div>
-        </div>
-        <div class="layui-form-item">
             <label class="layui-form-label">Entity:</label>
-            <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;margin-left: 200px;">
-                <legend>绑定实体</legend>
-            </fieldset>
-            <div id="tag-entity" class="demo-transfer"></div>
+            <div id="tag-entity" class="demo-transfer" style="height: 420px; margin-left: 200px;"></div>
         </div>
     </form>
 </div>
@@ -86,7 +75,7 @@
             {field: 'name', title: 'Name', width: 180},
             {field: 'category', title: 'Category', width: 200},
             {field: 'items', title: 'Items', width: 200},
-            {field: 'lastUpdateDate', title: 'Last Update Time', width: 200},
+            {field: 'lastUpdateTime', title: 'Last Update Time', width: 200},
             {fixed: 'right', width: 220, align: 'center', toolbar: '#toolbar'}
         ];
 
@@ -113,13 +102,7 @@
 
         $('#btn-add').on('click', function () {
             $('#pop-div').show();
-            $("#pop-password").show();
-            $("#name").val('');
-            $("#nick-name").val('');
-            $("#email").val('');
-            $("#telephone").val('');
-            $("#password").val('');
-            $("#select-role").find("option[value=1]").prop("selected", true);
+            $("#input-name").val('');
             layui.form.render();
 
             layer.open({
@@ -127,19 +110,23 @@
                 shadeClose: false,
                 title: 'Add',
                 btn: ['Save', 'Cancel'],
-                area: ['640px', '550px'],
+                area: ['725px', '700px'],
                 content: $('#pop-div'),
                 yes: function (index) {
                     layer.close(index);
                     var loading = layer.load(1);
 
+                    var entityIds = new Array();
+
+                    var transferData = transfer.getData('tagEntity');
+                    for (var i in transferData) {
+                        entityIds.push(transferData[i]["value"]);
+                    }
+
                     var param = {
-                        'email': $("#email").val().trim(),
-                        'name': $("#name").val().trim(),
-                        'nickName': $("#nick-name").val().trim(),
-                        'password': md5($("#password").val().trim()),
-                        'telephone': $("#telephone").val().trim(),
-                        'roleId': $("#select-role").val(),
+                        'name': $("#input-name").val().trim(),
+                        'category': $("#select-category").val(),
+                        'entityIds': entityIds.join(",")
                     };
 
                     $.post('/tag/create', param, function (result) {
@@ -166,12 +153,8 @@
 
             if (layEvent === 'edit') {
                 $('#pop-div').show();
-                $("#pop-password").hide();
-                $("#name").val(data.name);
-                $("#nick-name").val(data.nickName);
-                $("#email").val(data.email);
-                $("#telephone").val(data.telephone);
-                $("#select-role").find("option[value=" + data.roleId + "]").prop("selected", true);
+                $("#input-name").val('');
+                $("#select-category").find("option[name=" + data.category + "]").prop("selected", true);
                 layui.form.render();
 
                 layer.open({
@@ -179,19 +162,24 @@
                     shadeClose: false,
                     title: 'Add',
                     btn: ['Save', 'Cancel'],
-                    area: ['640px', '500px'],
+                    area: ['725px', '700px'],
                     content: $('#pop-div'),
                     yes: function (index) {
                         layer.close(index);
                         var loading = layer.load(1);
 
+                        var entityIds = new Array();
+
+                        var transferData = transfer.getData('tagEntity');
+                        for (var i in transferData) {
+                            entityIds.push(transferData[i]["value"]);
+                        }
+
                         var param = {
                             'id': data.id,
-                            'email': $("#email").val().trim(),
-                            'name': $("#name").val().trim(),
-                            'nickName': $("#nick-name").val().trim(),
-                            'telephone': $("#telephone").val().trim(),
-                            'roleId': $("#select-role").val(),
+                            'name': $("#input-name").val().trim(),
+                            'category': $("#select-category").val(),
+                            'entityIds': entityIds.join(",")
                         };
 
                         $.post('/tag/update', param, function (result) {
@@ -234,10 +222,23 @@
             //显示搜索框
             transfer.render({
                 elem: '#tag-entity'
-                ,data: data
-                ,title: ['全选', '全选']
-                ,showSearch: true
+                , data: data.data
+                , title: ['全选', '全选']
+                , showSearch: true
+                , id: "tagEntity"
             });
+        });
+
+        $.get('/enum/tag/category', {}, function (data) {
+            var html = "";
+            $("select[name='select-category']").empty();
+            $.each(data.data, function (index, item) {
+                html += "<option value='" + item.code + "'>" + item.name + "</option>";
+            });
+
+            $("select[name='select-category']").append(html);
+
+            layui.form.render('select');
         });
     });
 </script>

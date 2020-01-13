@@ -47,8 +47,6 @@ public class InvestmentStrategySchedule {
     private MyUserDao userDao;
     @Autowired
     private MyMailJdbcDao mailDao;
-    @Autowired
-    private MyDayOffDao dayOffDao;
 
     /**
      * 交易日15:30开始，计算所有股票的价值区间，保存到MyStockDailyStrategy表

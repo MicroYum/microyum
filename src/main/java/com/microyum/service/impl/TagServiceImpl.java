@@ -1,6 +1,7 @@
 package com.microyum.service.impl;
 
 import com.google.common.collect.Lists;
+import com.microyum.common.enums.TagCategoryEnum;
 import com.microyum.common.http.BaseResponseDTO;
 import com.microyum.common.http.HttpStatus;
 import com.microyum.common.util.StringUtils;
@@ -56,7 +57,15 @@ public class TagServiceImpl implements TagService {
     public BaseResponseDTO createTag(TagDto tagDto) {
 
         MyTag tag = new MyTag();
-        BeanUtils.copyProperties(tagDto, tag);
+        tag.setName(tagDto.getName());
+        tag.setCategory(TagCategoryEnum.of(Integer.valueOf(tagDto.getCategory())).getName());
+        tag.setStatus(1);
+        if (StringUtils.isBlank(tagDto.getEntityIds())) {
+            tag.setItems(0L);
+        } else {
+            tag.setItems(Long.valueOf(tagDto.getEntityIds().split(",").length));
+        }
+
         tag = tagDao.save(tag);
         saveTagBinding(tagDto, tag);
 
@@ -68,8 +77,15 @@ public class TagServiceImpl implements TagService {
     public BaseResponseDTO updateTag(TagDto tagDto) {
 
         tagBindingDao.deleteByTagId(tagDto.getId());
+
         MyTag tag = new MyTag();
-        BeanUtils.copyProperties(tagDto, tag);
+        tag.setName(tagDto.getName());
+        tag.setCategory(TagCategoryEnum.of(Integer.valueOf(tagDto.getCategory())).getName());
+        if (StringUtils.isBlank(tagDto.getEntityIds())) {
+            tag.setItems(0L);
+        } else {
+            tag.setItems(Long.valueOf(tagDto.getEntityIds().split(",").length));
+        }
         tagDao.save(tag);
 
         saveTagBinding(tagDto, tag);
@@ -122,16 +138,16 @@ public class TagServiceImpl implements TagService {
 
     private void saveTagBinding(TagDto tagDto, MyTag tag) {
 
-        if (tagDto.getEntityIds().size() == 0) {
+        if (StringUtils.isBlank(tagDto.getEntityIds()) || tagDto.getEntityIds().split(",").length == 0) {
             return;
         }
 
         List<MyTagBinding> tagBindings = Lists.newArrayList();
-        for (Long entityId : tagDto.getEntityIds()) {
+        for (String entityId : tagDto.getEntityIds().split(",")) {
             MyTagBinding tagBinding = new MyTagBinding();
             tagBinding.setTagId(tag.getId());
-            tagBinding.setEntityId(entityId);
-            tagBinding.setCategory(tagDto.getCategory());
+            tagBinding.setEntityId(Long.valueOf(entityId));
+            tagBinding.setCategory(Integer.valueOf(tagDto.getCategory()));
             tagBindings.add(tagBinding);
         }
 
