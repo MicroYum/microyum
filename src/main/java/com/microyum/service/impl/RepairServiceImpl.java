@@ -10,7 +10,6 @@ import com.microyum.service.RepairService;
 import com.microyum.strategy.StockStrategy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -47,7 +46,7 @@ public class RepairServiceImpl implements RepairService {
         // 调用StockStrategy类的calcStockValueRangeByDate方法，开始补齐策略
         while (!DateUtils.isSameDay(calDate, new Date())) {
 
-            log.info(DateUtils.formatDate(calDate, DateUtils.DATE_FORMAT) + " start ...");
+            log.debug(DateUtils.formatDate(calDate, DateUtils.DATE_FORMAT) + " start ...");
 
             if (!stockStrategy.isTradingDay(calDate)) {
                 calDate = DateUtils.addDays(calDate, 1);
@@ -59,7 +58,7 @@ public class RepairServiceImpl implements RepairService {
                 dailyStrategyDao.save(dailyStrategy);
             }
 
-            log.info(DateUtils.formatDate(calDate, DateUtils.DATE_FORMAT) + " end .");
+            log.debug(DateUtils.formatDate(calDate, DateUtils.DATE_FORMAT) + " end .");
 
             calDate = DateUtils.addDays(calDate, 1);
         }

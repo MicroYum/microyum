@@ -20,6 +20,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -70,14 +71,34 @@ public class ReferStockDataSchedule {
 
         log.info("获取股票数据定时任务开始...");
 
-        CloseableHttpClient httpclient = HttpClients.createDefault();
         List<MyStockBase> stockBaseList = stockJdbcDao.getObservedList();
 
+        List<String> urls = Lists.newArrayList();
         List<String> stocks = Lists.newArrayList();
         for (MyStockBase stockBase : stockBaseList) {
             stocks.add(stockBase.getArea() + stockBase.getStockCode());
+
+            if (stocks.size() == 300) {
+                urls.add(Constants.STOCK_SINA_URL + String.join(",", stocks));
+                stocks = Lists.newArrayList();
+            }
         }
-        String requestUrl = Constants.STOCK_SINA_URL + String.join(",", stocks);
+
+        if (stocks.size() != 0) {
+            urls.add(Constants.STOCK_SINA_URL + String.join(",", stocks));
+        }
+
+        for (String url : urls) {
+            updateNewStockData(url);
+        }
+
+        log.info("获取股票数据定时任务结束.");
+    }
+
+    @Async
+    public void updateNewStockData(String requestUrl) {
+
+        CloseableHttpClient httpclient = HttpClients.createDefault();
 
         try {
             // 创建httpget.
@@ -89,10 +110,12 @@ public class ReferStockDataSchedule {
             if (entity != null) {
                 String result = EntityUtils.toString(entity);
 
-                int index = 0;
                 for (String line : result.split("\n")) {
+
+                    String stockCode = line.substring(11, 18);
+
                     // 解析响应内容
-                    Map<String, String> mapStack = StockUtils.parseSinaStock(stockBaseList.get(index).getStockCode(), line);
+                    Map<String, String> mapStack = StockUtils.parseSinaStock(stockCode.substring(2), line);
 
                     // TODO 此处的判断，只是假设，可能会有错误，需要特别注意
                     // 日期不相同的场合，说明可能今天停市，或者股票停牌
@@ -101,7 +124,7 @@ public class ReferStockDataSchedule {
                     }
 
                     MyStockData stockData = this.tidyStockData(mapStack);
-                    stockData.setArea(stockBaseList.get(index).getArea());
+                    stockData.setArea(stockCode.substring(0, 2));
 
                     // insert / update
                     MyStockData stock = stockJdbcDao.selectTradeDateStock(stockData.getStockCode(), stockData.getArea(), stockData.getTradeDate());
@@ -109,7 +132,6 @@ public class ReferStockDataSchedule {
                         stockData.setId(stock.getId());
                     }
                     stockDataDao.save(stockData);
-                    index++;
                 }
             }
         } catch (Exception e) {
@@ -122,8 +144,6 @@ public class ReferStockDataSchedule {
                 log.error("释放新浪股票接口连接错误", e);
             }
         }
-
-        log.info("获取股票数据定时任务结束.");
     }
 
     private MyStockData tidyStockData(Map<String, String> mapStack) {

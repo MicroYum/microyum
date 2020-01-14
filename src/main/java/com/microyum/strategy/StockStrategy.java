@@ -182,13 +182,13 @@ public class StockStrategy {
         int dayWeek = calendar.get(Calendar.DAY_OF_WEEK);
 
         if (dayWeek == 1 || dayWeek == 7) {
-            log.info(DateUtils.formatDate(date, DateUtils.DATE_FORMAT) + ", 周六、周日.");
+            log.debug(DateUtils.formatDate(date, DateUtils.DATE_FORMAT) + ", 周六、周日.");
             return false;
         }
 
         MyDayOff dayOff = dayOffDao.findByTradeDate(DateUtils.formatDate(date, DateUtils.DATE_FORMAT));
         if (dayOff != null) {
-            log.info(DateUtils.formatDate(date, DateUtils.DATE_FORMAT) + ", 国定假日.");
+            log.debug(DateUtils.formatDate(date, DateUtils.DATE_FORMAT) + ", 国定假日.");
             return false;
         }
 

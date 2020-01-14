@@ -50,4 +50,10 @@ public class ScheduleController {
         investmentStrategySchedule.mailBuyingStock();
         return new BaseResponseDTO(HttpStatus.OK);
     }
+
+    @RequestMapping(value = "/public/schedule/personal/value/interval")
+    public BaseResponseDTO personalValueInterval() {
+        investmentStrategySchedule.personalValueInterval();
+        return new BaseResponseDTO(HttpStatus.OK);
+    }
 }
