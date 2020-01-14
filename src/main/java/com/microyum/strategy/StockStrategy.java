@@ -83,27 +83,16 @@ public class StockStrategy {
         Integer lowVolumeDays = stockJdbcDao.countStockDataByCode(stockBase.getArea(), stockBase.getStockCode(), lowVolume);
         dailyStrategy.setVolumeRate(new BigDecimal(df.format((float) lowVolumeDays / dailyStrategy.getTradeCount())));
 
-        // 小于500个交易日不做建议判断
-        if (tradeCount.intValue() > dailyStrategy.getTradeCount()) {
-            dailyStrategy.setStrategy(StockStrategyEnum.STRATEGY_NO_ADVICE.getCode());
+        if (dailyStrategy.getBuyingMax().compareTo(latestStock.getHfqClose()) == 1) {
+            dailyStrategy.setStrategy(StockStrategyEnum.STRATEGY_BUYING.getCode());
+        } else if (dailyStrategy.getUnderMax().compareTo(latestStock.getHfqClose()) == 1) {
+            dailyStrategy.setStrategy(StockStrategyEnum.STRATEGY_UNDER_VALUE.getCode());
+        } else if (dailyStrategy.getMiddleMax().compareTo(latestStock.getHfqClose()) == 1) {
+            dailyStrategy.setStrategy(StockStrategyEnum.STRATEGY_MIDDLE_VALUE.getCode());
+        } else if (dailyStrategy.getOverMax().compareTo(latestStock.getHfqClose()) == 1) {
+            dailyStrategy.setStrategy(StockStrategyEnum.STRATEGY_OVER_VALUE.getCode());
         } else {
-            if (dailyStrategy.getBuyingMax().compareTo(latestStock.getHfqClose()) == 1) {
-                if (dailyStrategy.getTradeCount().doubleValue() * 0.05 > dailyStrategy.getVolumeRate().doubleValue()) {
-                    dailyStrategy.setStrategy(StockStrategyEnum.STRATEGY_BUYING.getCode());
-                } else if (dailyStrategy.getTradeCount().doubleValue() * 0.4 < dailyStrategy.getVolumeRate().doubleValue()) {
-                    dailyStrategy.setStrategy(StockStrategyEnum.STRATEGY_BUYING.getCode());
-                } else {
-                    dailyStrategy.setStrategy(StockStrategyEnum.STRATEGY_UNDER_VALUE.getCode());
-                }
-            } else if (dailyStrategy.getUnderMax().compareTo(latestStock.getHfqClose()) == 1) {
-                dailyStrategy.setStrategy(StockStrategyEnum.STRATEGY_UNDER_VALUE.getCode());
-            } else if (dailyStrategy.getMiddleMax().compareTo(latestStock.getHfqClose()) == 1) {
-                dailyStrategy.setStrategy(StockStrategyEnum.STRATEGY_MIDDLE_VALUE.getCode());
-            } else if (dailyStrategy.getOverMax().compareTo(latestStock.getHfqClose()) == 1) {
-                dailyStrategy.setStrategy(StockStrategyEnum.STRATEGY_OVER_VALUE.getCode());
-            } else {
-                dailyStrategy.setStrategy(StockStrategyEnum.STRATEGY_SELLING.getCode());
-            }
+            dailyStrategy.setStrategy(StockStrategyEnum.STRATEGY_SELLING.getCode());
         }
 
         return dailyStrategy;
@@ -163,27 +152,16 @@ public class StockStrategy {
         Integer lowVolumeDays = stockJdbcDao.countStockDataByCode(area, stockCode, date, lowVolume);
         dailyStrategy.setVolumeRate(new BigDecimal(df.format((float) lowVolumeDays / dailyStrategy.getTradeCount())));
 
-        // 小于500个交易日不做建议判断
-        if (tradeCount.intValue() > dailyStrategy.getTradeCount()) {
-            dailyStrategy.setStrategy(StockStrategyEnum.STRATEGY_NO_ADVICE.getCode());
+        if (dailyStrategy.getBuyingMax().compareTo(latestStock.getHfqClose()) == 1) {
+            dailyStrategy.setStrategy(StockStrategyEnum.STRATEGY_BUYING.getCode());
+        } else if (dailyStrategy.getUnderMax().compareTo(latestStock.getHfqClose()) == 1) {
+            dailyStrategy.setStrategy(StockStrategyEnum.STRATEGY_UNDER_VALUE.getCode());
+        } else if (dailyStrategy.getMiddleMax().compareTo(latestStock.getHfqClose()) == 1) {
+            dailyStrategy.setStrategy(StockStrategyEnum.STRATEGY_MIDDLE_VALUE.getCode());
+        } else if (dailyStrategy.getOverMax().compareTo(latestStock.getHfqClose()) == 1) {
+            dailyStrategy.setStrategy(StockStrategyEnum.STRATEGY_OVER_VALUE.getCode());
         } else {
-            if (dailyStrategy.getBuyingMax().compareTo(latestStock.getHfqClose()) == 1) {
-                if (dailyStrategy.getTradeCount().doubleValue() * 0.05 > dailyStrategy.getVolumeRate().doubleValue()) {
-                    dailyStrategy.setStrategy(StockStrategyEnum.STRATEGY_BUYING.getCode());
-                } else if (dailyStrategy.getTradeCount().doubleValue() * 0.4 < dailyStrategy.getVolumeRate().doubleValue()) {
-                    dailyStrategy.setStrategy(StockStrategyEnum.STRATEGY_BUYING.getCode());
-                } else {
-                    dailyStrategy.setStrategy(StockStrategyEnum.STRATEGY_UNDER_VALUE.getCode());
-                }
-            } else if (dailyStrategy.getUnderMax().compareTo(latestStock.getHfqClose()) == 1) {
-                dailyStrategy.setStrategy(StockStrategyEnum.STRATEGY_UNDER_VALUE.getCode());
-            } else if (dailyStrategy.getMiddleMax().compareTo(latestStock.getHfqClose()) == 1) {
-                dailyStrategy.setStrategy(StockStrategyEnum.STRATEGY_MIDDLE_VALUE.getCode());
-            } else if (dailyStrategy.getOverMax().compareTo(latestStock.getHfqClose()) == 1) {
-                dailyStrategy.setStrategy(StockStrategyEnum.STRATEGY_OVER_VALUE.getCode());
-            } else {
-                dailyStrategy.setStrategy(StockStrategyEnum.STRATEGY_SELLING.getCode());
-            }
+            dailyStrategy.setStrategy(StockStrategyEnum.STRATEGY_SELLING.getCode());
         }
 
         return dailyStrategy;
