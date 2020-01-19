@@ -103,6 +103,8 @@
         $('#btn-add').on('click', function () {
             $('#pop-div').show();
             $("#input-name").val('');
+            $("#input-name").removeClass("layui-disabled");
+            $("#input-name").attr("disabled", false);
             layui.form.render();
 
             layer.open({
@@ -152,8 +154,11 @@
             var layEvent = obj.event;
 
             if (layEvent === 'edit') {
+                debugger;
                 $('#pop-div').show();
-                $("#input-name").val('');
+                $("#input-name").addClass("layui-disabled");
+                $("#input-name").attr("disabled", true);
+                $("#input-name").val(data.name);
                 $("#select-category").find("option[name=" + data.category + "]").prop("selected", true);
                 layui.form.render();
 

@@ -79,6 +79,7 @@ public class TagServiceImpl implements TagService {
         tagBindingDao.deleteByTagId(tagDto.getId());
 
         MyTag tag = new MyTag();
+        tag.setId(tagDto.getId());
         tag.setName(tagDto.getName());
         tag.setCategory(TagCategoryEnum.of(Integer.valueOf(tagDto.getCategory())).getName());
         if (StringUtils.isBlank(tagDto.getEntityIds())) {
@@ -86,6 +87,7 @@ public class TagServiceImpl implements TagService {
         } else {
             tag.setItems(Long.valueOf(tagDto.getEntityIds().split(",").length));
         }
+        tag.setStatus(1);
         tagDao.save(tag);
 
         saveTagBinding(tagDto, tag);

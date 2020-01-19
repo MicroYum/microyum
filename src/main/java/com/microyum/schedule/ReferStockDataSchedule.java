@@ -174,15 +174,18 @@ public class ReferStockDataSchedule {
             return;
         }
 
-        log.info("开始补齐当天的后复权数据...");
-
+        Process proc;
         try {
-            Runtime.getRuntime().exec(repairLatestScript);
+            log.info("开始补齐当天的后复权数据...");
+            proc = Runtime.getRuntime().exec(repairLatestScript);
+
+            if (proc.waitFor() == 0) {
+                log.info("补齐当天的后复权数据结束.");
+                return;
+            }
         } catch (Exception e) {
             log.error("补齐后复权数据失败, ", e);
             return;
         }
-
-        log.info("补齐当天的后复权数据结束.");
     }
 }
