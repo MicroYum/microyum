@@ -281,11 +281,31 @@ public class StockServiceImpl implements StockService {
                 if (dailyStrategy != null) {
                     dailyStrategyDao.save(dailyStrategy);
                 }
-
             }
             log.info(DateUtils.formatDate(calDate, DateUtils.DATE_FORMAT) + " end .");
 
             calDate = DateUtils.addDays(calDate, 1);
+        }
+
+        return new BaseResponseDTO(HttpStatus.OK);
+    }
+
+    @Override
+    public BaseResponseDTO removeRepeatStrategyData() {
+
+        List<MyStockBase> stockBases = stockBaseDao.findAll();
+
+        for (MyStockBase stockBase : stockBases) {
+
+            List<MyStockDailyStrategy> strategyList = dailyStrategyDao.findByStock(stockBase.getArea(), stockBase.getStockCode());
+
+            for (MyStockDailyStrategy strategy : strategyList) {
+
+                List<MyStockDailyStrategy> strategys = dailyStrategyDao.findByStockAndTradeDate(strategy.getArea(), strategy.getStockCode(), DateUtils.formatDate(strategy.getTradeDate(), DateUtils.DATE_FORMAT));
+                if (strategys.size() > 1) {
+                    dailyStrategyDao.deleteById(strategy.getId());
+                }
+            }
         }
 
         return new BaseResponseDTO(HttpStatus.OK);

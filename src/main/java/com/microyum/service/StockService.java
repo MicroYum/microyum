@@ -27,4 +27,6 @@ public interface StockService {
     BaseResponseDTO referEntityList(Integer type);
 
     BaseResponseDTO makeupStrategy(String date);
+
+    BaseResponseDTO removeRepeatStrategyData();
 }

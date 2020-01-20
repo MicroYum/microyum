@@ -6,6 +6,7 @@ import com.microyum.common.util.PinYinUtils;
 import com.microyum.dto.CalculateStockTransactionCostDto;
 import com.microyum.dto.StockBaseDto;
 import com.microyum.model.stock.MyStockBase;
+import com.microyum.service.RepairService;
 import com.microyum.service.StockService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,11 +20,14 @@ public class StockController {
 
     @Autowired
     private StockService stockService;
+    @Autowired
+    private RepairService repairService;
 
     /**
      * 获取股票的基本信息
      *
-     * @param id
+     * @param area
+     * @param code
      * @param request
      * @return
      */
@@ -87,5 +91,16 @@ public class StockController {
     @RequestMapping(value = "/public/hanzi/initials", produces = "application/json")
     public BaseResponseDTO getHanziInitials(String hanzi) {
         return new BaseResponseDTO(HttpStatus.OK, PinYinUtils.getHanziInitials(hanzi));
+    }
+
+    @RequestMapping(value = "/public/repair/chg/percent", produces = "application/json")
+    public BaseResponseDTO repairChgAndPercent() {
+        repairService.repairChgAndPercent();
+        return new BaseResponseDTO(HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/public/remove/repeat/strategy", produces = "application/json")
+    public BaseResponseDTO removeRepeatStrategyData() {
+        return  stockService.removeRepeatStrategyData();
     }
 }
