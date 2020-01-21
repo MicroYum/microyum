@@ -120,7 +120,7 @@ public class MyStockJdbcDao {
         }
 
         builder.append(" order by ");
-        builder.append("    s.strategy asc, b.list_sort asc, s.price_rate asc, s.volume_rate desc ");
+        builder.append("    s.strategy asc, s.price_rate asc, s.volume_rate desc, b.daily_date asc, b.list_sort asc ");
         builder.append("    limit :start, :pageSize ");
 
         List<StockBaseListDto> stockBaseList = namedParameterJdbcTemplate.query(builder.toString(), parameters, (rs, rowNum) -> {
