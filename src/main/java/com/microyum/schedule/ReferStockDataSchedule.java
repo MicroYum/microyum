@@ -112,7 +112,7 @@ public class ReferStockDataSchedule {
 
                 for (String line : result.split("\n")) {
 
-                    String stockCode = line.substring(11, 18);
+                    String stockCode = line.substring(11, 19);
 
                     // 解析响应内容
                     Map<String, String> mapStack = StockUtils.parseSinaStock(stockCode.substring(2), line);
