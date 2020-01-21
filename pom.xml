@@ -11,7 +11,7 @@
     <groupId>com.microyum</groupId>
     <artifactId>microyum</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>MicroYum</name>
+    <name>microyum</name>
     <description>micro yum project for Spring Boot</description>
 
     <properties>
@@ -139,6 +139,13 @@
     </dependencies>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+        <finalName>${project.name}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
