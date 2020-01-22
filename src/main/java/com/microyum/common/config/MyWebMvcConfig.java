@@ -1,4 +1,4 @@
-package com.microyum.config;
+package com.microyum.common.config;
 
 import com.microyum.common.Constants;
 import org.springframework.context.annotation.Configuration;

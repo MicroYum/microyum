@@ -1,4 +1,4 @@
-package com.microyum.filter;
+package com.microyum.common.filter;
 
 import com.microyum.model.common.MyUser;
 import com.microyum.service.UserService;

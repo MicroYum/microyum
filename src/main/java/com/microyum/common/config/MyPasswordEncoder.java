@@ -1,4 +1,4 @@
-package com.microyum.config;
+package com.microyum.common.config;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 

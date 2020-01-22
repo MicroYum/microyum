@@ -1,4 +1,4 @@
-package com.microyum.config;
+package com.microyum.common.config;
 
 import com.alibaba.fastjson.JSON;
 import com.microyum.common.http.BaseResponseDTO;
