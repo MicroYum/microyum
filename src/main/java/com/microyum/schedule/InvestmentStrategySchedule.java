@@ -64,9 +64,13 @@ public class InvestmentStrategySchedule {
 
         for (MyStockBase stockBase : listStock) {
 
-            MyStockDailyStrategy dailyStrategy = stockStrategy.calcStockValueRange(stockBase);
-            if (dailyStrategy != null) {
-                dailyStrategyDao.save(dailyStrategy);
+            try {
+                MyStockDailyStrategy dailyStrategy = stockStrategy.calcStockValueRange(stockBase);
+                if (dailyStrategy != null) {
+                    dailyStrategyDao.save(dailyStrategy);
+                }
+            } catch (Exception e) {
+                log.error("计算价值区间出错", stockBase.getStockCode());
             }
         }
     }

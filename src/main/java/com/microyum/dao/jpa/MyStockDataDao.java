@@ -14,6 +14,4 @@ public interface MyStockDataDao extends JpaRepository<MyStockData, Long> {
 
     @Query(value = "select * from my_stock_data where area = ?1 and stock_code = ?2 order by trade_date", nativeQuery = true)
     List<MyStockData> findByAreaAndStockCode(String area, String stockCode);
-
-    List<MyStockData> findByAreaAndStockCodeAndTradeDate(String area, String stockCode, Date tradeDate);
 }

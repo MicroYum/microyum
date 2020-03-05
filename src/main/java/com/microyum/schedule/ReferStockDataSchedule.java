@@ -117,9 +117,8 @@ public class ReferStockDataSchedule {
                     // 解析响应内容
                     Map<String, String> mapStack = StockUtils.parseSinaStock(stockCode.substring(2), line);
 
-                    // TODO 此处的判断，只是假设，可能会有错误，需要特别注意
-                    // 日期不相同的场合，说明可能今天停市，或者股票停牌
-                    if (!DateUtils.isSameDay(DateUtils.parseDate(mapStack.get("tradeDate"), DateUtils.DATE_FORMAT), new Date())) {
+                    // 股票停牌
+                    if (new BigDecimal(mapStack.get("open")).equals(BigDecimal.ZERO)) {
                         return;
                     }
 
