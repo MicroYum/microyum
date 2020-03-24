@@ -40,6 +40,12 @@ public class TagController {
         return tagService.tagOverview(page, limit, name);
     }
 
+    @GetMapping(value = "/tag/{id}/entity/list")
+    public BaseResponseDTO findEntityByTagId(@PathVariable("id") Long id) {
+
+        return tagService.findEntityByTagId(id);
+    }
+
     /**
      * Tag 绑定
      * @return

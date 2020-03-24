@@ -59,13 +59,13 @@ public class ReferStockDataSchedule {
         Calendar calendar = Calendar.getInstance();
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         if (!((hour >= 9 && hour <= 11) || (hour >= 13 && hour <= 15))) {
-            log.info("现在是：" + hour + "点，股市还未开盘");
+            log.debug("现在是：" + hour + "点，股市还未开盘");
             return;
         }
 
         int minute = calendar.get(Calendar.MINUTE);
         if ((hour == 9 && minute < 30) || (hour == 11 && minute > 30) || (hour == 13 && minute < 1) || (hour == 15 && minute > 1)) {
-            log.info("现在是：" + hour + "点" + minute + "分，股市还未开盘");
+            log.debug("现在是：" + hour + "点" + minute + "分，股市还未开盘");
             return;
         }
 

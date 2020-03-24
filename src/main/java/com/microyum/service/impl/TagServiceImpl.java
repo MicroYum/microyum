@@ -138,6 +138,13 @@ public class TagServiceImpl implements TagService {
         return new BaseResponseDTO(HttpStatus.OK);
     }
 
+    @Override
+    public BaseResponseDTO findEntityByTagId(Long id) {
+
+        List<String> tagNames = tagJdbcDao.findEntityNameByTagId(id);
+        return new BaseResponseDTO(HttpStatus.OK, tagNames);
+    }
+
     private void saveTagBinding(TagDto tagDto, MyTag tag) {
 
         if (StringUtils.isBlank(tagDto.getEntityIds()) || tagDto.getEntityIds().split(",").length == 0) {

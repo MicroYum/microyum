@@ -4,6 +4,7 @@ import com.microyum.common.util.DateUtils;
 import com.microyum.common.util.StringUtils;
 import com.microyum.dto.TagDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -15,6 +16,8 @@ public class MyTagJdbcDao {
 
     @Autowired
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     public List<TagDto> findByTagNamePaging(int start, int limit) {
         return this.findByTagNamePaging(start, limit, null);
@@ -52,6 +55,14 @@ public class MyTagJdbcDao {
         }
 
         return namedParameterJdbcTemplate.queryForObject(this.findTagInfoSql(name, true), parameters, Long.class);
+    }
+
+    public List<String> findEntityNameByTagId(Long id) {
+
+        String sql = "select b.stock_name from my_tag t, my_tag_binding tb, my_stock_base b " +
+                "where t.id = tb.tag_id and tb.entity_id = b.id and t.id = ?";
+
+        return jdbcTemplate.queryForList(sql, new Object[]{id}, String.class);
     }
 
     private String findTagInfoSql(String name, boolean isCount) {

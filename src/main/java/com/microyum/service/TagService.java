@@ -17,4 +17,6 @@ public interface TagService {
     BaseResponseDTO tagBinding(TagBindingDto dto);
 
     BaseResponseDTO tagUnbinding(TagBindingDto dto);
+
+    BaseResponseDTO findEntityByTagId(Long id);
 }
