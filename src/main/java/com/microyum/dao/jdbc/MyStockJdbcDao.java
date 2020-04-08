@@ -9,7 +9,6 @@ import com.microyum.dto.StockBaseListDto;
 import com.microyum.dto.StockLatestDataDto;
 import com.microyum.model.stock.MyStockBase;
 import com.microyum.model.stock.MyStockData;
-import com.microyum.model.stock.MyStockDataDetail;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -325,23 +323,6 @@ public class MyStockJdbcDao {
         }
 
         return list.get(0);
-    }
-
-    public List<MyStockDataDetail> referStockTradeDayDetail(String stockCode, String tradeDate) {
-
-        String sql = "select * from my_stock_data_detail where stock_code = ? and date_format(trade_datetime, '%Y-%m-%d') = ?";
-
-        List<MyStockDataDetail> list = jdbcTemplate.query(sql, new Object[]{stockCode, tradeDate}, (rs, rowNum) -> {
-            MyStockDataDetail detail = new MyStockDataDetail();
-            detail.setStockCode(rs.getString("stock_code"));
-            detail.setTradeDatetime(rs.getDate("trade_date_time"));
-            detail.setCurrent(rs.getBigDecimal("current"));
-            detail.setTradeCount(rs.getBigDecimal("trade_count"));
-            detail.setTradeAmount(rs.getBigDecimal("trade_amount"));
-            return detail;
-        });
-
-        return list;
     }
 
     public List<BuyingStockBO> referBuyingStock() {

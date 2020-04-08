@@ -6,10 +6,8 @@ import com.microyum.common.util.DateUtils;
 import com.microyum.common.util.StockUtils;
 import com.microyum.dao.jdbc.MyStockJdbcDao;
 import com.microyum.dao.jpa.MyStockDataDao;
-import com.microyum.dao.jpa.MyStockDataDetailDao;
 import com.microyum.model.stock.MyStockBase;
 import com.microyum.model.stock.MyStockData;
-import com.microyum.model.stock.MyStockDataDetail;
 import com.microyum.strategy.StockStrategy;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
@@ -27,7 +25,6 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 

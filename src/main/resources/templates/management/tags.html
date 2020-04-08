@@ -74,7 +74,7 @@
             {field: 'id', title: 'id', hide: true},
             {field: 'name', title: 'Name', width: 180},
             {field: 'category', title: 'Category', width: 200},
-            {field: 'items', title: 'Items', width: 200},
+            {field: 'items', title: 'Items', width: 200, event: 'showEntity'},
             {field: 'lastUpdateTime', title: 'Last Update Time', width: 200},
             {fixed: 'right', width: 220, align: 'center', toolbar: '#toolbar'}
         ];
@@ -215,6 +215,25 @@
                             tableObj.reload();
                         } else {
                             layer.alert("Delete failed.");
+                            console.log(result.msg)
+                        }
+                        layer.close(loading);
+                    });
+                });
+            } else if (layEvent == 'showEntity') {
+                layer.prompt({
+                    formType: 2,
+                    value: '',
+                    title: '['+ data.name +']绑定的Entity'
+                }, function(value, index){
+                    layer.close(index);
+                    var loading = layer.load(1);
+
+                    $.get("/tag/" + data.id + "/entity/list", {}, function (result) {
+                        if (result.code == 200) {
+                            alert(result.data);
+                        } else {
+                            layer.alert("Failed to get the bound entity of tag.");
                             console.log(result.msg)
                         }
                         layer.close(loading);
