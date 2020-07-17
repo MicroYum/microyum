@@ -42,6 +42,7 @@ public class TagController {
 
     /**
      * Tag 绑定
+     *
      * @return
      */
     @PostMapping(value = "/tag/binding")
@@ -52,10 +53,16 @@ public class TagController {
 
     /**
      * Tag解绑
+     *
      * @return
      */
     @PostMapping(value = "/tag/unbinding")
     public BaseResponseDTO tagUnbinding(TagBindingDto dto) {
         return tagService.tagUnbinding(dto);
+    }
+
+    @GetMapping(value = "/tag/{tagId}/stocks")
+    public BaseResponseDTO getStockListByTag(@PathVariable("tagId") Long tagId) {
+        return null;
     }
 }
