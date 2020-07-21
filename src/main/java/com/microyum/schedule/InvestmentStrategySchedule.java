@@ -224,7 +224,7 @@ public class InvestmentStrategySchedule {
      * 低成交量、正常成交量、高成交量
      * 成交量比例高低，从数据库中获取比较
      */
-    // @Scheduled(cron = "0 0 16 * * ? ")
+    @Scheduled(cron = "0 0 16 * * ? ")
     public void calcTurnoverRate() {
 
         if (!stockStrategy.isTradingDay()) {
@@ -308,6 +308,7 @@ public class InvestmentStrategySchedule {
         }
     }
 
+    @Scheduled(cron = "0 0 0 0 1 ? ")
     public void initTurnoverRate() {
 
         List<MyStockBase> stockBaseList = stockJdbcDao.getObservedList();
