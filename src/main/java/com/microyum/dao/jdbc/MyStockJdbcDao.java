@@ -10,7 +10,9 @@ import com.microyum.dto.StockLatestDataDto;
 import com.microyum.model.stock.MyStockBase;
 import com.microyum.model.stock.MyStockData;
 import com.microyum.model.stock.MyStockDataDetail;
+import com.microyum.model.stock.MyStockTurnoverStrategy;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -18,7 +20,6 @@ import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -147,20 +148,37 @@ public class MyStockJdbcDao {
         return stockBaseList;
     }
 
-    // 获取已列入观察的股票清单
+    public MyStockBase findStockBaseById(String area, String stockCode) {
+        String sql = "select * from `my_stock_base` where `area` = :area and `stock_code` = :stockCode";
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        parameters.addValue("area", area);
+        parameters.addValue("stockCode", stockCode);
+
+        List<MyStockBase> stocks = namedParameterJdbcTemplate.query(sql, parameters, new BeanPropertyRowMapper(MyStockBase.class));
+        if (stocks.size() != 1) {
+            return null;
+        }
+
+        return stocks.get(0);
+    }
+
+    /**
+     * 获取已列入观察的股票清单
+     *
+     * @return
+     */
     public List<MyStockBase> getObservedList() {
 
         String sql = "select * from `my_stock_base` where `observe` = true";
 
-        return jdbcTemplate.query(sql, new Object[]{}, (rs, rowNum) -> {
-            MyStockBase stockBase = new MyStockBase();
-            stockBase.setStockCode(rs.getString("stock_code"));
-            stockBase.setArea(rs.getString("area"));
-            return stockBase;
-        });
+        return jdbcTemplate.query(sql, new Object[]{}, new BeanPropertyRowMapper(MyStockBase.class));
     }
 
-    // 获取已列入观察的股票清单
+    /**
+     * 获取已列入观察的股票清单
+     *
+     * @return
+     */
     public List<MyStockBase> getObservedListNotIndex() {
 
         String sql = "select * from `my_stock_base` where `observe` = true and `listing_date` is not null";
@@ -298,11 +316,11 @@ public class MyStockJdbcDao {
         return list;
     }
 
-    public MyStockData selectTradeDateStock(String stockCode, String area, Date tradeDate) {
+    public MyStockData selectTradeDateStock(String area, String stockCode, Date tradeDate) {
 
         String sql = "select * from my_stock_data where stock_code = ? and area = ? and trade_date = ?";
 
-        List<MyStockData> list = jdbcTemplate.query(sql, new Object[]{stockCode, area, tradeDate}, (rs, rowNum) -> {
+        List<MyStockData> list = jdbcTemplate.query(sql, new Object[]{stockCode, area, DateUtils.formatDate(tradeDate, DateUtils.DATE_FORMAT)}, (rs, rowNum) -> {
             MyStockData stockData = new MyStockData();
             stockData.setId(rs.getLong("id"));
             stockData.setStockCode(rs.getString("stock_code"));
@@ -417,5 +435,56 @@ public class MyStockJdbcDao {
             map.put("strategy", rs.getString("strategy"));
             return map;
         });
+    }
+
+    public List<MyStockTurnoverStrategy> findAllTurnoverStrategy() {
+
+        String sql = "select * from my_stock_turnover_strategy";
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+
+        return namedParameterJdbcTemplate.query(sql, parameters, new BeanPropertyRowMapper(MyStockTurnoverStrategy.class));
+    }
+
+    public MyStockTurnoverStrategy findTurnoverStrategByStockCode(MyStockTurnoverStrategy strategy) {
+        String sql = "select * from my_stock_turnover_strategy where area = :area and stock_code = :stockCode";
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        parameters.addValue("area", strategy.getArea());
+        parameters.addValue("stockCode", strategy.getStockCode());
+
+        List<MyStockTurnoverStrategy> strategies = namedParameterJdbcTemplate.query(sql, parameters, new BeanPropertyRowMapper(MyStockBase.class));
+        if (strategies.size() == 0) {
+            return null;
+        }
+
+        return strategies.get(0);
+
+    }
+
+    public void saveTurnoverRate(MyStockTurnoverStrategy strategy) {
+
+        String sql = "insert into my_stock_turnover_strategy(`area`, `stock_code`, `lower_turnover`, `higher_turnover`, `date_range`) " +
+                "values (:area, :stockCode, :lowerTurnover, :higherTurnover, :dateRange)";
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        parameters.addValue("area", strategy.getArea());
+        parameters.addValue("stockCode", strategy.getStockCode());
+        parameters.addValue("lowerTurnover", strategy.getLowerTurnover());
+        parameters.addValue("higherTurnover", strategy.getHigherTurnover());
+        parameters.addValue("dateRange", strategy.getDateRange());
+
+        namedParameterJdbcTemplate.update(sql, parameters);
+    }
+
+    public void updateTurnoverRate(MyStockTurnoverStrategy strategy) {
+
+        String sql = "update my_stock_turnover_strategy set `lower_turnover` = :lowerTurnover, `higher_turnover` = :higherTurnover, " +
+                "`last_update_time` = now() where area = :area and stock_code = :stockCode ";
+
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        parameters.addValue("area", strategy.getArea());
+        parameters.addValue("stockCode", strategy.getStockCode());
+        parameters.addValue("lowerTurnover", strategy.getLowerTurnover());
+        parameters.addValue("higherTurnover", strategy.getHigherTurnover());
+
+        namedParameterJdbcTemplate.update(sql, parameters);
     }
 }

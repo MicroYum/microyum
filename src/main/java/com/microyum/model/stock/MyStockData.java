@@ -14,28 +14,49 @@ import java.util.Date;
 @Entity
 public class MyStockData extends BaseModel {
 
-    // 股票代码
+    /**
+     * 股票代码
+     */
     private String stockCode;
     private String area;
-    // 交易日
+
+    /**
+     * 交易日
+     */
     private Date tradeDate;
 
-    // 开盘价
+    /**
+     * 开盘价
+     */
     private BigDecimal open;
-    // 收盘价
+    /**
+     * 收盘价
+     */
     private BigDecimal close;
-    // 最高价
+    /**
+     * 最高价
+     */
     private  BigDecimal high;
-    // 最低价
+    /**
+     * 最低价
+     */
     private BigDecimal low;
 
-    // 涨跌幅(%)
+    /**
+     * 涨跌幅(%)
+     */
     private BigDecimal percent;
-    // 涨跌额
+    /**
+     * 涨跌额
+     */
     private BigDecimal chg;
 
-    // 成交数量(以股为单位)
+    /**
+     * 成交数量(以股为单位)
+     */
     private BigDecimal tradeCount;
-    // 成交金额(以元为单位)
+    /**
+     * 成交金额(以元为单位)
+     */
     private BigDecimal tradeAmount;
 }

@@ -56,4 +56,16 @@ public class ScheduleController {
         investmentStrategySchedule.personalValueInterval();
         return new BaseResponseDTO(HttpStatus.OK);
     }
+
+    @RequestMapping(value = "/public/schedule/turnover/rate")
+    public BaseResponseDTO calcTurnoverRate() {
+        investmentStrategySchedule.calcTurnoverRate();
+        return new BaseResponseDTO(HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/public/schedule/init/turnover/rate")
+    public BaseResponseDTO initTurnoverRate() {
+        investmentStrategySchedule.initTurnoverRate();
+        return new BaseResponseDTO(HttpStatus.OK);
+    }
 }

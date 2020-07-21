@@ -14,31 +14,57 @@ import java.util.Date;
 @Entity
 public class MyStockBase extends BaseModel {
 
-    // 股票代码
+    /**
+     * 股票代码
+     */
     private String stockCode;
-    // 股票名字
+    /**
+     * 股票名字
+     */
     private String stockName;
-    // 汉字的首字母
+    /**
+     * 汉字的首字母
+     */
     private String initials;
-    // 地域（SH表示上海，SZ表示深圳）
+    /**
+     * 地域（SH表示上海，SZ表示深圳）
+     */
     private String area;
-    // 上市日期
+    /**
+     * 上市日期
+     */
     private Date listingDate;
-    // 总股本(亿)
+    /**
+     * 总股本(亿)
+     */
     private Double totalCapital;
-    // 流通股本(亿)
+    /**
+     * 流通股本(亿)
+     */
     private Double circulationCapital;
-    // 公司簡介
+    /**
+     * 公司簡介
+     */
     @Column(nullable = false, columnDefinition = "TEXT")
     private String introduction;
-    // 列表排序序号
+    /**
+     * 列表排序序号
+     */
     private String listSort;
-    // 是否列入观察
+    /**
+     * 是否列入观察
+     */
     private Byte observe;
-    // 日数据开始日期
+    /**
+     * 日数据开始日期
+     */
     private Date dailyDate;
-    // 明细数据开始日期
+    /**
+     * 明细数据开始日期
+     */
     private Date detailDate;
-    // 类型(1:股票; 2:可转债; 3:国债; 4:企业债;)
+    /**
+     * 类型(1:股票; 2:可转债; 3:国债; 4:企业债;)
+     */
     private String type;
 }

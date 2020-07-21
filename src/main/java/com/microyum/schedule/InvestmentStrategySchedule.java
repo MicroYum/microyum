@@ -7,6 +7,7 @@ import com.microyum.common.Constants;
 import com.microyum.common.enums.StockStrategyEnum;
 import com.microyum.common.util.DateUtils;
 import com.microyum.common.util.MailUtils;
+import com.microyum.common.util.StringUtils;
 import com.microyum.dao.jdbc.MyFinanceJdbcDao;
 import com.microyum.dao.jdbc.MyMailJdbcDao;
 import com.microyum.dao.jdbc.MyStockJdbcDao;
@@ -18,15 +19,17 @@ import com.microyum.model.common.MyMailTemplate;
 import com.microyum.model.stock.MyStockBase;
 import com.microyum.model.stock.MyStockDailyStrategy;
 import com.microyum.model.common.MyUser;
+import com.microyum.model.stock.MyStockData;
+import com.microyum.model.stock.MyStockTurnoverStrategy;
 import com.microyum.strategy.StockStrategy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.Calendar;
-import java.util.List;
-import java.util.Map;
+import java.math.BigDecimal;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 投资策略定时任务
@@ -216,4 +219,137 @@ public class InvestmentStrategySchedule {
          */
     }
 
+    /**
+     * 遍历所有的股票，判断成交量(忽略指数)
+     * 低成交量、正常成交量、高成交量
+     * 成交量比例高低，从数据库中获取比较
+     */
+    // @Scheduled(cron = "0 0 16 * * ? ")
+    public void calcTurnoverRate() {
+
+        if (!stockStrategy.isTradingDay()) {
+            return;
+        }
+
+        MyMailTemplate mailTableTemplate = mailDao.findTemplateByName(Constants.MAIL_NAME_TURNOVER_STOCK_TABLE);
+        List<MyStockTurnoverStrategy> strategies = stockJdbcDao.findAllTurnoverStrategy();
+        StringBuilder lowerBuilder = new StringBuilder();
+        StringBuilder higherBuilder = new StringBuilder();
+        for (MyStockTurnoverStrategy strategy : strategies) {
+
+            // 获取成交量
+            MyStockData stockData = stockJdbcDao.selectTradeDateStock(strategy.getArea(), strategy.getStockCode(), new Date());
+            BigDecimal tradeCount = stockData.getTradeCount();
+
+            if (tradeCount.compareTo(BigDecimal.ZERO) == 0) {
+                continue;
+            }
+
+            MyStockBase stockBase = stockJdbcDao.findStockBaseById(strategy.getArea(), strategy.getStockCode());
+            // 流通股数(亿)
+            BigDecimal circulation = BigDecimal.valueOf(stockBase.getCirculationCapital()).multiply(new BigDecimal("100000000"));
+
+            BigDecimal turnoverRate = tradeCount.multiply(new BigDecimal("100")).divide(circulation, 2, BigDecimal.ROUND_HALF_EVEN);
+
+            if (turnoverRate.compareTo(BigDecimal.valueOf(strategy.getLowerTurnover())) == -1
+                    || turnoverRate.compareTo(BigDecimal.valueOf(strategy.getLowerTurnover())) == 0) {
+                String mailTable = mailTableTemplate.getMailBody();
+                mailTable = mailTable.replace(":stock_name", stockBase.getStockName());
+                mailTable = mailTable.replace(":turnover_rate", String.valueOf(turnoverRate));
+                mailTable = mailTable.replace(":lower_turnover_rate", String.valueOf(strategy.getLowerTurnover()));
+                mailTable = mailTable.replace(":higher_turnover_rate", String.valueOf(strategy.getHigherTurnover()));
+                mailTable = mailTable.replace(":price", String.valueOf(stockData.getClose()));
+                mailTable = mailTable.replace(":strategy", "买入");
+                lowerBuilder.append(mailTable);
+            } else if (turnoverRate.compareTo(BigDecimal.valueOf(strategy.getHigherTurnover())) == 1
+                    || turnoverRate.compareTo(BigDecimal.valueOf(strategy.getHigherTurnover())) == 0) {
+                String mailTable = mailTableTemplate.getMailBody();
+                mailTable = mailTable.replace(":stock_name", stockBase.getStockName());
+                mailTable = mailTable.replace(":turnover_rate", String.valueOf(turnoverRate));
+                mailTable = mailTable.replace(":lower_turnover_rate", String.valueOf(strategy.getLowerTurnover()));
+                mailTable = mailTable.replace(":higher_turnover_rate", String.valueOf(strategy.getHigherTurnover()));
+                mailTable = mailTable.replace(":price", String.valueOf(stockData.getClose()));
+                mailTable = mailTable.replace(":strategy", "卖出");
+                higherBuilder.append(mailTable);
+            }
+
+            // 计算下修底部换手率或提升顶部换手率
+//            String startDate = DateUtils.formatDate(DateUtils.addDays(new Date(), strategy.getDateRange()), DateUtils.DATE_FORMAT);
+//            String endDate = DateUtils.formatDate(new Date(), DateUtils.DATE_FORMAT);
+//            stockJdbcDao.referStockData(strategy.getArea(), strategy.getStockCode(), startDate, endDate);
+        }
+
+        if (lowerBuilder.length() != 0) {
+            MyMailTemplate mailTemplate = mailDao.findTemplateByName(Constants.MAIL_NAME_TURNOVER_STOCK);
+            String mailBody = mailTemplate.getMailBody();
+            mailBody = mailBody.replace(":table_content", lowerBuilder.toString());
+
+            // 发送邮件给管理员
+            MyUser user = userDao.findByUId(1L);
+            try {
+                MailUtils.sendMail("换手率提示邮件 - 买入", user.getEmail(), user.getNickName(), mailBody);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (higherBuilder.length() != 0) {
+            MyMailTemplate mailTemplate = mailDao.findTemplateByName(Constants.MAIL_NAME_TURNOVER_STOCK);
+            String mailBody = mailTemplate.getMailBody();
+            mailBody = mailBody.replace(":table_content", higherBuilder.toString());
+
+            // 发送邮件给管理员
+            MyUser user = userDao.findByUId(1L);
+            try {
+                MailUtils.sendMail("换手率提示邮件 - 卖出", user.getEmail(), user.getNickName(), mailBody);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void initTurnoverRate() {
+
+        List<MyStockBase> stockBaseList = stockJdbcDao.getObservedList();
+        for (MyStockBase stockBase : stockBaseList) {
+
+            if (stockBase.getCirculationCapital() == null || stockBase.getTotalCapital() == null) {
+                continue;
+            }
+
+            if (!StringUtils.equals(String.valueOf(stockBase.getCirculationCapital()), String.valueOf(stockBase.getTotalCapital()))) {
+                continue;
+            }
+
+            String startDate = DateUtils.formatDate(DateUtils.addDays(new Date(), -550), DateUtils.DATE_FORMAT);
+            String endDate = DateUtils.formatDate(new Date(), DateUtils.DATE_FORMAT);
+            List<MyStockData> stockDataList = stockJdbcDao.referStockData(stockBase.getArea(), stockBase.getStockCode(), startDate, endDate);
+
+            List<BigDecimal> turnoverList = stockDataList.stream().map(MyStockData::getTradeCount).collect(Collectors.toList());
+            Collections.sort(turnoverList);
+
+            int size = turnoverList.size();
+            BigDecimal lower = turnoverList.get((int) (size * 0.05));
+            BigDecimal higher = turnoverList.get((int) (size * 0.95));
+
+            BigDecimal circulation = BigDecimal.valueOf(stockBase.getCirculationCapital()).multiply(new BigDecimal("100000000"));
+
+            double lowerRate = lower.multiply(new BigDecimal("100")).divide(circulation, 2, BigDecimal.ROUND_HALF_EVEN).doubleValue();
+            double higherRate = higher.multiply(new BigDecimal("100")).divide(circulation, 2, BigDecimal.ROUND_HALF_EVEN).doubleValue();
+
+            MyStockTurnoverStrategy strategy = new MyStockTurnoverStrategy();
+            strategy.setArea(stockBase.getArea());
+            strategy.setStockCode(stockBase.getStockCode());
+            strategy.setLowerTurnover(lowerRate);
+            strategy.setHigherTurnover(higherRate);
+            strategy.setDateRange(-550);
+
+            MyStockTurnoverStrategy turnoverStrategy = stockJdbcDao.findTurnoverStrategByStockCode(strategy);
+            if (turnoverStrategy == null) {
+                stockJdbcDao.saveTurnoverRate(strategy);
+            } else {
+                stockJdbcDao.updateTurnoverRate(strategy);
+            }
+        }
+    }
 }

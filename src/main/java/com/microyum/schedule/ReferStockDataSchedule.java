@@ -127,7 +127,7 @@ public class ReferStockDataSchedule {
                     stockData.setArea(stockCode.substring(0, 2));
 
                     // insert / update
-                    MyStockData stock = stockJdbcDao.selectTradeDateStock(stockData.getStockCode(), stockData.getArea(), stockData.getTradeDate());
+                    MyStockData stock = stockJdbcDao.selectTradeDateStock( stockData.getArea(), stockData.getStockCode(),stockData.getTradeDate());
                     if (stock != null) {
                         stockData.setId(stock.getId());
                     }
