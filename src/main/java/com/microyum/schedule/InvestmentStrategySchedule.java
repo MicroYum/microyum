@@ -308,7 +308,6 @@ public class InvestmentStrategySchedule {
         }
     }
 
-    @Scheduled(cron = "0 0 0 0 1 ? ")
     public void initTurnoverRate() {
 
         List<MyStockBase> stockBaseList = stockJdbcDao.getObservedList();
