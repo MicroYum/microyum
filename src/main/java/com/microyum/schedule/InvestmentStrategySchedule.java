@@ -308,6 +308,7 @@ public class InvestmentStrategySchedule {
         }
     }
 
+    @Scheduled(cron = "0 0 20 1,10,20 * ? ")
     public void initTurnoverRate() {
 
         List<MyStockBase> stockBaseList = stockJdbcDao.getObservedList();
@@ -317,7 +318,7 @@ public class InvestmentStrategySchedule {
                 continue;
             }
 
-            if (!StringUtils.equals(String.valueOf(stockBase.getCirculationCapital()), String.valueOf(stockBase.getTotalCapital()))) {
+            if (stockBase.getCirculationCapital() / stockBase.getTotalCapital() < 0.95) {
                 continue;
             }
 

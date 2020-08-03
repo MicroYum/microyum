@@ -451,7 +451,7 @@ public class MyStockJdbcDao {
         parameters.addValue("area", strategy.getArea());
         parameters.addValue("stockCode", strategy.getStockCode());
 
-        List<MyStockTurnoverStrategy> strategies = namedParameterJdbcTemplate.query(sql, parameters, new BeanPropertyRowMapper(MyStockBase.class));
+        List<MyStockTurnoverStrategy> strategies = namedParameterJdbcTemplate.query(sql, parameters, new BeanPropertyRowMapper(MyStockTurnoverStrategy.class));
         if (strategies.size() == 0) {
             return null;
         }

@@ -32,10 +32,14 @@ public class StockUtils {
         result.put("stockCode", stockCode);
         result.put("tradeDate", stock[30]);
         result.put("tradeTime", stock[31]);
-        result.put("open", stock[1]);       // 今日开盘价
-        result.put("close", stock[3]);      // 最近成交价
-        result.put("high", stock[4]);       // 最高成交价
-        result.put("low", stock[5]);        // 最低成交价
+        // 今日开盘价
+        result.put("open", stock[1]);
+        // 最近成交价
+        result.put("close", stock[3]);
+        // 最高成交价
+        result.put("high", stock[4]);
+        // 最低成交价
+        result.put("low", stock[5]);
 
 
         BigDecimal chg = new BigDecimal(stock[3]).subtract(new BigDecimal(stock[2]));

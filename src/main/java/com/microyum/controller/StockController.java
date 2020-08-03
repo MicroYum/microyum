@@ -83,6 +83,11 @@ public class StockController {
         return stockService.referEntityList(type);
     }
 
+    /**
+     * 补策略数据
+     * @param date
+     * @return
+     */
     @RequestMapping(value = "/public/makeup/strategy", produces = "application/json")
     public BaseResponseDTO makeupStrategy(String date) {
         return stockService.makeupStrategy(date);
