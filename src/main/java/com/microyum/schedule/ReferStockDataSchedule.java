@@ -118,7 +118,7 @@ public class ReferStockDataSchedule {
                     Map<String, String> mapStack = StockUtils.parseSinaStock(stockCode.substring(2), line);
 
                     // 交易量为0，说明可能今天停市，或者股票停牌
-                    if ( Integer.parseInt(mapStack.get("tradeCount").trim()) == 0 ) {
+                    if (Long.parseLong(mapStack.get("tradeCount").trim()) == 0) {
                         continue;
                     }
 
@@ -126,7 +126,7 @@ public class ReferStockDataSchedule {
                     stockData.setArea(stockCode.substring(0, 2));
 
                     // insert / update
-                    MyStockData stock = stockJdbcDao.selectTradeDateStock( stockData.getArea(), stockData.getStockCode(),stockData.getTradeDate());
+                    MyStockData stock = stockJdbcDao.selectTradeDateStock(stockData.getArea(), stockData.getStockCode(), stockData.getTradeDate());
                     if (stock != null) {
                         stockData.setId(stock.getId());
                     }
