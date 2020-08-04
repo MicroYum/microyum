@@ -272,11 +272,6 @@ public class InvestmentStrategySchedule {
                 mailTable = mailTable.replace(":strategy", "卖出");
                 higherBuilder.append(mailTable);
             }
-
-            // 计算下修底部换手率或提升顶部换手率
-//            String startDate = DateUtils.formatDate(DateUtils.addDays(new Date(), strategy.getDateRange()), DateUtils.DATE_FORMAT);
-//            String endDate = DateUtils.formatDate(new Date(), DateUtils.DATE_FORMAT);
-//            stockJdbcDao.referStockData(strategy.getArea(), strategy.getStockCode(), startDate, endDate);
         }
 
         if (lowerBuilder.length() != 0) {
