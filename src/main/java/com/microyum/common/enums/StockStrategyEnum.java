@@ -2,6 +2,9 @@ package com.microyum.common.enums;
 
 import com.microyum.common.util.StringUtils;
 
+/**
+ * @author syaka.hong
+ */
 public enum StockStrategyEnum {
 
     STRATEGY_NO_ADVICE(0, "NO ADVICE"),

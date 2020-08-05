@@ -54,7 +54,7 @@ public class InvestmentStrategySchedule {
     /**
      * 交易日15:30开始，计算所有股票的价值区间，保存到MyStockDailyStrategy表
      */
-    @Scheduled(cron = "0 30 15 * * ? ")
+    @Scheduled(cron = "0 45 15 * * ? ")
     public void calcValueRange() {
 
         // 定时任务运行时间每周一到周五
@@ -77,7 +77,7 @@ public class InvestmentStrategySchedule {
     /**
      * 将推荐买入的股票，邮件发送给管理员
      */
-    @Scheduled(cron = "0 45 15 * * ? ")
+    @Scheduled(cron = "0 0 16 * * ? ")
     public void mailBuyingStock() {
 
         // 定时任务运行时间每周一到周五

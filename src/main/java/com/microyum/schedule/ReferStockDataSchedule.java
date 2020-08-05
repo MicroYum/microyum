@@ -33,6 +33,8 @@ import java.util.Map;
 
 /**
  * 获取股票实时数据定时任务
+ *
+ * @author syaka.hong
  */
 @Component
 @Slf4j
@@ -101,7 +103,7 @@ public class ReferStockDataSchedule {
         CloseableHttpClient httpclient = HttpClients.createDefault();
 
         try {
-            // 创建httpget.
+            // 创建httpGet.
             HttpGet httpget = new HttpGet(requestUrl);
             // 执行get请求.
             CloseableHttpResponse response = httpclient.execute(httpget);
@@ -163,9 +165,9 @@ public class ReferStockDataSchedule {
     }
 
     /**
-     * 每天收盘10分钟猴开始补齐后复权数据
+     * 每天收盘10分钟后开始补齐后复权数据
      */
-    @Scheduled(cron = "0 10 15 * * ? ")
+    @Scheduled(cron = "0 05 15 * * ? ")
     public void repairHfqData() {
 
         // 定时任务运行时间每周一到周五

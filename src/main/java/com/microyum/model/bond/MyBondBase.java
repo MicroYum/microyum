@@ -23,6 +23,9 @@ public class MyBondBase extends BaseModel {
      * 债券简称
      */
     private String bondName;
+
+    private String stockCode;
+    private String stockName;
     /**
      * 转股价
      */
@@ -35,6 +38,10 @@ public class MyBondBase extends BaseModel {
      * 强赎触发价
      */
     private BigDecimal qscfj;
+    /**
+     * 上市日
+     */
+    private Date listingDate;
     /**
      * 转股开始日
      */

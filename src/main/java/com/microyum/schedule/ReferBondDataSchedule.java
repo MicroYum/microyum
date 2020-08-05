@@ -29,6 +29,8 @@ import java.util.Map;
 
 /**
  * 获取债券实时数据定时任务
+ *
+ * @author syaka.hong
  */
 @Component
 @Slf4j
@@ -96,7 +98,7 @@ public class ReferBondDataSchedule {
         CloseableHttpClient httpclient = HttpClients.createDefault();
 
         try {
-            // 创建httpget.
+            // 创建httpGet
             HttpGet httpget = new HttpGet(requestUrl);
             // 执行get请求.
             CloseableHttpResponse response = httpclient.execute(httpget);
