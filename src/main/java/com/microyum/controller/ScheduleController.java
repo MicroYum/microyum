@@ -4,6 +4,7 @@ import com.microyum.common.http.BaseResponseDTO;
 import com.microyum.common.http.HttpStatus;
 import com.microyum.schedule.InvestmentStrategySchedule;
 import com.microyum.schedule.ReferStockDataSchedule;
+import com.microyum.service.RepairService;
 import com.microyum.service.StockService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +18,9 @@ public class ScheduleController {
 
     @Autowired
     private StockService stockService;
+
+    @Autowired
+    private RepairService repairService;
 
     @Autowired
     private InvestmentStrategySchedule investmentStrategySchedule;
@@ -66,6 +70,25 @@ public class ScheduleController {
     @RequestMapping(value = "/public/schedule/init/turnover/rate")
     public BaseResponseDTO initTurnoverRate() {
         investmentStrategySchedule.initTurnoverRate();
+        return new BaseResponseDTO(HttpStatus.OK);
+    }
+
+    /**
+     * 补所有的策略数据
+     *
+     * @return
+     */
+    @RequestMapping(value = "/public/schedule/repair/all/strategy")
+    public BaseResponseDTO repairAllStrategyData() {
+
+        repairService.repairAllStrategyData();
+        return new BaseResponseDTO(HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/public/schedule/repair/strategy")
+    public BaseResponseDTO repairStrategyData(String area, String code) {
+
+        repairService.repairStrategyData(area, code);
         return new BaseResponseDTO(HttpStatus.OK);
     }
 }

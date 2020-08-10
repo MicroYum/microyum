@@ -1,10 +1,13 @@
 package com.microyum.strategy;
 
 import com.google.common.collect.Maps;
+import com.microyum.common.cache.DayOffCache;
 import com.microyum.common.enums.StockStrategyEnum;
 import com.microyum.common.util.DateUtils;
+import com.microyum.common.util.StringUtils;
 import com.microyum.dao.jdbc.MyStockJdbcDao;
 import com.microyum.dao.jpa.MyDayOffDao;
+import com.microyum.dao.jpa.MyStockDailyStrategyDao;
 import com.microyum.dto.StockLatestDataDto;
 import com.microyum.model.common.MyDayOff;
 import com.microyum.model.stock.MyStockBase;
@@ -17,8 +20,12 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
+/**
+ * @author syaka.hong
+ */
 @Component
 @Slf4j
 public class StockStrategy {
@@ -26,7 +33,9 @@ public class StockStrategy {
     @Autowired
     private MyStockJdbcDao stockJdbcDao;
     @Autowired
-    private MyDayOffDao dayOffDao;
+    private MyStockDailyStrategyDao strategyDao;
+    @Autowired
+    private DayOffCache dayOffCache;
 
     public MyStockDailyStrategy calcStockValueRange(MyStockBase stockBase) {
 
@@ -100,7 +109,10 @@ public class StockStrategy {
 
     public MyStockDailyStrategy calcStockValueRangeByDate(String area, String stockCode, Date date) {
 
-        Integer tradeCount = stockJdbcDao.countStockDataByCode(area, stockCode, date, null);
+        // 设置交易区间为1200个交易日，大约为5年
+        Date startDate = DateUtils.addDays(date, -1200);
+
+        Integer tradeCount = stockJdbcDao.countStockDataByCode(area, stockCode, startDate, date, null);
         if (tradeCount < 200) {
             return null;
         }
@@ -110,9 +122,15 @@ public class StockStrategy {
         dailyStrategy.setStockCode(stockCode);
         dailyStrategy.setTradeDate(date);
 
-        // 获取所有后复权数据的最高点记录、最低点记录
-        BigDecimal highest = stockJdbcDao.getHighestStock(area, stockCode, date);
-        BigDecimal lowest = stockJdbcDao.getLowestStock(area, stockCode, date);
+        // 获取策略ID
+        MyStockDailyStrategy strategy = strategyDao.findByStockAndTradeDate(area, stockCode, DateUtils.formatDate(date, DateUtils.DATE_FORMAT));
+        if (strategy != null) {
+            dailyStrategy.setId(strategy.getId());
+        }
+
+        // 获取所1200个交易日内的后复权数据的最高点记录、最低点记录
+        BigDecimal highest = stockJdbcDao.getHighestStock(area, stockCode, startDate, date);
+        BigDecimal lowest = stockJdbcDao.getLowestStock(area, stockCode, startDate, date);
 
         // 将数据分为四档：低估5%, 低档15%, 中档60%, 高档15%, 高估5%
         BigDecimal interval = highest.subtract(lowest).divide(BigDecimal.valueOf(20));
@@ -144,12 +162,12 @@ public class StockStrategy {
 
         Map<String, BigDecimal> lowPrice = Maps.newHashMap();
         lowPrice.put("lowPrice", latestStock.getHfqClose());
-        Integer lowPriceDays = stockJdbcDao.countStockDataByCode(area, stockCode, date, lowPrice);
+        Integer lowPriceDays = stockJdbcDao.countStockDataByCode(area, stockCode, startDate, date, lowPrice);
         dailyStrategy.setPriceRate(new BigDecimal(df.format((float) lowPriceDays / dailyStrategy.getTradeCount())));
 
         Map<String, BigDecimal> lowVolume = Maps.newHashMap();
         lowVolume.put("lowVolume", latestStock.getTradeCount());
-        Integer lowVolumeDays = stockJdbcDao.countStockDataByCode(area, stockCode, date, lowVolume);
+        Integer lowVolumeDays = stockJdbcDao.countStockDataByCode(area, stockCode, startDate, date, lowVolume);
         dailyStrategy.setVolumeRate(new BigDecimal(df.format((float) lowVolumeDays / dailyStrategy.getTradeCount())));
 
         if (dailyStrategy.getBuyingMax().compareTo(latestStock.getHfqClose()) == 1) {
@@ -186,10 +204,13 @@ public class StockStrategy {
             return false;
         }
 
-        MyDayOff dayOff = dayOffDao.findByTradeDate(DateUtils.formatDate(date, DateUtils.DATE_FORMAT));
-        if (dayOff != null) {
-            log.debug(DateUtils.formatDate(date, DateUtils.DATE_FORMAT) + ", 国定假日.");
-            return false;
+        List<MyDayOff> dayOffList = dayOffCache.getMyDayOffList();
+        for (MyDayOff dayOff : dayOffList) {
+            if (StringUtils.equals(DateUtils.formatDate(dayOff.getTradeDate(), DateUtils.DATE_FORMAT),
+                    DateUtils.formatDate(date, DateUtils.DATE_FORMAT))) {
+                log.debug(DateUtils.formatDate(date, DateUtils.DATE_FORMAT) + ", 国定假日.");
+                return false;
+            }
         }
 
         return true;

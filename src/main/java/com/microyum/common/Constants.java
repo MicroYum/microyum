@@ -31,5 +31,6 @@ public class Constants {
     public static final String MAIL_NAME_TURNOVER_STOCK = "TURNOVER_STOCK";
     public static final String MAIL_NAME_TURNOVER_STOCK_TABLE = "TURNOVER_STOCK_TABLE";
 
-    public static final String STRATEGY_DEFAULT_DATE = "2019-01-01";
+    public static final String STRATEGY_DEFAULT_DATE = "2012-01-04";
+    public static final String STOCK_DAILY_DEFAULT_DATE = "2010-01-04";
 }

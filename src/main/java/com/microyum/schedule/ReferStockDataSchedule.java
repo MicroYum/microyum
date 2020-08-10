@@ -165,9 +165,9 @@ public class ReferStockDataSchedule {
     }
 
     /**
-     * 每天收盘10分钟后开始补齐后复权数据
+     * 交易日17:30开始补齐后复权数据
      */
-    @Scheduled(cron = "0 05 15 * * ? ")
+    @Scheduled(cron = "0 30 17 * * ? ")
     public void repairHfqData() {
 
         // 定时任务运行时间每周一到周五

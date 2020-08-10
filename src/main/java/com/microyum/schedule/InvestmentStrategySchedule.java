@@ -52,9 +52,9 @@ public class InvestmentStrategySchedule {
     private MyMailJdbcDao mailDao;
 
     /**
-     * 交易日15:30开始，计算所有股票的价值区间，保存到MyStockDailyStrategy表
+     * 交易日18:00开始，计算所有股票的价值区间，保存到MyStockDailyStrategy表
      */
-    @Scheduled(cron = "0 45 15 * * ? ")
+    @Scheduled(cron = "0 0 18 * * ? ")
     public void calcValueRange() {
 
         // 定时任务运行时间每周一到周五
@@ -77,7 +77,7 @@ public class InvestmentStrategySchedule {
     /**
      * 将推荐买入的股票，邮件发送给管理员
      */
-    @Scheduled(cron = "0 0 16 * * ? ")
+    @Scheduled(cron = "0 0 18 * * ? ")
     public void mailBuyingStock() {
 
         // 定时任务运行时间每周一到周五
@@ -118,7 +118,7 @@ public class InvestmentStrategySchedule {
         }
     }
 
-    @Scheduled(cron = "0 0 17 * * ? ")
+    @Scheduled(cron = "0 15 18 * * ? ")
     public void personalValueInterval() {
 
         // 检索Trader Account中已配置的账号
@@ -167,7 +167,7 @@ public class InvestmentStrategySchedule {
                 }
 
                 // 2、匹配MyStockDailyStrategy表，如果条件满足则列入List
-                MyStockDailyStrategy strategy = dailyStrategyDao.findByStockAndTradeDate(String.valueOf(item.get("area")), String.valueOf(item.get("stockCode")), DateUtils.getCurrentDate()).get(0);
+                MyStockDailyStrategy strategy = dailyStrategyDao.findByStockAndTradeDate(String.valueOf(item.get("area")), String.valueOf(item.get("stockCode")), DateUtils.getCurrentDate());
 
                 if (strategy.getStrategy().intValue() == StockStrategyEnum.STRATEGY_BUYING.getCode()) {
                     body.append("股票: <font color='red'><b>").append(item.get("stockName")).append("[").append(strategy.getStockCode()).append("]</b></font>已进入买入区, ");
@@ -224,7 +224,7 @@ public class InvestmentStrategySchedule {
      * 低成交量、正常成交量、高成交量
      * 成交量比例高低，从数据库中获取比较
      */
-    @Scheduled(cron = "0 0 16 * * ? ")
+    @Scheduled(cron = "0 0 18 * * ? ")
     public void calcTurnoverRate() {
 
         if (!stockStrategy.isTradingDay()) {

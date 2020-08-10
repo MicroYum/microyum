@@ -14,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * 认证失败处理器
+ * @author syaka.hong
  */
 public class AuthenticationFailureHandler implements org.springframework.security.web.authentication.AuthenticationFailureHandler {
 

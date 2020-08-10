@@ -4,6 +4,9 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 
+/**
+ * @author syaka.hong
+ */
 @Data
 public class BuyingStockBO {
 

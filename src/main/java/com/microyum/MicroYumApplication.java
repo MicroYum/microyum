@@ -7,10 +7,13 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+/**
+ * @author syaka.hong
+ */
 @EntityScan(basePackages = {"com.microyum.model"})
 @EnableJpaRepositories(basePackages = {"com.microyum.dao.jpa"})
 @SpringBootApplication
-@EnableScheduling
+// @EnableScheduling
 @EnableAsync
 public class MicroYumApplication {
 

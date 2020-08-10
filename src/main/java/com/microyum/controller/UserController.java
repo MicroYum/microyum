@@ -21,6 +21,9 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author syaka.hong
+ */
 @RestController
 public class UserController {
 

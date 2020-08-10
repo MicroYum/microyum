@@ -18,6 +18,9 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * @author syaka.hong
+ */
 @Slf4j
 @Service
 public class RepairServiceImpl implements RepairService {
@@ -30,6 +33,16 @@ public class RepairServiceImpl implements RepairService {
     private StockStrategy stockStrategy;
     @Autowired
     private MyStockDailyStrategyDao dailyStrategyDao;
+
+    @Override
+    public void repairAllStrategyData() {
+
+        List<MyStockBase> stockBaseList = stockBaseDao.findAll();
+
+        for (MyStockBase stockBase: stockBaseList) {
+            this.repairStrategyData(stockBase.getArea(), stockBase.getStockCode());
+        }
+    }
 
     @Override
     public void repairStrategyData(String area, String stockCode) {

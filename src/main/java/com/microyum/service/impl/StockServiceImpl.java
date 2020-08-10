@@ -141,6 +141,7 @@ public class StockServiceImpl implements StockService {
         return new BaseResponseDTO(HttpStatus.OK, dto);
     }
 
+    @Override
     public void repairStockData(String area, String stockCode) {
 
         log.info("开始补齐股票数据...");
@@ -178,29 +179,6 @@ public class StockServiceImpl implements StockService {
 
         MyStockBase entity = new MyStockBase();
         BeanUtils.copyProperties(stockBase, entity);
-
-        // 设置明细数据开始日期
-        // 周六、周日的场合，顺延到周一
-        // 周一到周五，判断如果是9:30之前，则设定为当日，否则就设置为次日
-        Calendar calendar = Calendar.getInstance();
-        int dayWeek = calendar.get(Calendar.DAY_OF_WEEK);
-        if (dayWeek == 1) {
-            entity.setDetailDate(DateUtils.addDays(new Date(), 1));
-        } else if (dayWeek == 7) {
-            entity.setDetailDate(DateUtils.addDays(new Date(), 2));
-        } else {
-            int hour = calendar.get(Calendar.HOUR_OF_DAY);
-            int minute = calendar.get(Calendar.MINUTE);
-
-            // 周五开盘后，设置为下周一
-            if ((dayWeek == 6) && ((hour > 9) || (hour == 9) && minute >= 30)) {
-                entity.setDetailDate(DateUtils.addDays(new Date(), 3));
-            } else if ((hour < 9) || (hour == 9 && minute < 30)) {
-                entity.setDetailDate(new Date());
-            } else {
-                entity.setDetailDate(DateUtils.addDays(new Date(), 1));
-            }
-        }
 
         entity.setListingDate(DateUtils.parseDate(stockBase.getListingDate(), DateUtils.DATE_FORMAT));
         entity.setCirculationCapital(Double.valueOf(stockBase.getCirculationCapital()));
@@ -301,9 +279,9 @@ public class StockServiceImpl implements StockService {
 
             for (MyStockDailyStrategy strategy : strategyList) {
 
-                List<MyStockDailyStrategy> strategys = dailyStrategyDao.findByStockAndTradeDate(strategy.getArea(), strategy.getStockCode(), DateUtils.formatDate(strategy.getTradeDate(), DateUtils.DATE_FORMAT));
-                if (strategys.size() > 1) {
-                    dailyStrategyDao.deleteById(strategy.getId());
+                MyStockDailyStrategy dailyStrategy = dailyStrategyDao.findByStockAndTradeDate(strategy.getArea(), strategy.getStockCode(), DateUtils.formatDate(strategy.getTradeDate(), DateUtils.DATE_FORMAT));
+                if (dailyStrategy != null) {
+                    dailyStrategyDao.deleteById(dailyStrategy.getId());
                 }
             }
         }

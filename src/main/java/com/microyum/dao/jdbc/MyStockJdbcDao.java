@@ -48,14 +48,15 @@ public class MyStockJdbcDao {
         return namedParameterJdbcTemplate.queryForObject(builder.toString(), parameters, Long.class);
     }
 
-    public Integer countStockDataByCode(String area, String stockCode, Date date, Map<String, BigDecimal> map) {
+    public Integer countStockDataByCode(String area, String stockCode, Date start, Date end, Map<String, BigDecimal> map) {
 
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         StringBuilder builder = new StringBuilder();
         builder.append("select count(1) count  from `my_stock_data` where `area` = :area and `stock_code` = :stockCode ");
-        if (date != null) {
-            builder.append(" and `trade_date` <= :tradeDate ");
-            parameters.addValue("tradeDate", DateUtils.formatDate(date, DateUtils.DATE_FORMAT));
+        if (start != null && end != null) {
+            builder.append(" and `trade_date` between :start and :end ");
+            parameters.addValue("start", DateUtils.formatDate(start, DateUtils.DATE_FORMAT));
+            parameters.addValue("end", DateUtils.formatDate(end, DateUtils.DATE_FORMAT));
         }
         parameters.addValue("area", area);
         parameters.addValue("stockCode", stockCode);
@@ -85,7 +86,7 @@ public class MyStockJdbcDao {
 
 
     public Integer countStockDataByCode(String area, String stockCode, Map<String, BigDecimal> map) {
-        return this.countStockDataByCode(area, stockCode, null, map);
+        return this.countStockDataByCode(area, stockCode, null, null, map);
     }
 
     public List<StockBaseListDto> referStockList(int pageNo, int pageSize, String stock) {
@@ -193,10 +194,10 @@ public class MyStockJdbcDao {
     }
 
     public BigDecimal getHighestStock(String area, String stockCode) {
-        return this.getHighestStock(area, stockCode, null);
+        return this.getHighestStock(area, stockCode, null, null);
     }
 
-    public BigDecimal getHighestStock(String area, String stockCode, Date date) {
+    public BigDecimal getHighestStock(String area, String stockCode, Date start, Date end) {
 
         MapSqlParameterSource param = new MapSqlParameterSource();
         StringBuilder builder = new StringBuilder();
@@ -207,19 +208,20 @@ public class MyStockJdbcDao {
         param.addValue("area", area);
         param.addValue("code", stockCode);
 
-        if (date != null) {
-            builder.append(" and t.trade_date < :date ");
-            param.addValue("date", DateUtils.formatDate(date, DateUtils.DATE_FORMAT));
+        if (start != null && end != null) {
+            builder.append(" and t.trade_date between :start and :end ");
+            param.addValue("start", DateUtils.formatDate(start, DateUtils.DATE_FORMAT));
+            param.addValue("end", DateUtils.formatDate(end, DateUtils.DATE_FORMAT));
         }
 
         return namedParameterJdbcTemplate.queryForObject(builder.toString(), param, BigDecimal.class);
     }
 
     public BigDecimal getLowestStock(String area, String stockCode) {
-        return this.getLowestStock(area, stockCode, null);
+        return this.getLowestStock(area, stockCode, null, null);
     }
 
-    public BigDecimal getLowestStock(String area, String stockCode, Date date) {
+    public BigDecimal getLowestStock(String area, String stockCode, Date start, Date end) {
 
         MapSqlParameterSource param = new MapSqlParameterSource();
         StringBuilder builder = new StringBuilder();
@@ -230,9 +232,10 @@ public class MyStockJdbcDao {
         param.addValue("area", area);
         param.addValue("code", stockCode);
 
-        if (date != null) {
-            builder.append(" and t.trade_date < :date ");
-            param.addValue("date", DateUtils.formatDate(date, DateUtils.DATE_FORMAT));
+        if (start != null && end != null) {
+            builder.append(" and t.trade_date between :start and :end ");
+            param.addValue("start", DateUtils.formatDate(start, DateUtils.DATE_FORMAT));
+            param.addValue("end", DateUtils.formatDate(end, DateUtils.DATE_FORMAT));
         }
 
         return namedParameterJdbcTemplate.queryForObject(builder.toString(), param, BigDecimal.class);

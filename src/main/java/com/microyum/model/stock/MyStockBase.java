@@ -9,6 +9,7 @@ import java.util.Date;
 
 /**
  * 基础表
+ * @author syaka.hong
  */
 @Data
 @Entity
@@ -59,10 +60,6 @@ public class MyStockBase extends BaseModel {
      * 日数据开始日期
      */
     private Date dailyDate;
-    /**
-     * 明细数据开始日期
-     */
-    private Date detailDate;
     /**
      * 类型(1:股票; 2:可转债; 3:国债; 4:企业债;)
      */
